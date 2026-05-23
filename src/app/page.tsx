@@ -1,11 +1,6 @@
-import { AnalysisReport } from "@/components/AnalysisReport";
 import { AppSidebar } from "@/components/AppSidebar";
-import { RecentCasesTable } from "@/components/RecentCasesTable";
-import { RedFlagsList } from "@/components/RedFlagsList";
-import { RiskScoreCard } from "@/components/RiskScoreCard";
-import { TicketPreview } from "@/components/TicketPreview";
-import { UploadPanel } from "@/components/UploadPanel";
-import { recentCases, redFlags, statusCards } from "@/lib/claim-data";
+import { ClaimReviewWorkflow } from "@/components/ClaimReviewWorkflow";
+import { statusCards } from "@/lib/claim-data";
 
 export default function Home() {
   return (
@@ -46,28 +41,7 @@ export default function Home() {
             </div>
           </header>
 
-          <div className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)] lg:p-8">
-            <div className="space-y-5">
-              <UploadPanel />
-              <TicketPreview />
-              <AnalysisReport />
-              <RecentCasesTable cases={recentCases} />
-            </div>
-
-            <aside className="space-y-5">
-              <RiskScoreCard score={68} riskLevel="Medium" />
-              <RedFlagsList flags={redFlags} />
-
-              <section className="rounded-lg border border-[#b7e7d0] bg-[#e7f7ef] p-5">
-                <h2 className="text-lg font-semibold text-[#064e3b]">Review guardrails</h2>
-                <div className="mt-4 space-y-3 text-sm leading-6 text-[#065f46]">
-                  <p>Use “Potential alteration detected” only as a review signal.</p>
-                  <p>Prefer “Manual review recommended” when evidence is mixed.</p>
-                  <p>Use “Inconclusive” or “Low confidence” when a signal is not reliable.</p>
-                </div>
-              </section>
-            </aside>
-          </div>
+          <ClaimReviewWorkflow />
         </div>
       </div>
     </main>
