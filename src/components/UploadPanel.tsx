@@ -2,8 +2,6 @@
 
 import { useMemo, useRef, useState, type DragEvent } from "react";
 import {
-  CheckCircle2,
-  Circle,
   FileImage,
   FileText,
   Loader2,
@@ -71,11 +69,7 @@ export function UploadPanel({
           ? "Re-run mock analysis"
           : "Run another review"
         : "Run mock analysis";
-  const steps = [
-    { label: "Upload", active: selectedFile !== null, complete: selectedFile !== null },
-    { label: "Analyze", active: status === "analyzing", complete: status === "complete" },
-    { label: "Report", active: status === "complete", complete: status === "complete" },
-  ];
+  const currentStep = analysisSteps[activeAnalysisStep]?.label ?? "Preparing support-safe mock review";
 
   function handleSelectedFile(file: File | null) {
     onFileSelect(file);
@@ -108,36 +102,12 @@ export function UploadPanel({
     <section className="cg-panel rounded-lg p-4">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#00A7A5]">New case</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#00A7A5]">Evidence upload</p>
           <h2 className="mt-1 text-lg font-semibold text-[#061426]">Upload claim evidence</h2>
         </div>
         <span className="rounded-md border border-[#E4F0F7] bg-[#F8FCFF] px-2.5 py-1 text-xs font-medium text-slate-600">
           Mock analysis
         </span>
-      </div>
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        {steps.map((step, index) => (
-          <div
-            className={`rounded-full border px-2.5 py-1 ${
-              step.active || step.complete
-                ? "border-[#BFEAF4] bg-[#F6FCFF] text-[#061426]"
-                : "border-[#E4F0F7] bg-white text-slate-500"
-            }`}
-            key={step.label}
-          >
-            <div className="flex items-center gap-2 text-xs font-semibold">
-              <span
-                className={`flex size-4 items-center justify-center rounded-full text-[10px] ${
-                  step.complete ? "cg-brand-gradient text-white" : "bg-[#EEF6FA] text-slate-500"
-                }`}
-              >
-                {step.complete ? <CheckCircle2 className="size-3" aria-hidden="true" /> : index + 1}
-              </span>
-              {step.label}
-            </div>
-          </div>
-        ))}
       </div>
 
       <input
@@ -238,59 +208,16 @@ export function UploadPanel({
       ) : null}
 
       {isAnalyzing ? (
-        <div className="mt-4 rounded-lg border border-[#E4F0F7] bg-white p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-slate-900">Mock analysis in progress</p>
-              <p className="mt-1 text-xs text-slate-500">Running local demo checks. No real AI or OCR is connected.</p>
+        <div className="mt-4 rounded-lg border border-[#E4F0F7] bg-white p-3">
+          <div className="flex items-center gap-3">
+            <Loader2 className="size-4 shrink-0 animate-spin text-[#08AEEA]" aria-hidden="true" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-slate-900">Mock review in progress</p>
+              <p className="mt-1 truncate text-xs text-slate-500">{currentStep}</p>
             </div>
-            <span className="rounded-md bg-[#F7FBFF] px-2.5 py-1 text-xs font-semibold text-[#08AEEA] ring-1 ring-[#DDECF5]">
-              Step {Math.min(activeAnalysisStep + 1, analysisSteps.length)} of {analysisSteps.length}
-            </span>
           </div>
-
-          <div className="mt-4 grid gap-3 xl:grid-cols-2">
-            {analysisSteps.map((step, index) => {
-              const isCompleteStep = index < activeAnalysisStep;
-              const isActiveStep = index === activeAnalysisStep;
-
-              return (
-                <div
-                  className={`rounded-lg border p-3 ${
-                    isActiveStep
-                      ? "border-[#BFEAF4] bg-[#F7FBFF]"
-                      : isCompleteStep
-                        ? "border-[#41D66F]/40 bg-[#E9FFF0]"
-                        : "border-[#E4F0F7] bg-[#F7FBFF]"
-                  }`}
-                  key={step.label}
-                >
-                  <div className="flex items-start gap-3">
-                    <span
-                      className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full ${
-                        isCompleteStep
-                          ? "bg-[#41D66F] text-[#020B18]"
-                          : isActiveStep
-                            ? "bg-[#08AEEA] text-white"
-                            : "bg-white text-slate-400 ring-1 ring-[#E4F0F7]"
-                      }`}
-                    >
-                      {isCompleteStep ? (
-                        <CheckCircle2 className="size-3.5" aria-hidden="true" />
-                      ) : isActiveStep ? (
-                        <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
-                      ) : (
-                        <Circle className="size-2.5" aria-hidden="true" />
-                      )}
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">{step.label}</p>
-                      <p className="mt-1 text-xs leading-5 text-slate-600">{step.detail}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#E4F0F7]">
+            <div className="h-full w-2/3 rounded-full cg-brand-gradient" />
           </div>
         </div>
       ) : null}
@@ -316,7 +243,7 @@ export function UploadPanel({
             : status === "uploaded"
               ? `${evidenceLabel} selected. Ready to analyze with local mock checks.`
               : status === "analyzing"
-                ? analysisSteps[activeAnalysisStep]?.label ?? "Checking visible fields and review needs."
+                ? currentStep
                 : "Mock report complete. Use results as review guidance only."}
         </div>
       </div>
