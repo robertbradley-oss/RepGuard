@@ -11,6 +11,7 @@ import {
   UploadCloud,
   X,
 } from "lucide-react";
+import { formatFileSize } from "@/lib/file-format";
 import type { AnalysisStatus, AnalysisStep } from "@/lib/claim-data";
 
 const acceptedTypes = "image/png,image/jpeg,image/webp,application/pdf";
@@ -18,6 +19,7 @@ const acceptedTypes = "image/png,image/jpeg,image/webp,application/pdf";
 type UploadPanelProps = {
   selectedFile: File | null;
   status: AnalysisStatus;
+  hasCompletedReport?: boolean;
   evidenceLabel: string;
   analysisSteps: AnalysisStep[];
   activeAnalysisStep: number;
@@ -29,6 +31,7 @@ type UploadPanelProps = {
 export function UploadPanel({
   selectedFile,
   status,
+  hasCompletedReport = false,
   evidenceLabel,
   analysisSteps,
   activeAnalysisStep,
@@ -43,7 +46,6 @@ export function UploadPanel({
       return null;
     }
 
-    const sizeInMb = selectedFile.size / 1024 / 1024;
     const extension = selectedFile.name.split(".").pop()?.toUpperCase() ?? "File";
     const readableType =
       selectedFile.type === "application/pdf"
@@ -54,13 +56,21 @@ export function UploadPanel({
 
     return {
       name: selectedFile.name,
-      size: `${sizeInMb.toFixed(sizeInMb > 9.9 ? 0 : 1)} MB`,
+      size: formatFileSize(selectedFile.size),
       type: readableType,
     };
   }, [selectedFile]);
 
   const isAnalyzing = status === "analyzing";
   const canAnalyze = Boolean(selectedFile) && !isAnalyzing;
+  const actionLabel =
+    isAnalyzing
+      ? "Analyzing evidence"
+      : status === "complete" || hasCompletedReport
+        ? selectedFile
+          ? "Re-run mock analysis"
+          : "Run another review"
+        : "Run mock analysis";
   const steps = [
     { label: "Upload", active: selectedFile !== null, complete: selectedFile !== null },
     { label: "Analyze", active: status === "analyzing", complete: status === "complete" },
@@ -95,34 +105,34 @@ export function UploadPanel({
   }
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-4">
+    <section className="cg-panel rounded-lg p-4">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#0f766e]">New case</p>
-          <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">Upload claim evidence</h2>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#00A7A5]">New case</p>
+          <h2 className="mt-1 text-lg font-semibold text-[#061426]">Upload claim evidence</h2>
         </div>
-        <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+        <span className="rounded-md border border-[#E4F0F7] bg-[#F8FCFF] px-2.5 py-1 text-xs font-medium text-slate-600">
           Mock analysis
         </span>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap gap-2">
         {steps.map((step, index) => (
           <div
-            className={`rounded-md border px-2.5 py-1.5 ${
+            className={`rounded-full border px-2.5 py-1 ${
               step.active || step.complete
-                ? "border-sky-200 bg-white text-sky-800"
-                : "border-slate-200 bg-white text-slate-500"
+                ? "border-[#BFEAF4] bg-[#F6FCFF] text-[#061426]"
+                : "border-[#E4F0F7] bg-white text-slate-500"
             }`}
             key={step.label}
           >
             <div className="flex items-center gap-2 text-xs font-semibold">
               <span
-                className={`flex size-5 items-center justify-center rounded-full text-[11px] ${
-                  step.complete ? "bg-[#0f766e] text-white" : "bg-slate-100 text-slate-500"
+                className={`flex size-4 items-center justify-center rounded-full text-[10px] ${
+                  step.complete ? "cg-brand-gradient text-white" : "bg-[#EEF6FA] text-slate-500"
                 }`}
               >
-                {step.complete ? <CheckCircle2 className="size-3.5" aria-hidden="true" /> : index + 1}
+                {step.complete ? <CheckCircle2 className="size-3" aria-hidden="true" /> : index + 1}
               </span>
               {step.label}
             </div>
@@ -140,10 +150,10 @@ export function UploadPanel({
       />
 
       <button
-        className={`mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-dashed px-4 py-5 text-left transition ${
+        className={`mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-dashed px-4 py-4 text-left transition ${
           isDragging
-            ? "border-sky-400 bg-sky-50"
-            : "border-slate-300 bg-slate-50 hover:border-sky-300 hover:bg-sky-50/60"
+            ? "border-[#08AEEA] bg-[#F7FBFF]"
+            : "border-[#D5E8F3] bg-[#F8FCFF] hover:border-[#8DDAEB] hover:bg-white"
         } ${isAnalyzing ? "cursor-not-allowed opacity-70" : ""}`}
         type="button"
         disabled={isAnalyzing}
@@ -163,7 +173,7 @@ export function UploadPanel({
         }}
         onDrop={handleDrop}
       >
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-md bg-white text-sky-600 ring-1 ring-slate-200">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-white text-[#08AEEA] ring-1 ring-[#DDECF5]">
           <UploadCloud className="size-6" aria-hidden="true" />
         </span>
         <span>
@@ -177,9 +187,9 @@ export function UploadPanel({
       </button>
 
       {selectedFile && fileMeta ? (
-        <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+        <div className="mt-4 rounded-lg border border-[#E4F0F7] bg-[#F8FCFF] p-3">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-white text-[#0f766e] ring-1 ring-slate-200">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-white text-[#00A7A5] ring-1 ring-[#DDECF5]">
               {selectedFile.type === "application/pdf" ? (
                 <FileText className="size-5" aria-hidden="true" />
               ) : (
@@ -192,8 +202,8 @@ export function UploadPanel({
                 <span
                   className={`rounded-md px-2 py-0.5 text-xs font-semibold ${
                     status === "uploaded"
-                      ? "bg-[#e7f7ef] text-[#0f766e]"
-                      : "bg-white text-slate-600 ring-1 ring-slate-200"
+                      ? "bg-[#E9FFF0] text-[#0B5F2A] ring-1 ring-[#41D66F]/35"
+                      : "bg-white text-slate-600 ring-1 ring-[#E4F0F7]"
                   }`}
                 >
                   {status === "uploaded" ? "Ready to analyze" : status === "complete" ? "Analyzed" : "Selected"}
@@ -205,7 +215,7 @@ export function UploadPanel({
                   { label: "File type", value: fileMeta.type },
                   { label: "File size", value: fileMeta.size },
                 ].map((item) => (
-                  <div className="rounded-md bg-white px-3 py-2 ring-1 ring-slate-200" key={item.label}>
+                  <div className="rounded-md bg-white px-3 py-2 ring-1 ring-[#E4F0F7]" key={item.label}>
                     <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                       {item.label}
                     </dt>
@@ -228,13 +238,13 @@ export function UploadPanel({
       ) : null}
 
       {isAnalyzing ? (
-        <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4">
+        <div className="mt-4 rounded-lg border border-[#E4F0F7] bg-white p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-900">Mock analysis in progress</p>
               <p className="mt-1 text-xs text-slate-500">Running local demo checks. No real AI or OCR is connected.</p>
             </div>
-            <span className="rounded-md bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700">
+            <span className="rounded-md bg-[#F7FBFF] px-2.5 py-1 text-xs font-semibold text-[#08AEEA] ring-1 ring-[#DDECF5]">
               Step {Math.min(activeAnalysisStep + 1, analysisSteps.length)} of {analysisSteps.length}
             </span>
           </div>
@@ -248,10 +258,10 @@ export function UploadPanel({
                 <div
                   className={`rounded-lg border p-3 ${
                     isActiveStep
-                      ? "border-sky-200 bg-sky-50"
+                      ? "border-[#BFEAF4] bg-[#F7FBFF]"
                       : isCompleteStep
-                        ? "border-emerald-200 bg-emerald-50"
-                        : "border-slate-200 bg-slate-50"
+                        ? "border-[#41D66F]/40 bg-[#E9FFF0]"
+                        : "border-[#E4F0F7] bg-[#F7FBFF]"
                   }`}
                   key={step.label}
                 >
@@ -259,10 +269,10 @@ export function UploadPanel({
                     <span
                       className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full ${
                         isCompleteStep
-                          ? "bg-[#0f766e] text-white"
+                          ? "bg-[#41D66F] text-[#020B18]"
                           : isActiveStep
-                            ? "bg-sky-600 text-white"
-                            : "bg-white text-slate-400 ring-1 ring-slate-200"
+                            ? "bg-[#08AEEA] text-white"
+                            : "bg-white text-slate-400 ring-1 ring-[#E4F0F7]"
                       }`}
                     >
                       {isCompleteStep ? (
@@ -287,7 +297,7 @@ export function UploadPanel({
 
       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
         <button
-          className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0b1f3a] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#102b50] disabled:cursor-not-allowed disabled:bg-slate-300"
+          className="cg-primary-button inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed"
           type="button"
           onClick={onRunAnalysis}
           disabled={!canAnalyze}
@@ -297,10 +307,10 @@ export function UploadPanel({
           ) : (
             <Play className="size-4" aria-hidden="true" />
           )}
-          {isAnalyzing ? "Analyzing evidence" : "Run mock analysis"}
+          {actionLabel}
         </button>
 
-        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-600 sm:flex-1">
+        <div className="rounded-md border border-[#E4F0F7] bg-[#F8FCFF] px-3 py-2 text-xs leading-5 text-slate-600 sm:flex-1">
           {status === "idle"
             ? "Select claim evidence to generate a support-safe mock report."
             : status === "uploaded"

@@ -7,6 +7,7 @@ import { RedFlagsList } from "@/components/RedFlagsList";
 import { RiskScoreCard } from "@/components/RiskScoreCard";
 import { TicketPreview } from "@/components/TicketPreview";
 import { UploadPanel } from "@/components/UploadPanel";
+import { formatFileSize } from "@/lib/file-format";
 import {
   mockAnalysisSteps,
   mockAnalysisReports,
@@ -57,13 +58,12 @@ export function ClaimReviewWorkflow() {
       return null;
     }
 
-    const sizeInMb = selectedFile.size / 1024 / 1024;
     const fileDetails =
       selectedFile.type === "application/pdf"
-        ? `PDF document | ${sizeInMb.toFixed(sizeInMb > 9.9 ? 0 : 1)} MB`
+        ? `PDF document | ${formatFileSize(selectedFile.size)}`
         : selectedFile.type.startsWith("image/")
-          ? `Image upload | ${sizeInMb.toFixed(sizeInMb > 9.9 ? 0 : 1)} MB`
-          : `${selectedFile.type || "Local file"} | ${sizeInMb.toFixed(sizeInMb > 9.9 ? 0 : 1)} MB`;
+          ? `Image upload | ${formatFileSize(selectedFile.size)}`
+          : `${selectedFile.type || "Local file"} | ${formatFileSize(selectedFile.size)}`;
 
     return {
       id: "CG-1049",
@@ -150,11 +150,12 @@ export function ClaimReviewWorkflow() {
   }
 
   return (
-    <div className="grid gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.75fr)] lg:p-7">
-      <div className="space-y-4">
+    <div className="grid gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.08fr)_minmax(340px,0.72fr)] lg:p-6">
+      <div className="space-y-5">
         <UploadPanel
           selectedFile={selectedFile}
           status={status}
+          hasCompletedReport={reportStatus === "complete"}
           evidenceLabel={selectedFile ? report.evidenceLabel : "Awaiting upload"}
           analysisSteps={mockAnalysisSteps}
           activeAnalysisStep={activeAnalysisStep}
@@ -162,11 +163,11 @@ export function ClaimReviewWorkflow() {
           onRunAnalysis={handleRunAnalysis}
           onReset={handleReset}
         />
-        <section className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#0f766e]">Current review case</p>
+        <section className="cg-panel rounded-lg p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#008F91]">Current review case</p>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-[#0b1f3a]">
+              <h2 className="text-lg font-semibold text-[#061426]">
                 {selectedCase ? `${selectedCase.id} - ${selectedCase.item}` : "New evidence review"}
               </h2>
               <p className="mt-1 text-sm text-slate-600">
@@ -176,7 +177,7 @@ export function ClaimReviewWorkflow() {
               </p>
             </div>
             {selectedCase ? (
-              <span className="w-fit rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+              <span className="w-fit rounded-md border border-[#E4F0F7] bg-[#F8FCFF] px-2.5 py-1 text-xs font-semibold text-[#061426]">
                 {selectedCase.risk} risk - {selectedCase.score}/100
               </span>
             ) : null}
@@ -192,7 +193,7 @@ export function ClaimReviewWorkflow() {
         />
       </div>
 
-      <aside className="space-y-4">
+      <aside className="space-y-5">
         <RiskScoreCard
           score={reportStatus === "complete" ? activeReport.score : 0}
           riskLevel={activeReport.riskLevel}
@@ -202,9 +203,9 @@ export function ClaimReviewWorkflow() {
         />
         <RedFlagsList flags={activeReport.redFlags} status={reportStatus} />
 
-        <section className="rounded-lg border border-slate-200 bg-white p-4">
+        <section className="cg-panel rounded-lg p-4">
           <details>
-            <summary className="cursor-pointer text-sm font-semibold text-[#0b1f3a]">
+            <summary className="cursor-pointer text-sm font-semibold text-[#061426]">
               Review guardrails
             </summary>
             <div className="mt-3 space-y-2 text-sm leading-6 text-slate-600">

@@ -330,20 +330,20 @@ export const mockAnalysisReports: Record<EvidenceType, MockAnalysisReport> = {
     score: 81,
     riskLevel: "Low",
     confidenceLevel: "Medium confidence",
-    reviewLabel: "Low confidence risk signal",
-    primaryFinding: "Visible receipt fields look consistent in this mock review.",
+    reviewLabel: "Standard verification",
+    primaryFinding: "No high-risk signals were generated in this mock review.",
     scoreExplanation:
-      "An 81 score means the visible PDF fields are mostly consistent, while metadata and purchase matching still need normal human verification.",
+      "An 81 score means this mock review generated no high-risk visible signals, while metadata and purchase matching still need normal human verification.",
     summary:
-      "The PDF appears internally consistent in this mock review, with only minor fields needing normal policy checks.",
+      "No high-risk signals were generated in this mock review. Manual policy verification is still recommended.",
     suggestedAction:
-      "Proceed with standard proof-of-purchase verification and approve if the order record matches policy requirements.",
+      "Proceed with standard proof-of-purchase verification only if the order record matches policy requirements.",
     supportRecommendation:
-      "Continue through the standard approval path once the order record, policy window, and product details are confirmed.",
+      "Continue through the standard review path once the order record, policy window, and product details are verified.",
     customerSafeWording:
       "Thanks for providing the receipt. We are checking it against the warranty requirements and will follow up shortly.",
     signalVsProof:
-      "A low-risk score does not prove authenticity. It only means this mock review found fewer visible signals needing escalation.",
+      "This mock result does not confirm authenticity. It only means this mock review found fewer visible signals needing escalation.",
     redFlags: [
       {
         label: "Low confidence metadata signal",
@@ -354,11 +354,11 @@ export const mockAnalysisReports: Record<EvidenceType, MockAnalysisReport> = {
     riskSignalGroups: [
       {
         category: "Receipt/document formatting",
-        summary: "Visible document fields look consistent enough for standard verification.",
+        summary: "No high-risk formatting signal was generated in this mock review.",
         signals: [
           {
             label: "Readable merchant, date, and total",
-            detail: "The PDF presents the main receipt fields in a consistent layout for normal support review.",
+            detail: "The PDF presents the main receipt fields for normal support review. Manual policy verification is still recommended.",
             confidence: "No material signal",
           },
         ],
@@ -562,14 +562,14 @@ export const recentCases: CaseRecord[] = [
     channel: "Email",
     risk: "Low",
     score: 91,
-    status: "Ready to approve",
+    status: "Policy check ready",
     evidence: "PDF receipt",
     report: mockAnalysisReports.pdf,
     ticket: {
       customerNote:
         "The sediment filter arrived with a damaged clear housing. I uploaded the invoice from my order confirmation.",
       uploadedFile: "jon-bell-wsp50-invoice.pdf",
-      fileDetails: "PDF document | 0.8 MB",
+      fileDetails: "PDF document | 819 KB",
       sla: "Review by 2:30 PM",
       requestedAction: "Standard warranty approval",
     },

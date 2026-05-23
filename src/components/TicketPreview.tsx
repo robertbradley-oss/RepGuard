@@ -7,6 +7,7 @@ import {
   ShoppingBag,
   UserRound,
 } from "lucide-react";
+import { formatFileSize } from "@/lib/file-format";
 import type { AnalysisStatus, CaseRecord, MockAnalysisReport } from "@/lib/claim-data";
 
 type TicketPreviewProps = {
@@ -18,7 +19,7 @@ type TicketPreviewProps = {
 
 export function TicketPreview({ selectedFile, status, report, caseRecord }: TicketPreviewProps) {
   const fileSize = selectedFile
-    ? `${(selectedFile.size / 1024 / 1024).toFixed(selectedFile.size / 1024 / 1024 > 9.9 ? 0 : 1)} MB`
+    ? formatFileSize(selectedFile.size)
     : "No file selected";
   const fileType = selectedFile
     ? selectedFile.type === "application/pdf"
@@ -50,26 +51,26 @@ export function TicketPreview({ selectedFile, status, report, caseRecord }: Tick
   const requestedAction = caseRecord?.ticket.requestedAction ?? "Warranty replacement review";
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-4">
+    <section className="cg-panel rounded-lg p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{caseId}</p>
-          <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">Warranty claim preview</h2>
+          <h2 className="mt-1 text-lg font-semibold text-[#061426]">Warranty claim preview</h2>
         </div>
-        <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+        <span className="rounded-md border border-[#E4F0F7] bg-[#F8FCFF] px-2.5 py-1 text-xs font-semibold text-[#061426]">
           {statusLabel}
         </span>
       </div>
 
-      <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <div className="mt-4 rounded-lg border border-[#E4F0F7] bg-[#F8FCFF] p-4">
         <div className="flex items-start gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-white text-sky-700 ring-1 ring-slate-200">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-white text-[#08AEEA] ring-1 ring-[#DDECF5]">
             <MessageCircle className="size-5" aria-hidden="true" />
           </span>
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-sm font-semibold text-slate-900">Customer note</p>
-              <span className="rounded-md bg-white px-2 py-0.5 text-xs font-medium text-slate-500 ring-1 ring-slate-200">
+              <span className="rounded-md bg-white px-2 py-0.5 text-xs font-medium text-slate-500 ring-1 ring-[#E4F0F7]">
                 {channel}
               </span>
             </div>
@@ -104,12 +105,12 @@ export function TicketPreview({ selectedFile, status, report, caseRecord }: Tick
           { label: "SLA", value: sla, icon: Clock3 },
           { label: "Requested action", value: requestedAction, icon: FileCheck2 },
         ].map((item) => (
-          <div className="rounded-lg border border-slate-200 bg-white p-3" key={item.label}>
+          <div className="rounded-lg border border-[#E4F0F7] bg-white p-3" key={item.label}>
             <dt className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
               <item.icon className="size-3.5" aria-hidden="true" />
               {item.label}
             </dt>
-            <dd className="mt-1 text-sm font-semibold text-slate-900">{item.value}</dd>
+            <dd className="mt-1 text-sm font-semibold text-[#061426]">{item.value}</dd>
           </div>
         ))}
       </dl>

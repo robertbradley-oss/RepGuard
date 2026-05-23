@@ -1,8 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f8fb;
-  --foreground: #0b1f3a;
+  --background: #f6fbff;
+  --foreground: #061426;
+  --cg-ink: #020b18;
+  --cg-navy: #061426;
+  --cg-sidebar: #071b2f;
+  --cg-blue: #08aeea;
+  --cg-cyan: #19d3f3;
+  --cg-teal: #00a7a5;
+  --cg-green: #41d66f;
+  --cg-card: #ffffff;
+  --cg-soft: #f7fbff;
+  --cg-border: #dcecf6;
+  --cg-border-soft: #e8f3f9;
+  --cg-muted: #5f6f82;
 }
 
 @theme inline {
@@ -17,17 +29,56 @@
 }
 
 html {
-  background: #07182d;
+  background: #eef7fc;
 }
 
 body {
   min-height: 100vh;
   margin: 0;
-  background: #07182d;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(8, 174, 234, 0.12), transparent 30rem),
+    linear-gradient(180deg, #eef7fc 0%, #f8fbfd 42%, #eef5f9 100%);
   color: var(--foreground);
 }
 
 button,
 input {
   font: inherit;
+}
+
+.cg-brand-gradient {
+  background-image: linear-gradient(135deg, #08aeea 0%, #00a7a5 54%, #41d66f 100%);
+}
+
+.cg-card {
+  border: 1px solid var(--cg-border);
+  background: var(--cg-card);
+}
+
+.cg-panel {
+  border: 1px solid var(--cg-border-soft);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 16px 40px rgba(6, 20, 38, 0.055);
+}
+
+.cg-soft-panel {
+  border: 1px solid var(--cg-border-soft);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fcff 100%);
+}
+
+.cg-primary-button {
+  background-image: linear-gradient(135deg, #08aeea 0%, #00a7a5 54%, #28c966 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(8, 174, 234, 0.18);
+}
+
+.cg-primary-button:hover:not(:disabled) {
+  filter: brightness(1.03);
+  box-shadow: 0 16px 28px rgba(8, 174, 234, 0.22);
+}
+
+.cg-primary-button:disabled {
+  background: #e7eef4;
+  color: #8a98a8;
+  box-shadow: none;
 }
