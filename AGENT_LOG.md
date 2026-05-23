@@ -1,0 +1,17 @@
+# ClaimGuard Agent Log
+
+This file is for notes from autonomous project-agent runs.
+
+The agent should append short entries here when it performs repo work from `AGENT_INBOX.md`.
+
+## Log Entries
+
+- 2026-05-23: Added repo-level agent communication files, configured the ClaimGuard Project Agent automation, and upgraded the MVP upload-to-analysis workflow with local mock states and support-safe report outputs. Verified with `npm.cmd run lint`, `npm.cmd run build`, and a browser load check with no console warnings or errors.
+- 2026-05-23: Improved the current upload-to-analysis MVP flow without adding real integrations. Added clearer upload/analyze/report step cues, richer ticket preview details, stronger authenticity-score explanation, completed report primary finding and verification checks, and renamed visible risk output toward review signals. Verified with `npm.cmd run lint`, `npm.cmd run build`, and a local browser load check with no console warnings or errors.
+- 2026-05-23: Added the `/claimguardagent` project command definition, user-facing command instructions, and a PowerShell helper for adding direct agent tasks to `AGENT_INBOX.md`. Verified command references and helper usage output.
+- 2026-05-23: Added a local Codex `claimguardagent` skill so future sessions can recognize direct ClaimGuard agent tasks. The bundled skill validator could not run because its Python environment is missing `yaml`; manual frontmatter and file checks were used instead.
+- 2026-05-23: Upgraded the completed mock analysis report output into a fuller support-review artifact. Added score explanations, confidence levels, categorized risk signals, support rep recommendations, customer-safe response suggestions, verification checklists, signal-versus-proof guardrails, and a manual-review-only disclaimer. Verified with `npm.cmd run lint`, `npm.cmd run build`, and a local browser load check with no console warnings or errors.
+- 2026-05-23: Clarified `/claimguardagent` semantics: direct command tasks wake the agent and run immediately in the current thread, and should not be duplicated into `AGENT_INBOX.md`. The inbox and helper script remain only for future queued tasks.
+- 2026-05-23: Upgraded the Phase 1 upload-to-analysis demo flow without adding real integrations. Added richer selected-file metadata, ready-to-analyze state, a five-step mock analysis sequence, ticket preview evidence/result updates, and a highlighted newly analyzed case row in recent cases. Verified with `npm.cmd run lint`, `npm.cmd run build`, and a local browser load check with no console warnings or errors.
+- 2026-05-23: Fixed upload event/state wiring for the demo flow. Replaced the fragile label-only upload trigger with an explicit ref-backed upload button, kept the file input `onChange` wired to parent state, added drag/drop handling, reset the native input when clearing evidence, and confirmed the JPG upload path enables mock analysis and completes the report in Playwright. Robert waived additional PNG/PDF manual verification for this pass. Verified with `npm.cmd run lint`, `npm.cmd run build`, and a local app load check.
+- Later task: Tune the mock analysis outputs so receipt, screenshot, PDF, and product-photo reports feel more varied and realistic while staying mock-only and support-safe. Do not connect real AI yet.
