@@ -78,6 +78,14 @@ export type CaseRecord = {
   score: number;
   status: string;
   evidence?: string;
+  report: MockAnalysisReport;
+  ticket: {
+    customerNote: string;
+    uploadedFile: string;
+    fileDetails: string;
+    sla: string;
+    requestedAction: string;
+  };
 };
 
 export type NavItem = {
@@ -530,41 +538,81 @@ export const recentCases: CaseRecord[] = [
     id: "CG-1048",
     customer: "Maya R.",
     submittedAt: "Today, 10:42 AM",
-    item: "Countertop blender",
+    item: "iSpring RCC7AK filter system",
     channel: "Zendesk",
     risk: "Medium",
     score: 68,
     status: "Manual review",
+    evidence: "Receipt and damage photo",
+    report: mockAnalysisReports.receipt,
+    ticket: {
+      customerNote:
+        "The under-sink filter housing started leaking after installation. I attached the receipt and a photo of the cracked canister.",
+      uploadedFile: "maya-r-ispring-rcc7ak-receipt.jpg",
+      fileDetails: "JPG image | 3.4 MB",
+      sla: "Review by 4:00 PM",
+      requestedAction: "Warranty replacement review",
+    },
   },
   {
     id: "CG-1047",
     customer: "Jon Bell",
     submittedAt: "Today, 9:18 AM",
-    item: "Wireless earbuds",
+    item: "iSpring WSP50 spin-down filter",
     channel: "Email",
     risk: "Low",
     score: 91,
     status: "Ready to approve",
+    evidence: "PDF receipt",
+    report: mockAnalysisReports.pdf,
+    ticket: {
+      customerNote:
+        "The sediment filter arrived with a damaged clear housing. I uploaded the invoice from my order confirmation.",
+      uploadedFile: "jon-bell-wsp50-invoice.pdf",
+      fileDetails: "PDF document | 0.8 MB",
+      sla: "Review by 2:30 PM",
+      requestedAction: "Standard warranty approval",
+    },
   },
   {
     id: "CG-1046",
     customer: "N. Patel",
     submittedAt: "Yesterday, 4:55 PM",
-    item: "Standing desk",
+    item: "iSpring UVF11A lamp kit",
     channel: "Intercom",
     risk: "High",
     score: 38,
     status: "Proof requested",
+    evidence: "Product damage photo",
+    report: mockAnalysisReports["damage-photo"],
+    ticket: {
+      customerNote:
+        "The replacement UV lamp appears cracked near the connector. I sent a close-up image but can provide more photos if needed.",
+      uploadedFile: "patel-uvf11a-closeup.webp",
+      fileDetails: "WEBP image | 2.1 MB",
+      sla: "Review by tomorrow, 11:00 AM",
+      requestedAction: "Senior support review",
+    },
   },
   {
     id: "CG-1045",
     customer: "Elena M.",
     submittedAt: "Yesterday, 2:07 PM",
-    item: "Smart lock",
+    item: "iSpring ED2000 conditioner",
     channel: "Shopify",
     risk: "Medium",
     score: 72,
     status: "Manual review",
+    evidence: "Order screenshot",
+    report: mockAnalysisReports.screenshot,
+    ticket: {
+      customerNote:
+        "The water conditioner stopped powering on. I attached a screenshot from the order page because I cannot find the email receipt.",
+      uploadedFile: "elena-m-ed2000-order-screenshot.png",
+      fileDetails: "PNG image | 1.6 MB",
+      sla: "Review by tomorrow, 9:30 AM",
+      requestedAction: "Proof-of-purchase verification",
+    },
   },
 ];
 

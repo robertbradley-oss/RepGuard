@@ -23,9 +23,7 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
-  background:
-    radial-gradient(circle at 14% 0%, rgba(56, 189, 248, 0.18), transparent 24rem),
-    linear-gradient(135deg, #07182d 0%, #0b1f3a 34%, #f5f8fb 34%, #f5f8fb 100%);
+  background: #07182d;
   color: var(--foreground);
 }
 
