@@ -37,6 +37,7 @@ Based on the current repo:
 - `src/app/page.tsx`: main dashboard screen.
 - `src/app/layout.tsx`: app metadata, font setup, and root layout.
 - `src/app/globals.css`: global CSS, theme tokens, and page background styling.
+- `DESIGN.md`: ClaimGuard visual system and design tokens.
 - `src/components/`: reusable UI components.
 - `src/components/AppSidebar.tsx`: sidebar navigation and ClaimGuard brand mark.
 - `src/components/UploadPanel.tsx`: local upload UI for receipts, photos, screenshots, and PDFs.
@@ -110,9 +111,15 @@ There is no test script configured yet. Do not claim tests pass unless a real te
 ## UI Standards
 
 - Keep the product as a working dashboard, not a marketing landing page.
-- Use a modern enterprise SaaS feel: dark navy, white, blue, and green.
+- Follow `DESIGN.md` for the ClaimGuard command-center visual system.
+- Use a dark forensic dashboard feel: deep navy and charcoal base, electric blue and verification green accents, and subtle document-forensics texture.
 - Prioritize dense, scannable, operational layouts for support reps.
-- Keep cards, tables, controls, and sidebars visually restrained and consistent.
+- Use strong evidence-review panels, support-ticket previews, security-style risk badges, and receipt/document surfaces.
+- Make the evidence viewer the dominant product surface. Uploaded documents and photos should feel like inspected evidence with scan frames, metadata, timestamps, evidence IDs, and verification details.
+- Case surfaces should feel like investigation records with customer-safe status, review queue, reviewer, channel, and last-updated metadata.
+- Risk intelligence should include confidence, detected signal count, severity distribution, and recommended support action, not just a decorative score.
+- Avoid generic white cards on gray backgrounds, centered SaaS hero layouts, default shadcn demo styling, random gradient blobs, and template-looking card grids.
+- Vary panel shape, width, emphasis, and density where useful; do not make every card the same size and shape.
 - Make the upload-to-analysis workflow obvious and demo-friendly.
 - Ensure text fits on mobile and desktop without awkward overlap.
 - Use customer-support language in visible UI.
@@ -182,6 +189,29 @@ When operating autonomously:
 7. Report back in the Codex thread with what changed and what remains.
 
 If an inbox request needs approval, write that clearly in the Codex thread instead of making the change.
+
+## ChatGPT Handoff Requirement
+
+Every ClaimGuard Codex run must end with this exact handoff format so Robert can paste the result into ChatGPT for review:
+
+```text
+CLAIMGUARD HANDOFF
+
+Task completed:
+Files changed:
+What changed:
+Checks run:
+- lint:
+- build:
+- browser check:
+
+Anything risky:
+Anything not finished:
+Recommended next task:
+Questions for Robert:
+```
+
+Keep the handoff concrete and concise. It should name changed files, verification performed, any remaining risk, and the single best next task.
 
 ## Do Not Change Without Approval
 

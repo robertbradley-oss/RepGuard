@@ -2,23 +2,32 @@
 
 import { useMemo, useRef, useState, type DragEvent } from "react";
 import {
+  AlertTriangle,
   FileImage,
-  FileText,
+  Fingerprint,
   Loader2,
+  Maximize2,
+  Minus,
   Play,
+  Plus,
+  RotateCw,
+  ScanLine,
   UploadCloud,
   X,
 } from "lucide-react";
 import { formatFileSize } from "@/lib/file-format";
-import type { AnalysisStatus, AnalysisStep } from "@/lib/claim-data";
+import type { AnalysisStatus, AnalysisStep, CaseRecord, MockAnalysisReport } from "@/lib/claim-data";
 
 const acceptedTypes = "image/png,image/jpeg,image/webp,application/pdf";
+const acceptedFileTypes = ["image/png", "image/jpeg", "image/webp", "application/pdf"];
 
 type UploadPanelProps = {
   selectedFile: File | null;
   status: AnalysisStatus;
   hasCompletedReport?: boolean;
   evidenceLabel: string;
+  report: MockAnalysisReport;
+  caseRecord?: CaseRecord;
   analysisSteps: AnalysisStep[];
   activeAnalysisStep: number;
   onFileSelect: (file: File | null) => void;
@@ -26,11 +35,22 @@ type UploadPanelProps = {
   onReset: () => void;
 };
 
+function evidenceHash(seed: string) {
+  let value = 0;
+  for (const character of seed) {
+    value = (value * 31 + character.charCodeAt(0)) % 0xffffff;
+  }
+
+  return `sha256:${value.toString(16).padStart(6, "0")}-mock`;
+}
+
 export function UploadPanel({
   selectedFile,
   status,
   hasCompletedReport = false,
   evidenceLabel,
+  report,
+  caseRecord,
   analysisSteps,
   activeAnalysisStep,
   onFileSelect,
@@ -39,6 +59,7 @@ export function UploadPanel({
 }: UploadPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileMeta = useMemo(() => {
     if (!selectedFile) {
       return null;
@@ -70,8 +91,35 @@ export function UploadPanel({
           : "Run another review"
         : "Run mock analysis";
   const currentStep = analysisSteps[activeAnalysisStep]?.label ?? "Preparing support-safe mock review";
+  const viewerFileName = caseRecord?.ticket.uploadedFile ?? fileMeta?.name ?? "No evidence selected";
+  const viewerFileDetails = caseRecord?.ticket.fileDetails ?? (fileMeta ? `${fileMeta.type} | ${fileMeta.size}` : "Awaiting receipt, screenshot, PDF, or photo");
+  const evidenceId = caseRecord ? `EV-${caseRecord.id.replace("CG-", "")}-A` : selectedFile ? "EV-LOCAL-001" : "EV-PENDING";
+  const uploadedAt = caseRecord?.submittedAt ?? (selectedFile ? "Just now" : "Awaiting upload");
+  const hashValue = evidenceHash(`${viewerFileName}-${report.evidenceType}-${report.score}`);
+  const viewerTitle = caseRecord || selectedFile ? report.evidenceLabel : "Evidence viewer";
+  const hasEvidence = Boolean(caseRecord || selectedFile);
+
+  function isAcceptedFile(file: File) {
+    return acceptedFileTypes.includes(file.type) || /\.(png|jpe?g|webp|pdf)$/i.test(file.name);
+  }
 
   function handleSelectedFile(file: File | null) {
+    if (!file) {
+      setUploadError(null);
+      onFileSelect(null);
+      return;
+    }
+
+    if (!isAcceptedFile(file)) {
+      setUploadError("Unsupported evidence type. Upload a PNG, JPG, WEBP, or PDF for mock review.");
+      onFileSelect(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    setUploadError(null);
     onFileSelect(file);
   }
 
@@ -81,6 +129,7 @@ export function UploadPanel({
     }
 
     setIsDragging(false);
+    setUploadError(null);
     onReset();
   }
 
@@ -99,14 +148,19 @@ export function UploadPanel({
   }
 
   return (
-    <section className="cg-panel min-h-[540px] rounded-2xl p-5 sm:p-7">
-      <div className="flex items-start justify-between gap-4">
+    <section className="cg-forensic-panel rounded-[1.35rem] p-4 sm:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#008F91]">Evidence upload</p>
-          <h2 className="mt-1 text-xl font-semibold text-[#061426]">Upload claim evidence</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cg-cyan)]">
+            Evidence workstation
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">Evidence under review</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--cg-text-muted)]">
+            Inspect submitted claim evidence and run local mock checks for document consistency, evidence quality, and support-safe next steps.
+          </p>
         </div>
-        <span className="rounded-full border border-[#D7EAF4] bg-white/85 px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm">
-          Mock analysis
+        <span className="cg-security-badge rounded-full px-3 py-1 text-xs font-semibold">
+          Mock analysis only
         </span>
       </div>
 
@@ -119,112 +173,213 @@ export function UploadPanel({
         onChange={(event) => handleSelectedFile(event.currentTarget.files?.[0] ?? null)}
       />
 
-      <button
-        className={`mt-6 flex min-h-44 cursor-pointer items-center gap-4 rounded-2xl border border-dashed px-5 py-7 text-left transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#08AEEA]/35 ${
-          isDragging
-            ? "border-[#08AEEA] bg-white shadow-[0_18px_42px_rgba(8,174,234,0.12)]"
-            : "border-[#CFE5F1] bg-gradient-to-br from-white to-[#F5FBFF] hover:border-[#8DDAEB] hover:bg-white hover:shadow-[0_18px_42px_rgba(6,20,38,0.07)]"
-        } ${isAnalyzing ? "cursor-not-allowed opacity-70" : ""}`}
-        type="button"
-        disabled={isAnalyzing}
-        onClick={() => fileInputRef.current?.click()}
-        onDragEnter={(event) => {
-          event.preventDefault();
-          if (!isAnalyzing) {
-            setIsDragging(true);
-          }
-        }}
-        onDragLeave={(event) => {
-          event.preventDefault();
-          setIsDragging(false);
-        }}
-        onDragOver={(event) => {
-          event.preventDefault();
-        }}
-        onDrop={handleDrop}
-      >
-        <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-white text-[#08AEEA] shadow-[0_10px_24px_rgba(8,174,234,0.1)] ring-1 ring-[#DDECF5]">
-          <UploadCloud className="size-7" aria-hidden="true" />
-        </span>
-        <span>
-          <span className="block text-base font-semibold text-slate-950">
-            {isDragging ? "Release to attach evidence" : "Drop evidence here or browse files"}
-          </span>
-          <span className="mt-2 block text-sm leading-6 text-slate-500">
-            Receipts, product photos, screenshots, and PDFs. Local mock review only.
-          </span>
-        </span>
-      </button>
-
-      {selectedFile && fileMeta ? (
-        <div className="mt-5 rounded-2xl border border-[#DDECF5] bg-white/86 p-4 shadow-[0_14px_34px_rgba(6,20,38,0.045)]">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-white text-[#00A7A5] ring-1 ring-[#DDECF5]">
-              {selectedFile.type === "application/pdf" ? (
-                <FileText className="size-5" aria-hidden="true" />
-              ) : (
-                <FileImage className="size-5" aria-hidden="true" />
-              )}
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="truncate text-sm font-semibold text-slate-950">{fileMeta.name}</p>
-                <span
-                  className={`rounded-md px-2 py-0.5 text-xs font-semibold ${
-                    status === "uploaded"
-                      ? "bg-[#E9FFF0] text-[#0B5F2A] ring-1 ring-[#41D66F]/35"
-                      : "bg-white text-slate-600 ring-1 ring-[#E4F0F7]"
-                  }`}
-                >
-                  {status === "uploaded" ? "Ready to analyze" : status === "complete" ? "Analyzed" : "Selected"}
-                </span>
-              </div>
-              <dl className="mt-3 grid gap-2 sm:grid-cols-3">
-                {[
-                  { label: "Evidence type", value: evidenceLabel },
-                  { label: "File type", value: fileMeta.type },
-                  { label: "File size", value: fileMeta.size },
-                ].map((item) => (
-                  <div className="rounded-lg bg-[#F8FCFF] px-3 py-2 ring-1 ring-[#E4F0F7]" key={item.label}>
-                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                      {item.label}
-                    </dt>
-                    <dd className="mt-1 text-xs font-semibold text-slate-900">{item.value}</dd>
-                  </div>
-                ))}
-              </dl>
+      <div className="mt-5 grid gap-4 2xl:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="rounded-2xl border border-[var(--cg-border-strong)] bg-[#020713]/70 p-3 shadow-[var(--cg-shadow-blue)]">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--cg-text-muted)]">
+                {evidenceId}
+              </p>
+              <h3 className="mt-1 text-lg font-semibold text-white">{viewerTitle}</h3>
             </div>
+            <div className="flex items-center gap-1.5">
+              {[Minus, Plus, RotateCw, Maximize2].map((Icon, index) => (
+                <button
+                  className="flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.035] text-[var(--cg-text-muted)] transition hover:border-[var(--cg-border-strong)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cg-cyan)]"
+                  type="button"
+                  aria-label={["Zoom out", "Zoom in", "Rotate preview", "Open full evidence preview"][index]}
+                  key={index}
+                >
+                  <Icon className="size-4" aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative mt-3 overflow-hidden rounded-xl border border-white/10 bg-[#07101d]">
+            <div className="pointer-events-none absolute inset-x-5 top-0 z-10 flex justify-between text-[9px] font-semibold text-[var(--cg-cyan)]/50">
+              {Array.from({ length: 11 }, (_, index) => (
+                <span className="h-3 border-l border-[var(--cg-cyan)]/35 pl-1" key={index}>
+                  {index}
+                </span>
+              ))}
+            </div>
+            <div className="pointer-events-none absolute inset-y-5 left-0 z-10 grid content-between text-[9px] font-semibold text-[var(--cg-cyan)]/50">
+              {Array.from({ length: 7 }, (_, index) => (
+                <span className="w-5 border-t border-[var(--cg-cyan)]/35 pt-1 text-right" key={index}>
+                  {index}
+                </span>
+              ))}
+            </div>
+
+            <div className="p-5 sm:p-6">
+              {hasEvidence ? (
+                <div className="mx-auto max-w-lg">
+                  <div
+                    className={`relative min-h-[360px] overflow-hidden rounded-xl ${
+                      report.evidenceType === "damage-photo"
+                        ? "border border-[rgba(53,217,255,0.34)] bg-[radial-gradient(circle_at_35%_35%,rgba(148,163,184,0.36),transparent_22%),linear-gradient(135deg,#273447,#0d1725)]"
+                        : "cg-ticket-paper"
+                    } p-5`}
+                  >
+                    <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0,rgba(53,217,255,0.12)_50%,transparent_100%)] opacity-20" />
+                    <div className="relative z-10">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className={report.evidenceType === "damage-photo" ? "text-xs font-bold uppercase tracking-[0.18em] text-cyan-100/80" : "text-xs font-bold uppercase tracking-[0.18em] text-[#526175]"}>
+                            {viewerFileName}
+                          </p>
+                          <p className={report.evidenceType === "damage-photo" ? "mt-2 text-2xl font-semibold text-white" : "mt-2 text-2xl font-bold text-[var(--cg-text-paper)]"}>
+                            {report.evidenceType === "damage-photo" ? "Product damage image" : "Purchase evidence"}
+                          </p>
+                        </div>
+                        <span className={report.evidenceType === "damage-photo" ? "rounded-md border border-cyan-200/25 bg-cyan-200/10 px-2 py-1 text-xs font-bold text-cyan-100" : "rounded-md border border-[rgba(20,33,51,0.14)] bg-white/60 px-2 py-1 text-xs font-bold text-[#526175]"}>
+                          {report.reviewLabel}
+                        </span>
+                      </div>
+
+                      {report.evidenceType === "damage-photo" ? (
+                        <div className="mt-8 grid min-h-48 place-items-center rounded-lg border border-dashed border-cyan-200/28 bg-black/16">
+                          <div className="text-center">
+                            <FileImage className="mx-auto size-12 text-[var(--cg-cyan)]" aria-hidden="true" />
+                            <p className="mt-3 text-sm font-semibold text-white">Damage area marked for manual review</p>
+                            <p className="mt-1 text-xs text-cyan-100/70">Request wider product context before resolution.</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-8 space-y-3 font-mono text-sm text-[#344155]">
+                          <div className="h-3 w-2/3 rounded bg-[#142133]/18" />
+                          <div className="h-3 w-11/12 rounded bg-[#142133]/16" />
+                          <div className="h-3 w-10/12 rounded bg-[#142133]/16" />
+                          <div className="my-6 border-t border-dashed border-[#142133]/18" />
+                          <div className="grid grid-cols-2 gap-3">
+                            <span>Order</span>
+                            <span className="text-right font-bold">{caseRecord?.ticket.orderNumber ?? "Pending match"}</span>
+                            <span>Total/date</span>
+                            <span className="text-right font-bold">Requires verification</span>
+                            <span>Source</span>
+                            <span className="text-right font-bold">{caseRecord?.ticket.purchaseChannel ?? "Local upload"}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className={`grid min-h-[360px] w-full cursor-pointer place-items-center rounded-xl border border-dashed px-5 py-6 text-center transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cg-cyan)] ${
+                    isDragging
+                      ? "border-[var(--cg-cyan)] bg-[rgba(24,183,255,0.14)]"
+                      : "border-[var(--cg-border-strong)] bg-[#06101f]/68 hover:bg-[#0b1728]"
+                  } ${isAnalyzing ? "cursor-not-allowed opacity-70" : ""}`}
+                  type="button"
+                  disabled={isAnalyzing}
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragEnter={(event) => {
+                    event.preventDefault();
+                    if (!isAnalyzing) {
+                      setIsDragging(true);
+                    }
+                  }}
+                  onDragLeave={(event) => {
+                    event.preventDefault();
+                    setIsDragging(false);
+                  }}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                  }}
+                  onDrop={handleDrop}
+                >
+                  <span>
+                    <UploadCloud className="mx-auto size-12 text-[var(--cg-cyan)]" aria-hidden="true" />
+                    <span className="mt-4 block text-lg font-semibold text-white">
+                      {isDragging ? "Release to attach evidence" : "Drop evidence into the scan frame"}
+                    </span>
+                    <span className="mt-2 block max-w-md text-sm leading-6 text-[var(--cg-text-muted)]">
+                      Receipts, product photos, screenshots, and PDFs appear here as inspected evidence.
+                    </span>
+                  </span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <aside className="grid content-start gap-3">
+          <div className="rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/62 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
+              File metadata
+            </p>
+            <dl className="mt-3 space-y-3 text-sm">
+              {[
+                { label: "Evidence ID", value: evidenceId },
+                { label: "Uploaded", value: uploadedAt },
+                { label: "Type", value: evidenceLabel },
+                { label: "Details", value: viewerFileDetails },
+                { label: "Hash", value: hashValue },
+              ].map((item) => (
+                <div className="rounded-lg border border-white/10 bg-white/[0.025] p-3" key={item.label}>
+                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">{item.label}</dt>
+                  <dd className="mt-1 break-words font-mono text-xs text-[var(--cg-text-soft)]">{item.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          {selectedFile ? (
             <button
-              className="flex size-8 shrink-0 items-center justify-center rounded-md text-slate-500 hover:bg-white hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-left text-sm font-semibold text-[var(--cg-text-soft)] transition hover:border-[var(--cg-border-strong)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
               type="button"
               onClick={handleResetSelection}
-              aria-label="Remove selected file"
               disabled={isAnalyzing}
             >
+              Remove local evidence
               <X className="size-4" aria-hidden="true" />
             </button>
+          ) : (
+            <button
+              className="flex items-center justify-between rounded-xl border border-[var(--cg-border-strong)] bg-[rgba(24,183,255,0.1)] px-4 py-3 text-left text-sm font-semibold text-white transition hover:bg-[rgba(24,183,255,0.16)]"
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Attach new evidence
+              <UploadCloud className="size-4" aria-hidden="true" />
+            </button>
+          )}
+        </aside>
+      </div>
+
+      {uploadError ? (
+        <div className="mt-5 rounded-2xl border border-[rgba(251,113,133,0.42)] bg-[rgba(251,113,133,0.12)] p-4 text-sm leading-6 text-rose-100">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 size-5 shrink-0 text-[var(--cg-red)]" aria-hidden="true" />
+            <div>
+              <p className="font-semibold text-white">Evidence upload needs attention</p>
+              <p className="mt-1 text-rose-100/85">{uploadError}</p>
+            </div>
           </div>
         </div>
       ) : null}
 
       {isAnalyzing ? (
-        <div className="mt-5 rounded-2xl border border-[#DDECF5] bg-white p-4 shadow-[0_14px_34px_rgba(6,20,38,0.045)]">
+        <div className="mt-5 rounded-2xl border border-[var(--cg-border-strong)] bg-[#06101f]/78 p-4">
           <div className="flex items-center gap-3">
-            <Loader2 className="size-4 shrink-0 animate-spin text-[#08AEEA]" aria-hidden="true" />
+            <Loader2 className="size-4 shrink-0 animate-spin text-[var(--cg-cyan)]" aria-hidden="true" />
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-slate-900">Evidence review in progress</p>
-              <p className="mt-1 truncate text-xs text-slate-500">{currentStep}</p>
+              <p className="text-sm font-semibold text-white">Evidence review in progress</p>
+              <p className="mt-1 truncate text-xs text-[var(--cg-text-muted)]">{currentStep}</p>
             </div>
+            <ScanLine className="size-5 text-[var(--cg-green)]" aria-hidden="true" />
           </div>
-          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#E4F0F7]">
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#13243a]">
             <div className="h-full w-2/3 rounded-full cg-brand-gradient" />
           </div>
         </div>
       ) : null}
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-5 grid gap-3 lg:grid-cols-[220px_1fr]">
         <button
-          className="cg-primary-button inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed"
+          className="cg-primary-button inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold transition disabled:cursor-not-allowed"
           type="button"
           onClick={onRunAnalysis}
           disabled={!canAnalyze}
@@ -237,11 +392,17 @@ export function UploadPanel({
           {actionLabel}
         </button>
 
-        <div className="rounded-xl border border-[#E4F0F7] bg-[#F8FCFF] px-3.5 py-2.5 text-xs leading-5 text-slate-600 sm:flex-1">
+        <div className="rounded-xl border border-[var(--cg-border)] bg-[#06101f]/64 px-4 py-3 text-xs leading-5 text-[var(--cg-text-muted)]">
+          <span className="inline-flex items-center gap-2 font-semibold text-[var(--cg-text-soft)]">
+            <Fingerprint className="size-3.5 text-[var(--cg-cyan)]" aria-hidden="true" />
+            Current state:
+          </span>{" "}
           {status === "idle"
-            ? "Select claim evidence to generate a support-safe mock report."
+            ? hasEvidence
+              ? "Selected case evidence is loaded in the scan frame."
+              : "Attach evidence or open a case from the queue."
             : status === "uploaded"
-              ? `${evidenceLabel} selected. Ready to analyze with local mock checks.`
+              ? `${evidenceLabel} selected. Ready for local mock analysis.`
               : status === "analyzing"
                 ? currentStep
                 : "Mock report complete. Use results as review guidance only."}

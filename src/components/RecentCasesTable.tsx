@@ -8,9 +8,9 @@ type RecentCasesTableProps = {
 };
 
 const riskClass: Record<RiskLevel, string> = {
-  Low: "bg-[#E9FFF0] text-[#0B5F2A] ring-[#41D66F]/40",
-  Medium: "bg-[#F7FBFF] text-[#066B8F] ring-[#19D3F3]/45",
-  High: "bg-[#FFF1F2] text-[#9F1239] ring-[#FECDD3]",
+  Low: "cg-risk-low",
+  Medium: "cg-risk-medium",
+  High: "cg-risk-high",
 };
 
 export function RecentCasesTable({
@@ -20,14 +20,14 @@ export function RecentCasesTable({
   onCaseSelect,
 }: RecentCasesTableProps) {
   return (
-    <section className="cg-panel rounded-lg p-4">
+    <section className="cg-command-panel rounded-[1.15rem] p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Queue</p>
-          <h2 className="mt-1 text-lg font-semibold text-[#061426]">Recent cases</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--cg-cyan)]">Review queue</p>
+          <h2 className="mt-1 text-xl font-semibold text-white">Evidence queue</h2>
         </div>
         <button
-          className="rounded-md border border-[#E4F0F7] px-3 py-2 text-sm font-semibold text-[#061426] hover:bg-[#F8FCFF]"
+          className="rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-[var(--cg-text-soft)] hover:border-[var(--cg-border-strong)] hover:text-white"
           type="button"
         >
           View all
@@ -35,15 +35,15 @@ export function RecentCasesTable({
       </div>
 
       <div className="mt-5 overflow-x-auto">
-        <table className="w-full min-w-[760px] border-separate border-spacing-0 text-left text-sm">
+        <table className="w-full min-w-[720px] border-separate border-spacing-0 text-left text-sm">
           <thead>
-            <tr className="text-xs uppercase tracking-wide text-slate-500">
-              <th className="border-b border-[#E4F0F7] pb-3 font-semibold">Case</th>
-              <th className="border-b border-[#E4F0F7] pb-3 font-semibold">Customer</th>
-              <th className="border-b border-[#E4F0F7] pb-3 font-semibold">Item</th>
-              <th className="border-b border-[#E4F0F7] pb-3 font-semibold">Risk</th>
-              <th className="border-b border-[#E4F0F7] pb-3 font-semibold">Score</th>
-              <th className="border-b border-[#E4F0F7] pb-3 font-semibold">Status</th>
+            <tr className="text-xs uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
+              <th className="border-b border-white/10 pb-3 font-semibold">Case</th>
+              <th className="border-b border-white/10 pb-3 font-semibold">Customer</th>
+              <th className="border-b border-white/10 pb-3 font-semibold">Item</th>
+              <th className="border-b border-white/10 pb-3 font-semibold">Review state</th>
+              <th className="border-b border-white/10 pb-3 font-semibold">Score</th>
+              <th className="border-b border-white/10 pb-3 font-semibold">Queue</th>
             </tr>
           </thead>
           <tbody>
@@ -55,8 +55,8 @@ export function RecentCasesTable({
                 <tr
                   aria-current={isActive ? "true" : undefined}
                   aria-label={`Open case ${claim.id}`}
-                  className={`cursor-pointer text-slate-700 outline-none transition hover:bg-[#F8FCFF] focus:bg-[#F8FCFF] ${
-                    isActive ? "bg-[#F8FCFF] shadow-[inset_3px_0_0_#19D3F3]" : ""
+                  className={`cursor-pointer text-[var(--cg-text-soft)] outline-none transition hover:bg-white/[0.055] focus:bg-white/[0.055] ${
+                    isActive ? "bg-[rgba(24,183,255,0.12)] shadow-[inset_4px_0_0_var(--cg-cyan)]" : ""
                   }`}
                   key={claim.id}
                   onClick={() => onCaseSelect(claim.id)}
@@ -69,36 +69,36 @@ export function RecentCasesTable({
                   role="button"
                   tabIndex={0}
                 >
-                  <td className="border-b border-[#EDF5FA] py-3.5 pl-2">
+                  <td className="border-b border-white/8 py-3.5 pl-2">
                     <div className="flex items-center gap-2">
-                      <p className="font-semibold text-slate-900">{claim.id}</p>
+                      <p className="font-mono font-semibold text-white">{claim.id}</p>
                       {isActive ? (
-                          <span className="rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-[#008F91] ring-1 ring-[#BFEAF4]">
+                        <span className="rounded-md border border-[var(--cg-border-strong)] bg-[rgba(24,183,255,0.12)] px-2 py-0.5 text-[11px] font-semibold text-[var(--cg-cyan)]">
                           Selected
                         </span>
                       ) : null}
                       {!isActive && isNewAnalysis ? (
-                        <span className="rounded-md bg-[#E9FFF0] px-2 py-0.5 text-[11px] font-semibold text-[#0B5F2A] ring-1 ring-[#41D66F]/35">
+                        <span className="rounded-md border border-[rgba(74,222,128,0.38)] bg-[rgba(74,222,128,0.12)] px-2 py-0.5 text-[11px] font-semibold text-[var(--cg-green)]">
                           New
                         </span>
                       ) : null}
                     </div>
-                    <p className="text-xs text-slate-500">{claim.submittedAt}</p>
+                    <p className="text-xs text-[var(--cg-text-muted)]">{claim.submittedAt}</p>
                   </td>
-                  <td className="border-b border-[#EDF5FA] py-3.5">{claim.customer}</td>
-                  <td className="border-b border-[#EDF5FA] py-3.5">
-                    <p>{claim.item}</p>
-                    {claim.evidence ? <p className="text-xs text-slate-500">{claim.evidence}</p> : null}
+                  <td className="border-b border-white/8 py-3.5">{claim.customer}</td>
+                  <td className="border-b border-white/8 py-3.5">
+                    <p className="text-white/92">{claim.item}</p>
+                    {claim.evidence ? <p className="text-xs text-[var(--cg-text-muted)]">{claim.evidence}</p> : null}
                   </td>
-                  <td className="border-b border-[#EDF5FA] py-3.5">
-                    <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ${riskClass[claim.risk]}`}>
-                      {claim.risk}
+                  <td className="border-b border-white/8 py-3.5">
+                    <span className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${riskClass[claim.risk]}`}>
+                      {claim.risk === "Low" ? "Low Concern" : claim.risk === "Medium" ? "Review Suggested" : "Manual Review"}
                     </span>
                   </td>
-                  <td className="border-b border-[#EDF5FA] py-3.5 font-mono text-slate-900">{claim.score}</td>
-                  <td className="border-b border-[#EDF5FA] py-3.5 pr-2">
-                    <p className="font-medium text-slate-900">{claim.status}</p>
-                    <p className="text-xs text-slate-500">{claim.channel}</p>
+                  <td className="border-b border-white/8 py-3.5 font-mono text-white">{claim.score}</td>
+                  <td className="border-b border-white/8 py-3.5 pr-2">
+                    <p className="font-medium text-white">{claim.reviewQueue}</p>
+                    <p className="text-xs text-[var(--cg-text-muted)]">{claim.assignedReviewer} | {claim.channel}</p>
                   </td>
                 </tr>
               );

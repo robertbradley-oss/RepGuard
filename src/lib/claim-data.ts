@@ -72,6 +72,9 @@ export type CaseRecord = {
   id: string;
   customer: string;
   submittedAt: string;
+  lastUpdated: string;
+  assignedReviewer: string;
+  reviewQueue: string;
   item: string;
   channel: string;
   risk: RiskLevel;
@@ -83,6 +86,10 @@ export type CaseRecord = {
     customerNote: string;
     uploadedFile: string;
     fileDetails: string;
+    orderNumber: string;
+    claimReason: string;
+    purchaseChannel: string;
+    supportRepNotes: string;
     sla: string;
     requestedAction: string;
   };
@@ -538,6 +545,9 @@ export const recentCases: CaseRecord[] = [
     id: "CG-1048",
     customer: "Maya R.",
     submittedAt: "Today, 10:42 AM",
+    lastUpdated: "11:18 AM",
+    assignedReviewer: "A. Chen",
+    reviewQueue: "Warranty manual review",
     item: "iSpring RCC7AK filter system",
     channel: "Zendesk",
     risk: "Medium",
@@ -550,6 +560,11 @@ export const recentCases: CaseRecord[] = [
         "The under-sink filter housing started leaking after installation. I attached the receipt and a photo of the cracked canister.",
       uploadedFile: "maya-r-ispring-rcc7ak-receipt.jpg",
       fileDetails: "JPG image | 3.4 MB",
+      orderNumber: "ORD-IS-884219",
+      claimReason: "Housing leak after installation",
+      purchaseChannel: "Direct web store",
+      supportRepNotes:
+        "Verify order total and purchase date before replacement handling. Customer has provided one receipt image and one damage photo.",
       sla: "Review by 4:00 PM",
       requestedAction: "Warranty replacement review",
     },
@@ -558,6 +573,9 @@ export const recentCases: CaseRecord[] = [
     id: "CG-1047",
     customer: "Jon Bell",
     submittedAt: "Today, 9:18 AM",
+    lastUpdated: "10:05 AM",
+    assignedReviewer: "M. Rivera",
+    reviewQueue: "Standard policy check",
     item: "iSpring WSP50 spin-down filter",
     channel: "Email",
     risk: "Low",
@@ -570,6 +588,11 @@ export const recentCases: CaseRecord[] = [
         "The sediment filter arrived with a damaged clear housing. I uploaded the invoice from my order confirmation.",
       uploadedFile: "jon-bell-wsp50-invoice.pdf",
       fileDetails: "PDF document | 819 KB",
+      orderNumber: "ORD-IS-882904",
+      claimReason: "Damaged housing on arrival",
+      purchaseChannel: "Email order confirmation",
+      supportRepNotes:
+        "Visible invoice fields are readable. Confirm purchase window and product model before standard warranty approval.",
       sla: "Review by 2:30 PM",
       requestedAction: "Standard warranty approval",
     },
@@ -578,6 +601,9 @@ export const recentCases: CaseRecord[] = [
     id: "CG-1046",
     customer: "N. Patel",
     submittedAt: "Yesterday, 4:55 PM",
+    lastUpdated: "Today, 8:12 AM",
+    assignedReviewer: "R. Brooks",
+    reviewQueue: "Senior support review",
     item: "iSpring UVF11A lamp kit",
     channel: "Intercom",
     risk: "High",
@@ -590,6 +616,11 @@ export const recentCases: CaseRecord[] = [
         "The replacement UV lamp appears cracked near the connector. I sent a close-up image but can provide more photos if needed.",
       uploadedFile: "patel-uvf11a-closeup.webp",
       fileDetails: "WEBP image | 2.1 MB",
+      orderNumber: "ORD-IS-879331",
+      claimReason: "Connector area crack",
+      purchaseChannel: "Intercom attachment",
+      supportRepNotes:
+        "Close crop limits product context. Request wider product photo showing serial area and damage location together.",
       sla: "Review by tomorrow, 11:00 AM",
       requestedAction: "Senior support review",
     },
@@ -598,6 +629,9 @@ export const recentCases: CaseRecord[] = [
     id: "CG-1045",
     customer: "Elena M.",
     submittedAt: "Yesterday, 2:07 PM",
+    lastUpdated: "Yesterday, 3:44 PM",
+    assignedReviewer: "T. Nguyen",
+    reviewQueue: "Proof-of-purchase verification",
     item: "iSpring ED2000 conditioner",
     channel: "Shopify",
     risk: "Medium",
@@ -610,6 +644,11 @@ export const recentCases: CaseRecord[] = [
         "The water conditioner stopped powering on. I attached a screenshot from the order page because I cannot find the email receipt.",
       uploadedFile: "elena-m-ed2000-order-screenshot.png",
       fileDetails: "PNG image | 1.6 MB",
+      orderNumber: "ORD-IS-877618",
+      claimReason: "Unit stopped powering on",
+      purchaseChannel: "Shopify account screenshot",
+      supportRepNotes:
+        "Screenshot is partial. Ask for full order confirmation or match order details against account history.",
       sla: "Review by tomorrow, 9:30 AM",
       requestedAction: "Proof-of-purchase verification",
     },

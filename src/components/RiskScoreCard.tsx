@@ -1,5 +1,5 @@
-import { ShieldAlert } from "lucide-react";
-import type { AnalysisStatus, RiskLevel } from "@/lib/claim-data";
+import { Activity, ArrowRight, BarChart3, ShieldAlert } from "lucide-react";
+import type { AnalysisConfidence, AnalysisStatus, RiskLevel } from "@/lib/claim-data";
 
 type RiskScoreCardProps = {
   score: number;
@@ -7,18 +7,27 @@ type RiskScoreCardProps = {
   status?: AnalysisStatus;
   reviewLabel?: string;
   summary?: string;
+  confidenceLevel?: AnalysisConfidence;
+  signalCount?: number;
+  suggestedAction?: string;
 };
 
-const riskStyles: Record<RiskLevel, string> = {
-  Low: "bg-[#E9FFF0] text-[#0B5F2A] ring-[#41D66F]/40",
-  Medium: "bg-[#F7FBFF] text-[#066B8F] ring-[#19D3F3]/45",
-  High: "bg-[#FFF1F2] text-[#9F1239] ring-[#FECDD3]",
+const riskClass: Record<RiskLevel, string> = {
+  Low: "cg-risk-low",
+  Medium: "cg-risk-medium",
+  High: "cg-risk-high",
 };
 
-const riskCopy: Record<RiskLevel, string> = {
-  Low: "No high-risk signals were generated in this mock review.",
-  Medium: "Evidence has review signals that should be checked before resolution.",
-  High: "Evidence needs a careful manual review before the rep decides next steps.",
+const riskLabel: Record<RiskLevel, string> = {
+  Low: "Low Concern",
+  Medium: "Review Suggested",
+  High: "Elevated Risk",
+};
+
+const severityDistribution: Record<RiskLevel, { low: number; medium: number; high: number }> = {
+  Low: { low: 72, medium: 22, high: 6 },
+  Medium: { low: 38, medium: 48, high: 14 },
+  High: { low: 22, medium: 34, high: 44 },
 };
 
 export function RiskScoreCard({
@@ -27,71 +36,112 @@ export function RiskScoreCard({
   status = "complete",
   reviewLabel = "Manual review recommended",
   summary = "The mock screening found mixed signals. Treat this as a prioritization cue, not a determination about the customer or the claim.",
+  confidenceLevel = "Medium confidence",
+  signalCount = 0,
+  suggestedAction = "Use the report to guide manual verification before resolving the claim.",
 }: RiskScoreCardProps) {
-  const circumference = 2 * Math.PI * 44;
-  const progress = (score / 100) * circumference;
   const isPending = status !== "complete";
+  const distribution = severityDistribution[riskLevel];
 
   return (
-    <section className="cg-panel rounded-lg p-4">
+    <section className="cg-forensic-panel rounded-[1.35rem] p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Authenticity score</p>
-          <h2 className="mt-1 text-lg font-semibold text-[#061426]">Evidence review</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--cg-cyan)]">
+            Risk intelligence
+          </p>
+          <h2 className="mt-1 text-xl font-semibold text-white">Scoring module</h2>
         </div>
-        <span className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ${riskStyles[riskLevel]}`}>
-          {isPending ? "Awaiting report" : `${riskLevel} risk`}
+        <span
+          className={`shrink-0 rounded-lg border px-3 py-1 text-xs font-bold ${
+            isPending ? "cg-security-badge" : riskClass[riskLevel]
+          }`}
+        >
+          {isPending ? "Awaiting report" : riskLabel[riskLevel]}
         </span>
       </div>
 
-      <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center">
-        <div className="relative size-28 shrink-0">
-          <svg className="size-28 -rotate-90" viewBox="0 0 104 104" role="img" aria-label={`Authenticity score ${score} of 100`}>
-            <circle cx="52" cy="52" r="44" fill="none" stroke="#E4F0F7" strokeWidth="10" />
-            <circle
-              cx="52"
-              cy="52"
-              r="44"
-              fill="none"
-              stroke={isPending ? "#E4F0F7" : "#08AEEA"}
-              strokeLinecap="round"
-              strokeWidth="10"
-              strokeDasharray={`${progress} ${circumference - progress}`}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-bold text-[#061426]">{isPending ? "--" : score}</span>
-            <span className="text-xs font-medium text-slate-500">/ 100</span>
+      <div className="mt-6 rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/62 p-4">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
+              Authenticity confidence
+            </p>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="font-mono text-6xl font-semibold leading-none tabular-nums text-white">
+                {isPending ? "--" : score}
+              </span>
+              <span className="font-mono text-sm text-[var(--cg-text-muted)]">/100</span>
+            </div>
           </div>
+          <ShieldAlert className="mb-2 size-9 text-[var(--cg-cyan)]" aria-hidden="true" />
         </div>
-
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#00A7A5]">
-            <ShieldAlert className="size-4" aria-hidden="true" />
-            {isPending ? "Upload evidence to begin" : reviewLabel}
-          </div>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            {isPending
-              ? "The authenticity score will update after the local mock analysis completes."
-              : summary}
-          </p>
+        <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#13243a]">
+          <div
+            className={`h-full rounded-full ${
+              riskLevel === "High"
+                ? "bg-[var(--cg-red)]"
+                : riskLevel === "Medium"
+                  ? "bg-[var(--cg-cyan)]"
+                  : "bg-[var(--cg-green)]"
+            }`}
+            style={{ width: isPending ? "0%" : `${score}%` }}
+          />
         </div>
       </div>
 
-      <div className="mt-4 space-y-3 border-t border-[#E4F0F7] pt-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">How to read it</p>
-          <p className="mt-1 text-sm leading-5 text-slate-700">
-            Higher scores mean fewer mock review signals, not a guarantee of authenticity.
-          </p>
-        </div>
-        <div className="rounded-lg bg-[#F8FCFF] p-3 ring-1 ring-[#E4F0F7]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Rep guidance</p>
-          <p className="mt-1 text-sm leading-5 text-slate-700">
-            {isPending ? "Run the mock analysis to see the recommended review path." : riskCopy[riskLevel]}
-          </p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-3 xl:grid-cols-1 2xl:grid-cols-3">
+        {[
+          { label: "Confidence", value: isPending ? "Pending" : confidenceLevel, icon: Activity },
+          { label: "Signals", value: isPending ? "--" : `${signalCount} detected`, icon: BarChart3 },
+          { label: "Review state", value: isPending ? "Evidence needed" : reviewLabel, icon: ShieldAlert },
+        ].map((item) => (
+          <div className="rounded-xl border border-white/10 bg-white/[0.025] p-3" key={item.label}>
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">
+              <item.icon className="size-3.5 text-[var(--cg-cyan)]" aria-hidden="true" />
+              {item.label}
+            </div>
+            <p className="mt-2 text-sm font-semibold text-white">{item.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 rounded-xl border border-[var(--cg-border)] bg-[#06101f]/62 p-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
+          Severity distribution
+        </p>
+        <div className="mt-3 space-y-2">
+          {[
+            { label: "Low concern", value: distribution.low, color: "bg-[var(--cg-green)]" },
+            { label: "Review suggested", value: distribution.medium, color: "bg-[var(--cg-cyan)]" },
+            { label: "Manual review", value: distribution.high, color: "bg-[var(--cg-red)]" },
+          ].map((item) => (
+            <div className="grid grid-cols-[112px_1fr_34px] items-center gap-2 text-xs" key={item.label}>
+              <span className="font-semibold text-[var(--cg-text-muted)]">{item.label}</span>
+              <span className="h-2 overflow-hidden rounded-full bg-[#13243a]">
+                <span className={`block h-full rounded-full ${item.color}`} style={{ width: isPending ? "0%" : `${item.value}%` }} />
+              </span>
+              <span className="font-mono text-[var(--cg-text-soft)]">{isPending ? "--" : item.value}</span>
+            </div>
+          ))}
         </div>
       </div>
+
+      <div className="mt-4 rounded-xl border border-[rgba(74,222,128,0.26)] bg-[rgba(74,222,128,0.08)] p-3">
+        <div className="flex items-start gap-2">
+          <ArrowRight className="mt-0.5 size-4 shrink-0 text-[var(--cg-green)]" aria-hidden="true" />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--cg-green)]">
+              Recommended support action
+            </p>
+            <p className="mt-1 text-sm leading-5 text-[var(--cg-text-soft)]">
+              {isPending ? "Attach evidence and run mock analysis to receive support-safe guidance." : suggestedAction}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p className="mt-4 text-sm leading-6 text-[var(--cg-text-muted)]">{isPending ? "Scores appear after review." : summary}</p>
     </section>
   );
 }

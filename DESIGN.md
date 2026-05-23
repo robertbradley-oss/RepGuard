@@ -1,0 +1,100 @@
+# ClaimGuard Design System
+
+ClaimGuard should look like a fraud-risk evidence review command center for support and warranty teams. It should not look like a generic white-card SaaS template, a default shadcn demo, or a centered landing page.
+
+## Design Principles
+
+- Evidence first: every screen should communicate claim evidence, document review, and support decisioning.
+- Evidence viewer first: uploaded receipts, screenshots, PDFs, and product photos should feel like inspected artifacts, not generic attachments.
+- Dark operational shell: use deep navy and charcoal as the base, with bright but controlled blue and verification green accents.
+- Dense but readable: support reps should scan scores, tickets, evidence, review signals, and safe wording quickly.
+- Professional, not cyberpunk: forensic textures, grid lines, receipt-paper surfaces, and scanline accents are acceptable when subtle.
+- Support-safe: visual urgency can indicate review priority, but copy must never accuse a customer or confirm fraud.
+
+## Tokens
+
+### Background Colors
+
+- `--cg-bg`: `#06101f` app background.
+- `--cg-bg-deep`: `#020713` deepest shell/nav surfaces.
+- `--cg-bg-panel`: `#0b1728` primary evidence panels.
+- `--cg-bg-panel-2`: `#101f34` raised panels.
+- `--cg-bg-paper`: `#f4f7f2` receipt/document preview surfaces.
+- `--cg-bg-muted`: `#13243a` subdued controls and inactive states.
+
+### Text Colors
+
+- `--cg-text`: `#edf7ff` primary text on dark.
+- `--cg-text-muted`: `#9fb4c8` secondary text.
+- `--cg-text-soft`: `#c8d8e8` supporting text.
+- `--cg-text-paper`: `#142133` text on document/receipt surfaces.
+
+### Accent Colors
+
+- `--cg-blue`: `#18b7ff` electric review blue.
+- `--cg-cyan`: `#35d9ff` scanline cyan.
+- `--cg-green`: `#4ade80` verification green.
+- `--cg-amber`: `#fbbf24` manual-review amber.
+- `--cg-red`: `#fb7185` high-priority review red.
+
+### Border Styles
+
+- `--cg-border`: `rgba(100, 169, 214, 0.28)` standard dark-surface border.
+- `--cg-border-strong`: `rgba(53, 217, 255, 0.45)` active evidence border.
+- `--cg-border-paper`: `rgba(20, 33, 51, 0.14)` document surface border.
+- Use fine 1px borders, inset highlights, and left accent rails instead of thick generic card outlines.
+
+### Shadows And Glows
+
+- `--cg-shadow-panel`: `0 24px 80px rgba(0, 0, 0, 0.34)`.
+- `--cg-shadow-blue`: `0 0 0 1px rgba(53, 217, 255, 0.2), 0 18px 48px rgba(24, 183, 255, 0.12)`.
+- `--cg-shadow-green`: `0 0 0 1px rgba(74, 222, 128, 0.24), 0 18px 48px rgba(74, 222, 128, 0.1)`.
+- Glows should be restrained and tied to active review states, not random decoration.
+
+### Risk States
+
+- Low: verification green, standard verification, fewer visible signals.
+- Medium: electric blue/cyan, manual review recommended, inconclusive or mixed context.
+- High: red plus amber, senior/manual review recommended, additional evidence needed.
+- Risk language must remain careful: "risk signal," "manual review recommended," "inconclusive," and "needs proof-of-purchase verification."
+
+### Card Styles
+
+- `cg-forensic-panel`: dark evidence-review panel with scanline texture.
+- `cg-command-panel`: raised dark command-center panel.
+- `cg-ticket-paper`: off-white ticket/document surface that resembles receipt paper.
+- `cg-scan-frame`: evidence-viewer surface with ruler ticks, scanline overlay, metadata, and document/photo inspection affordances.
+- Panels should vary in width, rhythm, and emphasis. Avoid making every card the same size and shape.
+
+### Badge Styles
+
+- Badges are compact, security-style labels with uppercase or short title-case text.
+- Use colored left dots, fine borders, and subtle glow for state.
+- Avoid pill overload; badges should convey risk, status, evidence type, or queue priority.
+
+### Typography Scale
+
+- Page title: 30-40px, tight line-height, semibold.
+- Section heading: 16-22px, semibold.
+- Operational labels: 11-12px, uppercase, tracked.
+- Body: 13-15px, readable line-height.
+- Numeric score: large monospace or tabular-style display.
+
+### Spacing
+
+- App shell: 16-24px gutters.
+- Panel padding: 16-28px depending on emphasis.
+- Dense lists/tables: 10-14px vertical rhythm.
+- Use asymmetric layouts where useful: sidebar plus main command grid, larger upload/report panels, smaller status/risk modules.
+
+## Component Direction
+
+- Dashboard layout: dark shell with subtle grid/scanline texture, investigation record header, dominant evidence viewer, case queue, and review report.
+- Sidebar: compact security console navigation with logo, status, and active review rail.
+- Upload panel: evidence workstation with scan-frame viewer, zoom controls, evidence ID, upload timestamp, file metadata, hash-style details, and local mock analysis action.
+- Ticket preview: support-ticket surface with customer message, order number, claim reason, uploaded attachments, purchase channel, support rep notes, SLA, and requested action.
+- Risk score card: serious scoring module with authenticity confidence, signal count, severity distribution, confidence, review state, and recommended support action.
+- Red flags list: "Detected signals" or "Review signals," not accusations; dense signal rows with severity, confidence, evidence source, and manual review recommendation.
+- Analysis report: evidence summary, suggested support action, customer-safe wording, verification checks, and signal-versus-proof guardrail.
+- Recent cases table: operational queue table with selected/new states and security-style risk badges.
+- Empty/loading/error states: dark forensic surfaces that explain the next safe action without sounding accusatory.

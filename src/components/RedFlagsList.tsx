@@ -1,48 +1,100 @@
-import { AlertCircle } from "lucide-react";
-import type { AnalysisStatus, RedFlag } from "@/lib/claim-data";
+import { AlertCircle, CheckCircle2, Radar } from "lucide-react";
+import type { AnalysisStatus, RedFlag, RiskLevel } from "@/lib/claim-data";
 
 type RedFlagsListProps = {
   flags: RedFlag[];
   status?: AnalysisStatus;
+  evidenceLabel: string;
+  riskLevel: RiskLevel;
 };
 
-export function RedFlagsList({ flags, status = "complete" }: RedFlagsListProps) {
+const severityByRisk: Record<RiskLevel, string[]> = {
+  Low: ["Low concern", "Verification note", "Low concern"],
+  Medium: ["Review suggested", "Verification incomplete", "Low confidence"],
+  High: ["Elevated risk", "Review suggested", "Manual review required"],
+};
+
+export function RedFlagsList({
+  flags,
+  status = "complete",
+  evidenceLabel,
+  riskLevel,
+}: RedFlagsListProps) {
   const isPending = status !== "complete";
 
   return (
-    <section className="cg-panel rounded-lg p-4">
+    <section className="cg-command-panel rounded-[1.15rem] p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-[#061426]">Review signals</h2>
-          <p className="mt-1 text-xs text-slate-500">Signals guide manual review, not conclusions.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--cg-cyan)]">
+            Signal monitor
+          </p>
+          <h2 className="mt-1 text-xl font-semibold text-white">Detected signals</h2>
+          <p className="mt-1 text-xs text-[var(--cg-text-muted)]">Signals guide manual review, not conclusions.</p>
         </div>
-        <span className="text-xs font-semibold text-slate-500">
+        <span className="cg-security-badge rounded-lg px-3 py-1 text-xs font-semibold">
           {isPending ? "Pending" : `${flags.length} signals`}
         </span>
       </div>
 
-      <div className="mt-4 space-y-2.5">
+      <div className="mt-4 space-y-3">
         {isPending ? (
-          <div className="rounded-lg border border-dashed border-[#D5E8F3] bg-[#F8FCFF] p-4 text-sm leading-6 text-slate-600">
-            Risk signals will appear here after the mock analysis completes.
+          <div className="rounded-xl border border-dashed border-[var(--cg-border-strong)] bg-[#06101f]/58 p-4 text-sm leading-6 text-[var(--cg-text-muted)]">
+            <div className="flex items-start gap-3">
+              <Radar className="mt-0.5 size-5 shrink-0 text-[var(--cg-cyan)]" aria-hidden="true" />
+              <p>Detected signals will appear here after the mock analysis completes.</p>
+            </div>
           </div>
         ) : null}
 
         {!isPending &&
-          flags.map((flag) => (
-            <article className="rounded-lg border border-[#E4F0F7] bg-white p-3" key={flag.label}>
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-[#FFF8EA] text-amber-700 ring-1 ring-amber-200">
-                  <AlertCircle className="size-4" aria-hidden="true" />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">{flag.label}</p>
-                  <p className="mt-1 text-sm leading-5 text-slate-600">{flag.detail}</p>
-                  <p className="mt-2 text-xs font-semibold text-slate-500">{flag.confidence}</p>
+          flags.map((flag, index) => {
+            const severity = severityByRisk[riskLevel][index] ?? severityByRisk[riskLevel][0];
+
+            return (
+              <article
+                className="cg-evidence-rail rounded-xl border border-[var(--cg-border)] bg-[#06101f]/62 p-3 transition hover:border-[var(--cg-border-strong)] hover:bg-[#0b1728]/70"
+                key={flag.label}
+              >
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg border border-[rgba(251,191,36,0.35)] bg-[rgba(251,191,36,0.1)] text-[var(--cg-amber)]">
+                    <AlertCircle className="size-4" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-semibold text-white">{flag.label}</p>
+                      <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[10px] font-bold text-[var(--cg-text-muted)]">
+                        SIG-{String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm leading-5 text-[var(--cg-text-muted)]">{flag.detail}</p>
+
+                    <dl className="mt-3 grid gap-2 sm:grid-cols-3">
+                      {[
+                        { label: "Severity", value: severity },
+                        { label: "Confidence", value: flag.confidence },
+                        { label: "Evidence source", value: evidenceLabel },
+                      ].map((item) => (
+                        <div className="rounded-lg border border-white/10 bg-white/[0.025] px-2.5 py-2" key={item.label}>
+                          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">
+                            {item.label}
+                          </dt>
+                          <dd className="mt-1 text-xs font-semibold text-[var(--cg-text-soft)]">{item.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+
+                    <div className="mt-3 flex items-start gap-2 rounded-lg border border-[rgba(74,222,128,0.22)] bg-[rgba(74,222,128,0.07)] p-2.5">
+                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[var(--cg-green)]" aria-hidden="true" />
+                      <p className="text-xs leading-5 text-[var(--cg-text-soft)]">
+                        Manual review recommended before final support action. Ask for verification only when needed.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
       </div>
     </section>
   );
