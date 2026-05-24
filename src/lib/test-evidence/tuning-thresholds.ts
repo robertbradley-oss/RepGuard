@@ -123,8 +123,8 @@ export const analyzerTuningSummary = {
     },
     {
       label: "Date labels",
-      value: "order/purchase/transaction/invoice/date",
-      detail: "The parser records the source label used for extracted purchase dates.",
+      value: "order/purchase/transaction/invoice/date plus ISO",
+      detail: "The parser records the source label used for extracted purchase dates, including month-day-year, day-month-year, numeric, and ISO-style dates.",
     },
     {
       label: "Split date labels",
@@ -188,8 +188,8 @@ export const analyzerTuningSummary = {
     },
     {
       label: "Split label/value lines",
-      value: "label line + adjacent amount/payment",
-      detail: "Pairs amount and payment labels with the following value line so mobile OCR line breaks keep useful source context.",
+      value: "label line + adjacent date/amount/payment",
+      detail: "Pairs common date, amount due/balance due, currency-prefixed amount, and payment/tender labels with the following value line so OCR line breaks keep useful source context.",
     },
     {
       label: "Amazon order format",

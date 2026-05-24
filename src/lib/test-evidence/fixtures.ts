@@ -6,6 +6,7 @@ export type SampleEvidenceFixtureId =
   | "item-price-receipt"
   | "quantity-sku-receipt"
   | "generic-order-confirmation"
+  | "generic-split-summary"
   | "lowes-email-order"
   | "ispring-direct-invoice"
   | "adjusted-receipt"
@@ -411,6 +412,106 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
         }.`,
         note:
           "Generic receipts should use parsed proof-of-purchase fields for review instead of Amazon-only structure checks.",
+      },
+    ],
+  },
+  {
+    id: "generic-split-summary",
+    label: "Generic split-summary order",
+    fileName: "generic-split-summary.jpg",
+    type: "image",
+    description: "Readable generic order confirmation with ISO date, split amount labels, currency prefix, and payment type label.",
+    expectedRisk: "Low",
+    expectedOutcome: "Generic fallback should extract split date, total, and payment fields while keeping the source generic.",
+    tuningNotes:
+      "Use this to tune common order confirmations where labels and values land on separate OCR lines. This should improve field extraction without creating a merchant-specific classifier.",
+    loadFile: () =>
+      canvasToFile(
+        drawReceiptCanvas([
+          "NEIGHBORHOOD WATER SUPPLY",
+          "Order Confirmation",
+          "Order No. NWS-778201",
+          "Placed",
+          "2026-05-04",
+          "RCC7AK filter kit $72.00",
+          "Merchandise Total",
+          "72.00",
+          "HST",
+          "5.76",
+          "Amount Due",
+          "CAD $77.76",
+          "Payment Type",
+          "Shop Pay Visa ending with 4242",
+          "Pickup",
+          "Ready for pickup",
+        ]),
+        "generic-split-summary.jpg",
+      ),
+    evaluate: (result) => [
+      {
+        label: "Generic split-summary source remains generic",
+        status: expectationStatus(
+          result.receipt.sourceClassification.category === "generic-merchant-receipt" &&
+            result.receipt.sourceClassification.confidence < 70 &&
+            result.receipt.structure.amazonOrderFormat === "not-applicable",
+          "Warning",
+        ),
+        detail: `Class ${result.receipt.sourceClassification.label}; confidence ${result.receipt.sourceClassification.confidence}%; Amazon format ${result.receipt.structure.amazonOrderFormat}.`,
+        note:
+          "Split-label generic confirmations should stay in the generic source lane and avoid Amazon-only validation.",
+      },
+      {
+        label: "Generic split date is extracted",
+        status: expectationStatus(
+          result.receipt.purchaseDate === "2026-05-04" && /Adjacent order date label/.test(result.receipt.parsingDetails.purchaseDateSource ?? ""),
+          "Warning",
+        ),
+        detail: `Date ${result.receipt.purchaseDate ?? "missing"}; source ${
+          result.receipt.parsingDetails.purchaseDateSource ?? "missing"
+        }.`,
+        note:
+          "A split Placed label followed by an ISO date should populate the purchase date for manual order matching.",
+      },
+      {
+        label: "Generic split amount total is selected",
+        status: expectationStatus(
+          result.receipt.total === "77.76" && /Amount Due label/.test(result.receipt.parsingDetails.selectedTotalSource ?? ""),
+          "Warning",
+        ),
+        detail: `Total ${result.receipt.total ?? "missing"}; source ${
+          result.receipt.parsingDetails.selectedTotalSource ?? "missing"
+        }; amount candidates ${result.receipt.parsingDetails.amountCandidates.length}.`,
+        note:
+          "Amount Due with a following CAD value should beat item-price and subtotal lines when selecting the proof-of-purchase total.",
+      },
+      {
+        label: "Generic payment type is extracted",
+        status: expectationStatus(
+          Boolean(result.receipt.paymentMethod) &&
+            result.receipt.parsingDetails.paymentSource === "Payment detail after label" &&
+            result.receipt.parsingDetails.paymentCandidates.some((candidate) => candidate.kind === "card" && candidate.hasVisibleLastFour),
+          "Warning",
+        ),
+        detail: `Payment source ${result.receipt.parsingDetails.paymentSource ?? "missing"}; candidates ${
+          result.receipt.parsingDetails.paymentCandidates
+            .map((candidate) => `${candidate.kind}:${candidate.hasVisibleLastFour ? "last-four" : "no-last-four"}`)
+            .join(" | ") || "none"
+        }.`,
+        note:
+          "Payment Type followed by card or wallet wording should support matching without requiring a known merchant.",
+      },
+      {
+        label: "Generic split source summary remains privacy-safe",
+        status: expectationStatus(
+          result.receipt.sourceSpecificSummary?.category === "generic-merchant-receipt" &&
+            !/NWS-778201|4242|2026-05-04|Neighborhood Water Supply/i.test(JSON.stringify(result.receipt.sourceSpecificSummary)),
+          "Warning",
+        ),
+        detail: result.receipt.sourceSpecificSummary
+          ? `${result.receipt.sourceSpecificSummary.confidence}% confidence; ${result.receipt.sourceSpecificSummary.fieldsPresent}/${result.receipt.sourceSpecificSummary.fieldsExpected} fields.`
+          : "No source summary.",
+        note:
+          "Even richer generic extraction should keep source summaries to field presence and counts only.",
       },
     ],
   },

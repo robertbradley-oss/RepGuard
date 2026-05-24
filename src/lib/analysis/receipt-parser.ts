@@ -13,13 +13,14 @@ import type {
 } from "@/lib/analysis/types";
 
 const amazonOrderPattern = /^\d{3}-\d{7}-\d{7}$/;
-const receiptDatePattern = /([A-Za-z]{3,9}\s+\d{1,2},\s+\d{4}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i;
+const receiptDatePattern =
+  /((?:(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)\s*,?\s+)?(?:[A-Za-z]{3,9}\s+\d{1,2}(?:,?\s+\d{4})|\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}|\d{4}[/-]\d{1,2}[/-]\d{1,2}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}))/i;
 const amazonInvoiceDatePattern =
   /((?:(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)\s*,?\s+)?(?:[A-Za-z]{3,9}\s+\d{1,2}(?:,?\s+\d{4})?|\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}|\d{4}[/-]\d{1,2}[/-]\d{1,2}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}))/i;
 const lowesDatePattern =
   /((?:(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)\s*,?\s+)?[A-Za-z]{3,9}\s+\d{1,2}(?:,\s+\d{4})?|\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?)/i;
 const fieldLabelPattern =
-  /^(order|order id|invoice|invoice number|receipt|date|status|e-mail|email|telephone|phone|purchased|purchase date|purchased on|ordered|ordered on|placed|transaction date|invoice date|order placed|placed on|order date|items ordered|order summary|order history|date added|customer order comment|image|product|model|quantity|unit price|arriving|arrives|delivered|shipped|shipped to|sold by|seller|shipping method|billing address|shipping address|payment address|bill to|billed to|subtotal|sub-total|item subtotal|estimated tax|tax|sales tax|shipping|delivery|ship to|deliver to|recipient|grand total|orders? total|total paid|amount paid|payment total|total|payment|payment method|payment information|paid with|charged|promotion|promo|subscribe & save|visa|mastercard|amex|paypal|gift card|store credit|thank you)\b/i;
+  /^(order|order id|invoice|invoice number|receipt|date|status|e-mail|email|telephone|phone|purchased|purchase date|purchased on|ordered|ordered on|placed|transaction date|invoice date|order placed|placed on|order date|items ordered|order summary|order history|date added|customer order comment|image|product|model|quantity|unit price|arriving|arrives|delivered|shipped|shipped to|sold by|seller|shipping method|billing address|shipping address|payment address|bill to|billed to|subtotal|sub-total|item subtotal|estimated tax|tax|sales tax|vat|gst|hst|shipping|delivery|ship to|deliver to|recipient|grand total|orders? total|invoice total|receipt total|final total|amount due|balance due|total paid|amount paid|payment total|total|payment|payments|payment type|payment method|method of payment|payment information|paid with|charged|tender|tender type|promotion|promo|subscribe & save|visa|mastercard|amex|paypal|gift card|store credit|thank you)\b/i;
 
 function compact(text: string) {
   return text.replace(/[^\S\r\n]+/g, " ").trim();
@@ -253,7 +254,11 @@ function getPurchaseDate(text: string, lines: string[], sourceCategory?: Receipt
 }
 
 function amountPriorityFor(line: string) {
-  if (/\b(grand\s*total|orders?\s*total|order\s*summary|total\s*paid|amount\s*paid|payment\s*total|total\s*charged|amount\s*charged|charged)\b/i.test(line)) {
+  if (
+    /\b(grand\s*total|orders?\s*total|invoice\s*total|receipt\s*total|final\s*total|amount\s*due|balance\s*due|order\s*summary|total\s*paid|amount\s*paid|payment\s*total|total\s*charged|amount\s*charged|charged)\b/i.test(
+      line,
+    )
+  ) {
     return 100;
   }
 
@@ -289,11 +294,15 @@ function amountCategoryFor(line: string): ReceiptAmountCategory {
     return "subtotal";
   }
 
-  if (/\b(grand\s*total|orders?\s*total|order\s*summary|total\s*paid|amount\s*paid|payment\s*total|total\s*charged|amount\s*charged|charged|total)\b/i.test(line)) {
+  if (
+    /\b(grand\s*total|orders?\s*total|invoice\s*total|receipt\s*total|final\s*total|amount\s*due|balance\s*due|order\s*summary|total\s*paid|amount\s*paid|payment\s*total|total\s*charged|amount\s*charged|charged|total)\b/i.test(
+      line,
+    )
+  ) {
     return "total";
   }
 
-  if (/\b(payment|paid|visa|mastercard|amex|paypal|gift card|store credit)\b/i.test(line)) {
+  if (/\b(payment|paid|visa|mastercard|amex|paypal|apple pay|google pay|shop pay|gift card|store credit)\b/i.test(line)) {
     return "payment";
   }
 
@@ -301,7 +310,7 @@ function amountCategoryFor(line: string): ReceiptAmountCategory {
 }
 
 function amountMatchesFor(line: string) {
-  return [...line.matchAll(/\$?\s*(\d[\d,]*[.]\d{2})/g)];
+  return [...line.matchAll(/(?:\b(?:USD|CAD)\s*)?\$?\s*(\d[\d,]*[.]\d{2})/gi)];
 }
 
 function hasAmount(line: string) {
@@ -345,12 +354,12 @@ function getAmountCandidates(lines: string[]) {
       matchIndex,
     }));
     const nextLine = lines[lineIndex + 1];
-    const nextLineAmount = nextLine?.match(/^\s*\$?\s*(\d[\d,]*[.]\d{2})\s*$/);
+    const nextLineAmount = nextLine?.match(/^\s*(?:USD|CAD)?\s*\$?\s*(\d[\d,]*[.]\d{2})\s*$/i);
     const shouldPairNextLine =
       !matches.length &&
       nextLineAmount?.[1] &&
       amountCategoryFor(line) !== "other" &&
-      /\b(subtotal|sub total|item subtotal|items total|merchandise total|tax|shipping|delivery|grand\s*total|orders?\s*total|total\s*paid|amount\s*paid|payment\s*total|total|charged)\b/i.test(
+      /\b(subtotal|sub total|item subtotal|items total|merchandise total|tax|vat|gst|hst|shipping|delivery|grand\s*total|orders?\s*total|invoice\s*total|receipt\s*total|final\s*total|amount\s*due|balance\s*due|total\s*paid|amount\s*paid|payment\s*total|total|charged)\b/i.test(
         line,
       );
 
@@ -421,7 +430,7 @@ function paymentKindFor(line: string, sourceCategory?: ReceiptSourceCategory): R
     return "card";
   }
 
-  if (/\bpaypal\b/i.test(line)) {
+  if (/\b(paypal|apple pay|google pay|shop pay)\b/i.test(line)) {
     return "wallet";
   }
 
@@ -442,7 +451,7 @@ function hasPaymentCue(line: string, sourceCategory?: ReceiptSourceCategory) {
     return true;
   }
 
-  return /\b(payment|payment method|payment information|payment details|payment summary|paid with|paid by|charged to|charged|tender|visa|mastercard|amex|american express|discover|credit card|debit card|paypal|gift card|store credit|amazon(?:\.com)? store card|card ending|ending(?:\s+(?:in|with))?|last\s*(?:four|4))\b/i.test(
+  return /\b(payment|payment type|payment method|method of payment|payment information|payment details|payment summary|paid with|paid by|charged to|charged|tender|tender type|visa|mastercard|amex|american express|discover|credit card|debit card|paypal|apple pay|google pay|shop pay|gift card|store credit|amazon(?:\.com)? store card|card ending|ending(?:\s+(?:in|with))?|last\s*(?:four|4))\b/i.test(
     line,
   );
 }
@@ -456,7 +465,7 @@ function hasPaymentLabel(line: string, sourceCategory?: ReceiptSourceCategory) {
     return /\b(payment method|payment information|payment details|payment instrument|payment summary|paid with|paid by|charged to)\b/i.test(line);
   }
 
-  return /^\s*(payment|payments|payment method|payment information|payment details|payment summary|paid with|paid by|charged to|tender)\s*:?\s*$/i.test(
+  return /^\s*(payment|payments|payment type|payment method|method of payment|payment information|payment details|payment summary|paid with|paid by|charged to|tender|tender type)\s*:?\s*$/i.test(
     line,
   );
 }
@@ -606,7 +615,7 @@ function contextKindForAdjacentLabel(line: string): ReceiptContextCandidate["kin
     return "delivery";
   }
 
-  if (/^\s*(payment method|payment information|paid with)\s*:?\s*$/i.test(line)) {
+  if (/^\s*(payment|payments|payment type|payment method|method of payment|payment information|paid with|tender|tender type)\s*:?\s*$/i.test(line)) {
     return "payment";
   }
 
@@ -768,8 +777,8 @@ function genericReceiptCueLabels(text: string, lines: string[]) {
     ["Receipt or invoice heading", /\b(receipt|invoice|order confirmation|sales order)\b/i.test(text)],
     ["Order or transaction identifier cue", /\b(order\s*(?:#|id|number|no\.?)|invoice\s*(?:#|id|number|no\.?)|transaction\s*(?:#|id|number|no\.?))\b/i.test(text)],
     ["Purchase/date label cue", /\b(date|order date|purchase date|purchased|ordered|placed|transaction date|invoice date)\b/i.test(text)],
-    ["Amount structure cue", /\b(subtotal|sub total|tax|sales tax|shipping|delivery|grand total|total paid|amount paid|payment total|total charged|amount charged|total)\b/i.test(text)],
-    ["Payment or tender cue", /\b(payment|paid with|paid by|charged to|tender|visa|mastercard|amex|american express|discover|paypal|gift card|store credit|credit card|debit card|ending(?:\s+(?:in|with))?|last\s*(?:four|4))\b/i.test(text)],
+    ["Amount structure cue", /\b(subtotal|sub total|tax|sales tax|vat|gst|hst|shipping|delivery|grand total|invoice total|receipt total|final total|amount due|balance due|total paid|amount paid|payment total|total charged|amount charged|total)\b/i.test(text)],
+    ["Payment or tender cue", /\b(payment|payment type|method of payment|paid with|paid by|charged to|tender|tender type|visa|mastercard|amex|american express|discover|paypal|apple pay|google pay|shop pay|gift card|store credit|credit card|debit card|ending(?:\s+(?:in|with))?|last\s*(?:four|4))\b/i.test(text)],
     ["Shipping or delivery cue", /\b(shipping|delivery|delivered|ship to|shipped to|pickup|store pickup)\b/i.test(text)],
     ["Product/price line cue", hasLineWithAmountAndProduct],
   ];
@@ -910,7 +919,7 @@ function lineItemRejectionReason(line: string, previousLine?: string) {
     return "Receipt field label or summary line";
   }
 
-  if (/amazon|walmart|target|best buy|costco|shopify|ispring water systems/i.test(line)) {
+  if (/amazon|walmart|target|best buy|costco|shopify|home\s*depot|homedepot|ispring water systems/i.test(line)) {
     return "Merchant/platform heading";
   }
 
@@ -957,7 +966,11 @@ function lineItemRejectionReason(line: string, previousLine?: string) {
     return "Order history or shipping status text";
   }
 
-  if (/\b(payment|visa|mastercard|amex|american express|discover|paypal|gift card|store credit|ending(?:\s+(?:in|with))?|last\s*(?:four|4)|card)\b/i.test(line)) {
+  if (
+    /\b(payment|visa|mastercard|amex|american express|discover|paypal|apple pay|google pay|shop pay|gift card|store credit|ending(?:\s+(?:in|with))?|last\s*(?:four|4)|card)\b/i.test(
+      line,
+    )
+  ) {
     return "Payment text";
   }
 
