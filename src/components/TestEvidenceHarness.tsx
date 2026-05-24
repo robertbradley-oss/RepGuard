@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -1138,6 +1138,7 @@ function RealReceiptQaSection({
   onClearRun: (id: string) => void;
   onClearSession: () => void;
 }) {
+  const uploadInputRef = useRef<HTMLInputElement>(null);
   const isRunning = runs.some((run) => run.status === "running");
   const notes = activeRun?.notes ?? emptyRealQaNotes;
   const canCopyFull = Boolean(activeRun?.result && privacyChecklist.sourceRedacted && privacyChecklist.ocrReviewed && privacyChecklist.jsonReviewed);
@@ -1288,18 +1289,24 @@ function RealReceiptQaSection({
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
         <div className="grid gap-4">
-          <label className="grid min-h-44 cursor-pointer place-items-center rounded-xl border border-dashed border-[var(--cg-border)] bg-[#020713]/55 p-5 text-center transition hover:border-[var(--cg-border-strong)]">
-            <input
-              className="sr-only"
-              type="file"
-              accept="image/png,image/jpeg,image/webp,application/pdf"
-              multiple
-              disabled={isRunning}
-              onChange={(event) => {
-                onFilesSelect(Array.from(event.currentTarget.files ?? []));
-                event.currentTarget.value = "";
-              }}
-            />
+          <input
+            ref={uploadInputRef}
+            className="sr-only"
+            type="file"
+            accept="image/png,image/jpeg,image/webp,application/pdf"
+            multiple
+            disabled={isRunning}
+            onChange={(event) => {
+              onFilesSelect(Array.from(event.currentTarget.files ?? []));
+              event.currentTarget.value = "";
+            }}
+          />
+          <button
+            className="grid min-h-44 place-items-center rounded-xl border border-dashed border-[var(--cg-border)] bg-[#020713]/55 p-5 text-center transition hover:border-[var(--cg-border-strong)] disabled:cursor-not-allowed disabled:opacity-70"
+            type="button"
+            disabled={isRunning}
+            onClick={() => uploadInputRef.current?.click()}
+          >
             <span>
               <UploadCloud className="mx-auto size-10 text-[var(--cg-cyan)]" aria-hidden="true" />
               <span className="mt-3 block font-semibold text-white">
@@ -1307,7 +1314,7 @@ function RealReceiptQaSection({
               </span>
               <span className="mt-2 block text-sm text-[var(--cg-text-muted)]">PNG, JPG, WEBP, or PDF. Multiple files stay local to this browser session.</span>
             </span>
-          </label>
+          </button>
 
           {uploadError ? (
             <div className="rounded-lg border border-[rgba(251,113,133,0.42)] bg-[rgba(251,113,133,0.1)] p-3 text-sm text-rose-100">
