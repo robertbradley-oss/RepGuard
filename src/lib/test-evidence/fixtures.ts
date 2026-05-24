@@ -11,6 +11,8 @@ export type SampleEvidenceFixtureId =
   | "home-depot-split-order"
   | "home-depot-long-order-detail"
   | "costco-order"
+  | "costco-split-field-order"
+  | "costco-receipt-id-order"
   | "lowes-email-order"
   | "lowes-split-payment-order"
   | "ispring-direct-invoice"
@@ -867,6 +869,183 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
         }.`,
         note:
           "Costco order identifiers should not become Amazon order-number issues.",
+      },
+    ],
+  },
+  {
+    id: "costco-split-field-order",
+    label: "Costco split-field order",
+    fileName: "costco-split-field-order.jpg",
+    type: "image",
+    description: "Synthetic Costco order layout with split date and masked payment-summary rows.",
+    expectedRisk: "Low",
+    expectedOutcome:
+      "Costco order details should classify as Costco and extract date, total, product detail, and masked payment context from source-scoped labels.",
+    tuningNotes:
+      "Use this to guard privacy-safe Costco observations where source classification and totals work but date or payment fields are missed because labels and values are split across rows.",
+    loadFile: () =>
+      canvasToFile(
+        drawReceiptCanvas([
+          "Costco.ca",
+          "Order Details",
+          "Date Ordered",
+          "May 8, 2026",
+          "Standard Delivery",
+          "iSpring filter replacement kit",
+          "Item Subtotal: $88.00",
+          "GST/HST: $11.44",
+          "Order Total: $99.44",
+          "Tender",
+          "Payment Card",
+          "Masked account",
+        ]),
+        "costco-split-field-order.jpg",
+      ),
+    evaluate: (result) => [
+      {
+        label: "Costco split-field source is classified",
+        status: expectationStatus(
+          result.receipt.sourceClassification.category === "costco-order" &&
+            result.receipt.source === "merchant-receipt",
+          "Warning",
+        ),
+        detail: `Class ${result.receipt.sourceClassification.label}; cues ${result.receipt.sourceClassification.cues.join(" | ")}.`,
+        note:
+          "Costco split-field tuning should stay inside the Costco source lane and avoid generic fallback changes.",
+      },
+      {
+        label: "Costco split-field date, total, and product are extracted",
+        status: expectationStatus(
+          Boolean(
+            result.receipt.purchaseDate &&
+              /Costco/.test(result.receipt.parsingDetails.purchaseDateSource ?? "") &&
+              result.receipt.total &&
+              result.receipt.parsingDetails.lineItemCandidates.some((candidate) => /iSpring filter replacement kit/i.test(candidate)),
+          ),
+          "Warning",
+        ),
+        detail: `Date ${result.receipt.purchaseDate ?? "missing"} from ${
+          result.receipt.parsingDetails.purchaseDateSource ?? "missing"
+        }; total ${result.receipt.total ?? "missing"}; items ${
+          result.receipt.parsingDetails.lineItemCandidates.join(" | ") || "none"
+        }.`,
+        note:
+          "Costco date labels and core proof-of-purchase fields should remain available for manual matching.",
+      },
+      {
+        label: "Costco split-field payment is extracted",
+        status: expectationStatus(
+          Boolean(result.receipt.paymentMethod) &&
+            result.receipt.parsingDetails.paymentSource === "Payment detail after label" &&
+            result.receipt.parsingDetails.paymentCandidates.some((candidate) => candidate.kind === "card" && !candidate.hasVisibleLastFour),
+          "Warning",
+        ),
+        detail: `Payment present ${Boolean(result.receipt.paymentMethod)}; source ${
+          result.receipt.parsingDetails.paymentSource ?? "missing"
+        }; candidates ${result.receipt.parsingDetails.paymentCandidates.length}.`,
+        note:
+          "Masked Costco payment summaries should count as payment context without needing or exposing private payment values.",
+      },
+      {
+        label: "Costco split-field summary stays privacy-safe",
+        status: expectationStatus(
+          result.receipt.sourceSpecificSummary?.category === "costco-order" &&
+            !/\b(?:payment card|masked account|costco\.ca|may 8, 2026)\b/i.test(JSON.stringify(result.receipt.sourceSpecificSummary)),
+          "Warning",
+        ),
+        detail: result.receipt.sourceSpecificSummary
+          ? `${result.receipt.sourceSpecificSummary.confidence}% confidence; ${result.receipt.sourceSpecificSummary.fieldsPresent}/${result.receipt.sourceSpecificSummary.fieldsExpected} fields.`
+          : "No source summary.",
+        note:
+          "Costco source summaries should report presence and counts only, not raw merchant, date, payment, address, member, or private values.",
+      },
+    ],
+  },
+  {
+    id: "costco-receipt-id-order",
+    label: "Costco receipt ID order",
+    fileName: "costco-receipt-id-order.jpg",
+    type: "image",
+    description: "Synthetic Costco receipt/order layout with receipt ID, transaction date, total, product detail, and card-summary wording.",
+    expectedRisk: "Low",
+    expectedOutcome:
+      "Costco receipt/order ID labels should populate the parsed order number field while remaining privacy-safe in source summaries.",
+    tuningNotes:
+      "Use this to guard Costco observations where the source summary sees an order or receipt identifier cue but parsed order number remains missing.",
+    loadFile: () =>
+      canvasToFile(
+        drawReceiptCanvas([
+          "Costco Wholesale",
+          "Receipt # CST-TEST-01",
+          "Transaction Date: 05/09/2026",
+          "Warehouse Delivery",
+          "iSpring membrane kit",
+          "Item Subtotal: $64.00",
+          "Tax: $5.12",
+          "Total Paid: $69.12",
+          "Payment Method",
+          "Costco Anywhere Visa",
+          "Redacted card",
+        ]),
+        "costco-receipt-id-order.jpg",
+      ),
+    evaluate: (result) => [
+      {
+        label: "Costco receipt ID source is classified",
+        status: expectationStatus(
+          result.receipt.sourceClassification.category === "costco-order" &&
+            result.receipt.source === "merchant-receipt",
+          "Warning",
+        ),
+        detail: `Class ${result.receipt.sourceClassification.label}; cues ${result.receipt.sourceClassification.cues.join(" | ")}.`,
+        note:
+          "Receipt ID extraction should stay source-scoped to Costco and preserve non-Amazon behavior.",
+      },
+      {
+        label: "Costco receipt ID and core fields are extracted",
+        status: expectationStatus(
+          Boolean(
+            result.receipt.orderNumber &&
+              result.receipt.structure.hasOrderNumber &&
+              result.receipt.purchaseDate &&
+              result.receipt.total &&
+              result.receipt.paymentMethod,
+          ),
+          "Warning",
+        ),
+        detail: `Order/receipt ID present ${Boolean(result.receipt.orderNumber)}; date ${
+          result.receipt.purchaseDate ?? "missing"
+        }; total ${result.receipt.total ?? "missing"}; payment present ${Boolean(result.receipt.paymentMethod)}.`,
+        note:
+          "Costco receipt/order identifier labels should populate parsed fields for manual proof-of-purchase matching.",
+      },
+      {
+        label: "Costco receipt ID summary stays privacy-safe",
+        status: expectationStatus(
+          result.receipt.sourceSpecificSummary?.category === "costco-order" &&
+            (result.receipt.sourceSpecificSummary.fields.find((field) => field.key === "orderOrReceiptId")?.present ?? false) &&
+            !/\b(?:cst-test-01|costco anywhere visa|redacted card|05\/09\/2026|costco wholesale)\b/i.test(
+              JSON.stringify(result.receipt.sourceSpecificSummary),
+            ),
+          "Warning",
+        ),
+        detail: result.receipt.sourceSpecificSummary
+          ? `${result.receipt.sourceSpecificSummary.confidence}% confidence; ${result.receipt.sourceSpecificSummary.fieldsPresent}/${result.receipt.sourceSpecificSummary.fieldsExpected} fields.`
+          : "No source summary.",
+        note:
+          "Costco summaries should expose identifier presence only, not raw receipt/order IDs, payment wording, dates, member details, addresses, or private values.",
+      },
+      {
+        label: "Costco receipt ID preserves non-Amazon behavior",
+        status: expectationStatus(
+          result.receipt.structure.amazonOrderFormat === "not-applicable" &&
+            !result.signals.some((signal) => /Amazon/i.test(signal.title)) &&
+            result.riskLevel !== "High",
+          "Warning",
+        ),
+        detail: `Amazon format ${result.receipt.structure.amazonOrderFormat}; received ${result.riskLevel} at ${result.score}.`,
+        note:
+          "Costco receipt identifiers should not trigger Amazon order-number validation or automatic high-risk treatment.",
       },
     ],
   },

@@ -96,7 +96,46 @@ function orderIdentifierFromValue(value?: string, sourceCategory?: ReceiptSource
   return orderIdentifierLooksUsable(value, sourceCategory) ? normalizeOrderNumber(value, sourceCategory) : undefined;
 }
 
+function getCostcoOrderNumber(lines: string[]) {
+  const inlinePatterns = [
+    /\b(?:order|web\s*order|online\s*order|receipt|warehouse\s*receipt|transaction)\s*(?:number|no\.?|#|id)\s*[:#-]?\s*([A-Z0-9][A-Z0-9 -]{3,})\b/i,
+    /\b(?:order|receipt|transaction)\s*#\s*([A-Z0-9][A-Z0-9-]{3,})\b/i,
+  ];
+  const adjacentLabelPattern =
+    /^\s*(?:order|web\s*order|online\s*order|receipt|warehouse\s*receipt|transaction)\s*(?:number|no\.?|#|id)?\s*:?\s*$/i;
+
+  for (const line of lines) {
+    for (const pattern of inlinePatterns) {
+      const candidate = orderIdentifierFromValue(line.match(pattern)?.[1], "costco-order");
+      if (candidate) {
+        return candidate;
+      }
+    }
+  }
+
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    if (!adjacentLabelPattern.test(lines[index])) {
+      continue;
+    }
+
+    const candidate = orderIdentifierFromValue(lines[index + 1], "costco-order");
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  return undefined;
+}
+
 function getOrderNumber(lines: string[], text: string, sourceCategory?: ReceiptSourceCategory) {
+  if (isCostcoSource(sourceCategory)) {
+    const costcoOrderNumber = getCostcoOrderNumber(lines);
+
+    if (costcoOrderNumber) {
+      return costcoOrderNumber;
+    }
+  }
+
   const inlinePatterns = isHomeDepotSource(sourceCategory)
     ? [
         /\b(?:online\s+order|order)\s*(?:number|no\.?|#|id)\s*[:#-]?\s*([A-Z0-9][A-Z0-9 -]{3,})\b/i,
@@ -158,6 +197,10 @@ function isAmazonInvoiceOrDetailSource(sourceCategory?: ReceiptSourceCategory) {
 
 function isLowesSource(sourceCategory?: ReceiptSourceCategory) {
   return sourceCategory === "lowes-email-order";
+}
+
+function isCostcoSource(sourceCategory?: ReceiptSourceCategory) {
+  return sourceCategory === "costco-order";
 }
 
 function isHomeDepotSource(sourceCategory?: ReceiptSourceCategory) {
@@ -257,6 +300,89 @@ function getAmazonInvoiceDetailPurchaseDate(text: string, lines: string[]) {
   return undefined;
 }
 
+function isCostcoDateLabel(line: string) {
+  return /\b(order\s*date|date\s*ordered|ordered\s*on|order\s*placed|placed\s*on|purchase\s*date|purchased\s*on|receipt\s*date|transaction\s*date|warehouse\s*date|delivery\s*date)\b/i.test(
+    line,
+  );
+}
+
+function costcoDateSourceFor(line: string) {
+  if (/\b(delivery|delivered)\b/i.test(line)) {
+    return "Costco delivery date label";
+  }
+
+  if (/\b(receipt|transaction|warehouse)\b/i.test(line)) {
+    return "Costco receipt date label";
+  }
+
+  return "Costco order date label";
+}
+
+function getCostcoPurchaseDate(text: string, lines: string[]) {
+  const labelJoiner = String.raw`\s*:?\s*`;
+  const labeledDatePatterns = [
+    {
+      source: "Costco order date label",
+      pattern: new RegExp(
+        String.raw`\b(?:order\s*date|date\s*ordered|ordered\s*on|order\s*placed|placed\s*on)\b${labelJoiner}${receiptDatePattern.source}`,
+        "i",
+      ),
+    },
+    {
+      source: "Costco purchase date label",
+      pattern: new RegExp(String.raw`\b(?:purchase\s*date|purchased\s*on)\b${labelJoiner}${receiptDatePattern.source}`, "i"),
+    },
+    {
+      source: "Costco receipt date label",
+      pattern: new RegExp(
+        String.raw`\b(?:receipt\s*date|transaction\s*date|warehouse\s*date)\b${labelJoiner}${receiptDatePattern.source}`,
+        "i",
+      ),
+    },
+  ];
+
+  for (const item of labeledDatePatterns) {
+    const match = text.match(item.pattern);
+    if (match?.[1]) {
+      return {
+        value: match[1].trim(),
+        source: item.source,
+      };
+    }
+  }
+
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    const line = lines[index];
+
+    if (!line || receiptDatePattern.test(line) || !isCostcoDateLabel(line)) {
+      continue;
+    }
+
+    for (let offset = 1; offset <= 2; offset += 1) {
+      const candidateLine = lines[index + offset];
+
+      if (!candidateLine) {
+        break;
+      }
+
+      const match = candidateLine.match(receiptDatePattern);
+
+      if (match?.[1]) {
+        return {
+          value: match[1].trim(),
+          source: costcoDateSourceFor(line).replace(/^Costco/, "Adjacent Costco"),
+        };
+      }
+
+      if (fieldLabelPattern.test(candidateLine) && !/\b(?:date|ordered|purchase|receipt|transaction|warehouse)\b/i.test(candidateLine)) {
+        break;
+      }
+    }
+  }
+
+  return undefined;
+}
+
 function getPurchaseDate(text: string, lines: string[], sourceCategory?: ReceiptSourceCategory) {
   if (sourceCategory === "lowes-email-order") {
     const lowesInlineMatch = text.match(
@@ -290,6 +416,14 @@ function getPurchaseDate(text: string, lines: string[], sourceCategory?: Receipt
           };
         }
       }
+    }
+  }
+
+  if (isCostcoSource(sourceCategory)) {
+    const costcoPurchaseDate = getCostcoPurchaseDate(text, lines);
+
+    if (costcoPurchaseDate) {
+      return costcoPurchaseDate;
     }
   }
 
@@ -597,6 +731,13 @@ function paymentKindFor(line: string, sourceCategory?: ReceiptSourceCategory): R
   }
 
   if (
+    isCostcoSource(sourceCategory) &&
+    /\b(?:card|credit|debit|visa|mastercard|amex|american express|discover|costco\s+anywhere|masked|redacted)\b/i.test(line)
+  ) {
+    return "card";
+  }
+
+  if (
     isHomeDepotSource(sourceCategory) &&
     (/\b(?:card|credit|debit|visa|mastercard|amex|american express|discover)\b/i.test(line) || hasVisiblePaymentLastFour(line))
   ) {
@@ -623,6 +764,15 @@ function hasPaymentCue(line: string, sourceCategory?: ReceiptSourceCategory) {
   if (
     isLowesSource(sourceCategory) &&
     /\b(?:payment(?:\s+(?:method|details|summary|information))?|paid with|paid by|charged to|tender(?:\s+type)?|visa|mastercard|amex|american express|discover|paypal|wallet|gift card|store credit|payment card|credit card|debit card|\bcard\b|ending(?:\s+(?:in|with))?|last\s*(?:four|4)|x{2,}|\*{2,}|\u2022{2,}|masked|redacted)\b/i.test(
+      line,
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    isCostcoSource(sourceCategory) &&
+    /\b(?:payment(?:\s+(?:method|details|summary|information))?|paid with|paid by|charged to|tender(?:\s+type|ed)?|card(?:\s+type)?|visa|mastercard|amex|american express|discover|costco\s+anywhere|paypal|wallet|gift card|shop card|store credit|payment card|credit card|debit card|\bcard\b|ending(?:\s+(?:in|with))?|last\s*(?:four|4)|x{2,}|\*{2,}|\u2022{2,}|masked|redacted|approved)\b/i.test(
       line,
     )
   ) {
@@ -657,6 +807,15 @@ function hasPaymentLabel(line: string, sourceCategory?: ReceiptSourceCategory) {
     return true;
   }
 
+  if (
+    isCostcoSource(sourceCategory) &&
+    /^\s*(payment|payments|payment method|payment details|payment summary|payment information|paid with|paid by|charged to|tender|tender type|card type)\s*:?\s*$/i.test(
+      line,
+    )
+  ) {
+    return true;
+  }
+
   if (isAmazonInvoiceOrDetailSource(sourceCategory)) {
     return /\b(payment method|payment information|payment details|payment instrument|payment summary|paid with|paid by|charged to)\b/i.test(line);
   }
@@ -674,7 +833,8 @@ function getPaymentCandidates(lines: string[], sourceCategory?: ReceiptSourceCat
     const nextLine = lines[lineIndex + 1];
     const nextNextLine = lines[lineIndex + 2];
     const amazonInvoiceOrDetail = isAmazonInvoiceOrDetailSource(sourceCategory);
-    const supportsTwoLinePaymentDetail = amazonInvoiceOrDetail || isHomeDepotSource(sourceCategory) || isLowesSource(sourceCategory);
+    const supportsTwoLinePaymentDetail =
+      amazonInvoiceOrDetail || isHomeDepotSource(sourceCategory) || isLowesSource(sourceCategory) || isCostcoSource(sourceCategory);
 
     if (hasPaymentLabel(line, sourceCategory) && nextLine && !hasPaymentLabel(nextLine, sourceCategory) && hasPaymentCue(nextLine, sourceCategory)) {
       const paymentDetailLines =
@@ -1415,7 +1575,7 @@ function buildVendorOrderSummary(params: {
   };
   classification: ReceiptSourceClassification;
 }): ReceiptSourceStructureSummary {
-  const alignWithParsedFields = params.classification.category === "home-depot-order";
+  const alignWithParsedFields = params.classification.category === "home-depot-order" || params.classification.category === "costco-order";
   const fields = [
     fieldSummary({
       key: "vendorMarker",

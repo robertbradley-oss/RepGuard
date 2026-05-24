@@ -122,6 +122,11 @@ export const analyzerTuningSummary = {
       detail: "Home Depot, Costco, Lazada, and iSpring direct orders require a visible source marker plus order/layout cues; summaries report presence/counts only and do not externally verify the merchant.",
     },
     {
+      label: "Costco field extraction",
+      value: "date + payment + receipt ID",
+      detail: "Costco source-scoped parsing recognizes split order/date labels, transaction or receipt dates, payment/tender/card-summary rows, and order/receipt identifier labels without changing broad scoring thresholds or other vendor behavior.",
+    },
+    {
       label: "Lowe's payment extraction",
       value: "email/order payment summary",
       detail: "Lowe's source-scoped parsing recognizes split payment labels, tender/payment rows, masked card summaries, and payment-summary layouts without changing broad scoring thresholds or Amazon/generic behavior.",
