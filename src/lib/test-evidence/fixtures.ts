@@ -8,6 +8,7 @@ export type SampleEvidenceFixtureId =
   | "generic-order-confirmation"
   | "generic-split-summary"
   | "home-depot-order"
+  | "home-depot-split-order"
   | "costco-order"
   | "lowes-email-order"
   | "ispring-direct-invoice"
@@ -578,6 +579,15 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
           "Home Depot summaries should expose field presence and counts only, not order, payment, date, or location values.",
       },
       {
+        label: "Home Depot blank order label is not misread",
+        status: expectationStatus(result.receipt.orderNumber !== "Store Pickup", "Warning"),
+        detail: `Order field ${result.receipt.orderNumber ? "present" : "missing"}; missing fields ${
+          result.receipt.missingFields.join(", ") || "none"
+        }.`,
+        note:
+          "A bare Order Number label should not cause fulfillment text such as Store Pickup to be extracted as an order number.",
+      },
+      {
         label: "Home Depot order skips Amazon validation",
         status: expectationStatus(
           result.receipt.structure.amazonOrderFormat === "not-applicable" &&
@@ -589,6 +599,101 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
         }.`,
         note:
           "Home Depot order identifiers should not become Amazon order-number issues.",
+      },
+    ],
+  },
+  {
+    id: "home-depot-split-order",
+    label: "Home Depot split-label order",
+    fileName: "home-depot-split-order.jpg",
+    type: "image",
+    description: "Synthetic Home Depot order layout with online order, split date, pickup total, tender, product, and tax cues.",
+    expectedRisk: "Low",
+    expectedOutcome: "Home Depot split-label order layouts should extract order, total, and payment fields without broad scoring changes.",
+    tuningNotes:
+      "Use this to tune Home Depot / Home Depot Canada field extraction only. The order token is intentionally partial synthetic data, not a real or full order identifier.",
+    loadFile: () =>
+      canvasToFile(
+        drawReceiptCanvas([
+          "THE HOME DEPOT",
+          "Online Order",
+          "HD-12XX",
+          "Order Date",
+          "05/10/2026",
+          "Store Pickup",
+          "iSpring filter housing $58.00",
+          "Subtotal",
+          "$58.00",
+          "Sales Tax",
+          "$4.64",
+          "Pickup Order Total",
+          "$62.64",
+          "Tender",
+          "Card",
+        ]),
+        "home-depot-split-order.jpg",
+      ),
+    evaluate: (result) => [
+      {
+        label: "Home Depot split-label source is classified",
+        status: expectationStatus(
+          result.receipt.sourceClassification.category === "home-depot-order" &&
+            result.receipt.source === "merchant-receipt" &&
+            result.receipt.sourceClassification.confidence > 80,
+          "Warning",
+        ),
+        detail: `Class ${result.receipt.sourceClassification.label}; confidence ${result.receipt.sourceClassification.confidence}%; cues ${result.receipt.sourceClassification.cues.join(
+          " | ",
+        )}.`,
+        note:
+          "Home Depot split-label layouts should preserve the supported source lane rather than falling back to generic merchant.",
+      },
+      {
+        label: "Home Depot split-label fields are extracted",
+        status: expectationStatus(
+          Boolean(
+            result.receipt.orderNumber === "HD-12XX" &&
+              result.receipt.total === "62.64" &&
+              result.receipt.paymentMethod &&
+              /Pickup Order Total/i.test(result.receipt.parsingDetails.selectedTotalSource ?? "") &&
+              /Payment detail after label/i.test(result.receipt.parsingDetails.paymentSource ?? ""),
+          ),
+          "Warning",
+        ),
+        detail: `Order ${result.receipt.orderNumber ? "present" : "missing"}; total ${
+          result.receipt.total ? "present" : "missing"
+        } from ${result.receipt.parsingDetails.selectedTotalSource ?? "no source"}; payment ${
+          result.receipt.paymentMethod ? "present" : "missing"
+        } from ${result.receipt.parsingDetails.paymentSource ?? "no source"}.`,
+        note:
+          "Online order labels, pickup totals, and tender/card rows should populate parsed fields for local proof-of-purchase matching.",
+      },
+      {
+        label: "Home Depot split-label summary stays privacy-safe",
+        status: expectationStatus(
+          result.receipt.sourceSpecificSummary?.category === "home-depot-order" &&
+            (result.receipt.sourceSpecificSummary?.fieldsPresent ?? 0) >= 6 &&
+            !/HD-12XX|05\/10\/2026|62\.64|Card/i.test(JSON.stringify(result.receipt.sourceSpecificSummary)),
+          "Warning",
+        ),
+        detail: result.receipt.sourceSpecificSummary
+          ? `${result.receipt.sourceSpecificSummary.confidence}% confidence; ${result.receipt.sourceSpecificSummary.fieldsPresent}/${result.receipt.sourceSpecificSummary.fieldsExpected} fields.`
+          : "No source summary.",
+        note:
+          "Home Depot source summaries should remain presence/count-only even when parsed field extraction improves.",
+      },
+      {
+        label: "Home Depot split-label order skips Amazon validation",
+        status: expectationStatus(
+          result.receipt.structure.amazonOrderFormat === "not-applicable" &&
+            !result.signals.some((signal) => /Amazon/i.test(signal.title)),
+          "Warning",
+        ),
+        detail: `Amazon format ${result.receipt.structure.amazonOrderFormat}; signals: ${
+          result.signals.map((signal) => signal.title).join(" | ") || "none"
+        }.`,
+        note:
+          "Home Depot order tokens should not create Amazon order-number validation behavior.",
       },
     ],
   },

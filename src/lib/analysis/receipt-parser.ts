@@ -64,6 +64,71 @@ function normalizeOrderNumber(orderNumber?: string) {
   return cleaned.replace(/\s+/g, " ");
 }
 
+function orderIdentifierLooksUsable(value?: string, sourceCategory?: ReceiptSourceCategory) {
+  const normalized = normalizeOrderNumber(value);
+
+  if (!normalized || !/\d/.test(normalized)) {
+    return false;
+  }
+
+  if (
+    /\b(order|online order|order confirmation|order details|store pickup|pickup|delivery|ship(?:ped)? to|payment|subtotal|tax|total|receipt|invoice)\b/i.test(
+      normalized,
+    )
+  ) {
+    return false;
+  }
+
+  return isHomeDepotSource(sourceCategory) ? normalized.length >= 5 : normalized.length >= 4;
+}
+
+function orderIdentifierFromValue(value?: string, sourceCategory?: ReceiptSourceCategory) {
+  return orderIdentifierLooksUsable(value, sourceCategory) ? normalizeOrderNumber(value) : undefined;
+}
+
+function getOrderNumber(lines: string[], text: string, sourceCategory?: ReceiptSourceCategory) {
+  const inlinePatterns = isHomeDepotSource(sourceCategory)
+    ? [
+        /\b(?:online\s+order|order)\s*(?:number|no\.?|#|id)\s*[:#-]?\s*([A-Z0-9][A-Z0-9 -]{3,})\b/i,
+        /\b(?:online\s+order|order)\s*#\s*([A-Z0-9][A-Z0-9-]{3,})\b/i,
+      ]
+    : [
+        /\b(?:order|invoice|receipt)\s*(?:number|no\.?|#|id)\s*[:#-]?\s*([A-Z0-9][A-Z0-9 =-]{3,})\b/i,
+      ];
+  const adjacentLabelPattern = isHomeDepotSource(sourceCategory)
+    ? /^\s*(?:online\s+order|order)\s*(?:number|no\.?|#|id)?\s*:?\s*$/i
+    : /^\s*(?:order|invoice|receipt)\s*(?:number|no\.?|#|id)\s*:?\s*$/i;
+
+  for (const line of lines) {
+    for (const pattern of inlinePatterns) {
+      const candidate = orderIdentifierFromValue(line.match(pattern)?.[1], sourceCategory);
+      if (candidate) {
+        return candidate;
+      }
+    }
+  }
+
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    if (!adjacentLabelPattern.test(lines[index])) {
+      continue;
+    }
+
+    const candidate = orderIdentifierFromValue(lines[index + 1], sourceCategory);
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  return orderIdentifierFromValue(
+    findFirstMatch(text, [
+      /\b(\d{17})\b/,
+      /\b(\d{3}\s+\d{7}\s+\d{7})\b/,
+      /\b(\d{3}\s*[=-]\s*\d{7}\s*[=-]\s*\d{7})\b/,
+    ]),
+    sourceCategory,
+  );
+}
+
 function normalizePaymentMethod(paymentMethod?: string) {
   return paymentMethod
     ?.replace(/\s+/g, " ")
@@ -79,6 +144,10 @@ function normalizeAmount(amount?: string) {
 
 function isAmazonInvoiceOrDetailSource(sourceCategory?: ReceiptSourceCategory) {
   return sourceCategory === "amazon-invoice-detail" || sourceCategory === "amazon-print-order-details";
+}
+
+function isHomeDepotSource(sourceCategory?: ReceiptSourceCategory) {
+  return sourceCategory === "home-depot-order";
 }
 
 function hasGenericMerchantMarker(text: string) {
@@ -253,7 +322,16 @@ function getPurchaseDate(text: string, lines: string[], sourceCategory?: Receipt
     : undefined;
 }
 
-function amountPriorityFor(line: string) {
+function amountPriorityFor(line: string, sourceCategory?: ReceiptSourceCategory) {
+  if (
+    isHomeDepotSource(sourceCategory) &&
+    /\b(order\s*total|pickup\s*(?:order\s*)?total|delivery\s*(?:order\s*)?total|refund\s*total|total\s*paid|amount\s*paid|payment\s*total|total\s*charged|amount\s*charged)\b/i.test(
+      line,
+    )
+  ) {
+    return 100;
+  }
+
   if (
     /\b(grand\s*total|orders?\s*total|invoice\s*total|receipt\s*total|final\s*total|amount\s*due|balance\s*due|order\s*summary|total\s*paid|amount\s*paid|payment\s*total|total\s*charged|amount\s*charged|charged)\b/i.test(
       line,
@@ -339,10 +417,10 @@ function hasProductLikeText(text: string) {
   return /[a-z]{3,}/i.test(text) && text.length >= 6;
 }
 
-function getAmountCandidates(lines: string[]) {
+function getAmountCandidates(lines: string[], sourceCategory?: ReceiptSourceCategory) {
   return lines.flatMap((line, lineIndex) => {
     const matches = amountMatchesFor(line);
-    const priority = amountPriorityFor(line);
+    const priority = amountPriorityFor(line, sourceCategory);
     const category = amountCategoryFor(line);
     const label = cleanAmountLabel(line) || (priority >= 88 ? "Total-like amount" : "Visible amount");
     const lineCandidates = matches.map((match, matchIndex) => ({
@@ -430,6 +508,10 @@ function paymentKindFor(line: string, sourceCategory?: ReceiptSourceCategory): R
     return "card";
   }
 
+  if (isHomeDepotSource(sourceCategory) && /\b(?:card|credit|debit|visa|mastercard|amex|american express|discover)\b/i.test(line)) {
+    return "card";
+  }
+
   if (/\b(paypal|apple pay|google pay|shop pay)\b/i.test(line)) {
     return "wallet";
   }
@@ -438,6 +520,15 @@ function paymentKindFor(line: string, sourceCategory?: ReceiptSourceCategory): R
 }
 
 function hasPaymentCue(line: string, sourceCategory?: ReceiptSourceCategory) {
+  if (
+    isHomeDepotSource(sourceCategory) &&
+    /\b(payment|payments|payment type|payment method|method of payment|payment information|payment details|paid with|paid by|charged to|charged|tender|tender type|tendered|visa|mastercard|amex|american express|discover|credit|debit|card|paypal|gift card|store credit|commercial card|pro\s*xtra)\b/i.test(
+      line,
+    )
+  ) {
+    return true;
+  }
+
   if (sourceCategory === "lowes-email-order" && /\b(?:visa|mastercard|amex|paypal|gift card|store credit|ending(?:\s+in)?|x{2,}|\*{2,})\s*\d{0,4}\b/i.test(line)) {
     return true;
   }
@@ -457,6 +548,10 @@ function hasPaymentCue(line: string, sourceCategory?: ReceiptSourceCategory) {
 }
 
 function hasPaymentLabel(line: string, sourceCategory?: ReceiptSourceCategory) {
+  if (isHomeDepotSource(sourceCategory) && /^\s*(payment|payments|payment type|payment method|method of payment|payment information|payment details|paid with|paid by|charged to|tender|tender type|tendered)\s*:?\s*$/i.test(line)) {
+    return true;
+  }
+
   if (sourceCategory === "lowes-email-order" && /^\s*(payment|payments|payment details|payment summary)\s*:?\s*$/i.test(line)) {
     return true;
   }
@@ -714,8 +809,8 @@ function getContextCandidates(lines: string[]) {
   });
 }
 
-function getSelectedTotal(lines: string[]) {
-  const candidates = getAmountCandidates(lines);
+function getSelectedTotal(lines: string[], sourceCategory?: ReceiptSourceCategory) {
+  const candidates = getAmountCandidates(lines, sourceCategory);
   const selected = [...candidates].sort((first, second) => {
     if (second.priority !== first.priority) {
       return second.priority - first.priority;
@@ -855,7 +950,7 @@ function classifyReceiptSource(text: string, lines: string[]): ReceiptSourceClas
       confidence: 87,
       cues: [
         ["Home Depot marker", /\bthe\s+home\s+depot\b|\bhome\s*depot(?:\s+canada)?\b|\bhomedepot\.(?:com|ca)\b/i],
-        ["Home Depot order/receipt cue", /\b(order\s*(?:#|number|no\.?|id|confirmation|details)|date\s*ordered|store\s*pickup|pickup|delivery|ship(?:ped)?\s*to|item\s*subtotal|sales\s*tax|order\s*total|total\s*paid)\b/i],
+        ["Home Depot order/receipt cue", /\b(online\s+order|order\s*(?:#|number|no\.?|id|confirmation|details)|date\s*ordered|store\s*pickup|pickup|delivery|ship(?:ped)?\s*to|item\s*subtotal|sales\s*tax|order\s*total|total\s*paid)\b/i],
       ],
     },
     {
@@ -1223,7 +1318,7 @@ function buildVendorOrderSummary(params: {
     fieldSummary({
       key: "orderOrReceiptId",
       label: "Order or receipt ID cue present",
-      present: /\b(order\s*(?:#|id|number|no\.?|confirmation|details)|receipt\s*(?:#|id|number|no\.?)|transaction\s*(?:#|id|number|no\.?))\b/i.test(params.text),
+      present: /\b(online\s+order|order\s*(?:#|id|number|no\.?|confirmation|details)|receipt\s*(?:#|id|number|no\.?)|transaction\s*(?:#|id|number|no\.?))\b/i.test(params.text),
       presentNote: "Order, receipt, or transaction identifier label detected without exposing the identifier.",
       missingNote: "Order, receipt, or transaction identifier label was not detected.",
     }),
@@ -1468,15 +1563,10 @@ export function parseReceiptText(rawText: string): ExtractedReceiptInfo {
   const merchantName = getMerchantName(lines);
   const sourceClassification = classifyReceiptSource(text, lines);
   const source = legacySourceFor(sourceClassification);
-  const orderNumber = normalizeOrderNumber(findFirstMatch(text, [
-    /(?:order\s*(?:number|no\.?|#|id))\s*[:#]?\s*([A-Z0-9][A-Z0-9 =-]{5,})/i,
-    /\b(\d{17})\b/,
-    /\b(\d{3}\s+\d{7}\s+\d{7})\b/,
-    /\b(\d{3}\s*[=-]\s*\d{7}\s*[=-]\s*\d{7})\b/,
-  ]));
+  const orderNumber = getOrderNumber(lines, text, sourceClassification.category);
   const purchaseDateResult = getPurchaseDate(text, lines, sourceClassification.category);
   const purchaseDate = purchaseDateResult?.value;
-  const selectedTotal = getSelectedTotal(lines);
+  const selectedTotal = getSelectedTotal(lines, sourceClassification.category);
   const total = selectedTotal.total;
   const paymentCandidates = getPaymentCandidates(lines, sourceClassification.category);
   const selectedPayment = selectPaymentMethod(paymentCandidates);

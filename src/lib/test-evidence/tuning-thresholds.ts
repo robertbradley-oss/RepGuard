@@ -122,6 +122,11 @@ export const analyzerTuningSummary = {
       detail: "Home Depot, Costco, Lazada, and iSpring direct orders require a visible source marker plus order/layout cues; summaries report presence/counts only and do not externally verify the merchant.",
     },
     {
+      label: "Home Depot field extraction",
+      value: "online order + pickup/refund total + tender",
+      detail: "Home Depot source-scoped parsing pairs online order labels with adjacent order-token rows, treats pickup/delivery/refund total labels as selectable totals, and recognizes tender/card payment rows without changing broad scoring thresholds.",
+    },
+    {
       label: "Generic source diagnostics",
       value: "2+ generic cues, no narrow source match",
       detail: "Generic merchant receipts remain the fallback after supported source checks and list which receipt/order cues were visible in a privacy-safe field-presence summary.",
