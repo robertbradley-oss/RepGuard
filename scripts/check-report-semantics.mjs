@@ -6,12 +6,16 @@ const repoRoot = process.cwd();
 const filesToCheck = [
   "src/lib/analysis/analyzer.ts",
   "src/lib/analysis/report-adapter.ts",
+  "src/lib/analysis/scoring.ts",
+  "src/lib/analysis/types.ts",
   "src/components/AnalysisReport.tsx",
   "src/components/AuthenticityResultCard.tsx",
   "src/components/ClaimReviewWorkflow.tsx",
   "src/components/RiskScoreCard.tsx",
   "src/components/TestEvidenceHarness.tsx",
   "src/app/test-evidence/page.tsx",
+  "src/lib/test-evidence/fixtures.ts",
+  "src/lib/test-evidence/tuning-thresholds.ts",
   "TEST_EVIDENCE.md",
 ];
 
@@ -54,8 +58,20 @@ const requiredSemanticSignals = [
     patterns: [/scoreMeaning/i, /Score meaning/i, /High-score meaning/i],
   },
   {
+    label: "high score is not proof language",
+    patterns: [/High score does not prove/i, /does not prove the receipt is real/i],
+  },
+  {
     label: "not externally verified language",
     patterns: [/Not externally verified/i, /External verification (?:was )?not performed/i],
+  },
+  {
+    label: "external verification fixed to not performed",
+    patterns: [/externalVerification:\s*"Not performed"/i, /externalVerification\s*=\s*"Not performed"/i],
+  },
+  {
+    label: "local analysis does not confirm authenticity",
+    patterns: [/does not confirm authenticity/i, /Local analysis can assess evidence quality and internal consistency only/i],
   },
   {
     label: "privacy-safe tuning/export wording",
@@ -63,14 +79,27 @@ const requiredSemanticSignals = [
   },
 ];
 
-const sourceOnlyBannedPhrases = [
+const guardedBannedPhrases = [
   /Authenticity score/i,
   /verified authentic/i,
+  /verified authenticity/i,
+  /authenticity verified/i,
+  /confirmed authentic(?:ity)?/i,
   /definitely real/i,
   /fraud confirmed/i,
+  /\bfake\b/i,
   /fake receipt/i,
   /customer committed fraud/i,
   /deny this claim/i,
+  /proof of authenticity/i,
+  /(?:proves|proven)\s+(?:that\s+)?(?:the\s+)?receipt\s+(?:is\s+)?(?:real|authentic)/i,
+];
+
+const unsafeHighScoreProofPattern = /High score(?![^.]*does not prove)[^.]*\b(?:proves?|confirms?|verifies?|authentic|real)\b/i;
+const unsafeExternalVerificationPatterns = [
+  /externalVerification\s*:\s*["'`](?!Not performed)/i,
+  /external verification (?:complete|passed|confirmed|verified)/i,
+  /externally verified by/i,
 ];
 
 const safeCountRedactionPattern =
@@ -84,9 +113,19 @@ for (const signal of requiredSemanticSignals) {
   }
 }
 
-for (const bannedPhrase of sourceOnlyBannedPhrases) {
-  if (bannedPhrase.test(sourceCorpus)) {
-    failures.push(`Unsafe source wording found: ${bannedPhrase}`);
+for (const bannedPhrase of guardedBannedPhrases) {
+  if (bannedPhrase.test(corpus)) {
+    failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
+  }
+}
+
+if (unsafeHighScoreProofPattern.test(corpus)) {
+  failures.push("Unsafe score wording found: high score appears to imply proof, verification, or authenticity.");
+}
+
+for (const pattern of unsafeExternalVerificationPatterns) {
+  if (pattern.test(sourceCorpus)) {
+    failures.push(`Unsafe external-verification wording found: ${pattern}`);
   }
 }
 
@@ -163,5 +202,5 @@ if (failures.length > 0) {
   process.exitCode = 1;
 } else {
   console.log("ClaimGuard report semantic smoke check passed.");
-  console.log("Checked analyzer report adapters, score cards, /test-evidence, tuning exports, and docs.");
+  console.log("Checked analyzer report adapters, score cards, /test-evidence, tuning exports, fixtures, and docs.");
 }

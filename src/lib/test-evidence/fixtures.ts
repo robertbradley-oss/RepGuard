@@ -671,7 +671,7 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
     expectedRisk: "Low",
     expectedOutcome: "iSpring direct invoices should classify as iSpring direct and keep product table rows separate from footer/account text.",
     tuningNotes:
-      "Use this to tune iSpring direct PDF invoices. This is a clean synthetic fixture, so a high reliability score means parser recognition and internal consistency are working; it does not mean the fake test invoice is externally verified or real. Product table rows should count as item evidence, while address, account nav, order history, testimonial, newsletter, and footer rows should stay out of item evidence.",
+      "Use this to tune iSpring direct PDF invoices. This is a clean synthetic fixture, so a high reliability score means parser recognition and internal consistency are working; it does not mean the synthetic test invoice is externally verified or real. Product table rows should count as item evidence, while address, account nav, order history, testimonial, newsletter, and footer rows should stay out of item evidence.",
     loadFile: () =>
       Promise.resolve(
         createPdfFile(
@@ -813,7 +813,7 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
         note:
           result.riskLevel !== "High"
             ? "iSpring direct invoice structure is being treated as source-specific purchase context."
-            : "Inspect whether PDF extraction, footer rejection, or non-Amazon source classification is over-penalizing a readable fake invoice.",
+            : "Inspect whether PDF extraction, footer rejection, or non-Amazon source classification is over-penalizing a readable synthetic invoice.",
       },
     ],
   },
