@@ -14,6 +14,8 @@ import type {
 
 const amazonOrderPattern = /^\d{3}-\d{7}-\d{7}$/;
 const receiptDatePattern = /([A-Za-z]{3,9}\s+\d{1,2},\s+\d{4}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i;
+const lowesDatePattern =
+  /((?:(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)\s*,?\s+)?[A-Za-z]{3,9}\s+\d{1,2}(?:,\s+\d{4})?|\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?)/i;
 const fieldLabelPattern =
   /^(order|order id|invoice|invoice number|receipt|date|status|e-mail|email|telephone|phone|purchased|purchase date|purchased on|ordered|ordered on|placed|transaction date|invoice date|order placed|placed on|order date|items ordered|order summary|order history|date added|customer order comment|image|product|model|quantity|unit price|arriving|arrives|delivered|shipped|shipped to|sold by|seller|shipping method|billing address|shipping address|payment address|bill to|billed to|subtotal|sub-total|item subtotal|estimated tax|tax|sales tax|shipping|delivery|ship to|deliver to|recipient|grand total|orders? total|total paid|amount paid|payment total|total|payment|payment method|payment information|paid with|charged|promotion|promo|subscribe & save|visa|mastercard|amex|paypal|gift card|store credit|thank you)\b/i;
 
@@ -71,7 +73,42 @@ function normalizeAmount(amount?: string) {
   return amount?.replace(/,/g, "").trim();
 }
 
-function getPurchaseDate(text: string, lines: string[]) {
+function getPurchaseDate(text: string, lines: string[], sourceCategory?: ReceiptSourceCategory) {
+  if (sourceCategory === "lowes-email-order") {
+    const lowesInlineMatch = text.match(
+      new RegExp(
+        String.raw`(?:order\s*placed|placed|delivery\s*date|delivered)\s*:?\s*(?:on\s+)?${lowesDatePattern.source}`,
+        "i",
+      ),
+    );
+
+    if (lowesInlineMatch?.[1]) {
+      return {
+        value: lowesInlineMatch[1].trim(),
+        source: /delivered|delivery/i.test(lowesInlineMatch[0]) ? "Lowe's delivery date label" : "Lowe's order date label",
+      };
+    }
+
+    for (let index = 0; index < lines.length - 1; index += 1) {
+      const line = lines[index];
+      const nextLine = lines[index + 1];
+
+      if (!line || !nextLine || lowesDatePattern.test(line) || !lowesDatePattern.test(nextLine)) {
+        continue;
+      }
+
+      if (/\b(order\s*placed|placed|delivery\s*date|delivered)\b/i.test(line)) {
+        const match = nextLine.match(lowesDatePattern);
+        if (match?.[1]) {
+          return {
+            value: match[1].trim(),
+            source: /delivered|delivery/i.test(line) ? "Adjacent Lowe's delivery date label" : "Adjacent Lowe's order date label",
+          };
+        }
+      }
+    }
+  }
+
   const labeledDatePatterns = [
     {
       source: "Order placed/date label",
@@ -284,7 +321,7 @@ function buildAmountReviewNotes(params: {
   return [...new Set(notes)];
 }
 
-function paymentKindFor(line: string): ReceiptPaymentCandidate["kind"] {
+function paymentKindFor(line: string, sourceCategory?: ReceiptSourceCategory): ReceiptPaymentCandidate["kind"] {
   if (/\bgift card\b/i.test(line)) {
     return "gift-card";
   }
@@ -297,6 +334,10 @@ function paymentKindFor(line: string): ReceiptPaymentCandidate["kind"] {
     return "card";
   }
 
+  if (sourceCategory === "lowes-email-order" && /\b(?:ending(?:\s+in)?|x{2,}|\*{2,})\s*\d{4}\b/i.test(line)) {
+    return "card";
+  }
+
   if (/\bpaypal\b/i.test(line)) {
     return "wallet";
   }
@@ -304,45 +345,53 @@ function paymentKindFor(line: string): ReceiptPaymentCandidate["kind"] {
   return "unknown";
 }
 
-function hasPaymentCue(line: string) {
+function hasPaymentCue(line: string, sourceCategory?: ReceiptSourceCategory) {
+  if (sourceCategory === "lowes-email-order" && /\b(?:visa|mastercard|amex|paypal|gift card|store credit|ending(?:\s+in)?|x{2,}|\*{2,})\s*\d{0,4}\b/i.test(line)) {
+    return true;
+  }
+
   return /\b(payment method|payment information|paid with|visa|mastercard|amex|paypal|gift card|store credit|amazon(?:\.com)? store card|card ending|ending in|ending)\b/i.test(
     line,
   );
 }
 
-function hasPaymentLabel(line: string) {
+function hasPaymentLabel(line: string, sourceCategory?: ReceiptSourceCategory) {
+  if (sourceCategory === "lowes-email-order" && /^\s*(payment|payments|payment details|payment summary)\s*:?\s*$/i.test(line)) {
+    return true;
+  }
+
   return /\b(payment method|payment information|paid with)\b/i.test(line);
 }
 
-function getPaymentCandidates(lines: string[]) {
+function getPaymentCandidates(lines: string[], sourceCategory?: ReceiptSourceCategory) {
   return lines.flatMap((line, lineIndex) => {
     const candidates: ReceiptPaymentCandidate[] = [];
     const previousLine = lines[lineIndex - 1];
     const nextLine = lines[lineIndex + 1];
 
-    if (hasPaymentLabel(line) && nextLine && !hasPaymentLabel(nextLine) && hasPaymentCue(nextLine)) {
+    if (hasPaymentLabel(line, sourceCategory) && nextLine && !hasPaymentLabel(nextLine, sourceCategory) && hasPaymentCue(nextLine, sourceCategory)) {
       const value = normalizePaymentMethod(`${line} ${nextLine}`) ?? `${line} ${nextLine}`;
       return [
         {
           label: "Payment detail after label",
           value,
-          kind: paymentKindFor(value),
+          kind: paymentKindFor(value, sourceCategory),
           hasVisibleLastFour: /\b(?:ending(?:\s+in)?|x{2,}|\*{2,})\s*\d{4}\b/i.test(value),
         },
       ];
     }
 
-    if (previousLine && hasPaymentLabel(previousLine) && !hasPaymentLabel(line) && hasPaymentCue(line)) {
+    if (previousLine && hasPaymentLabel(previousLine, sourceCategory) && !hasPaymentLabel(line, sourceCategory) && hasPaymentCue(line, sourceCategory)) {
       return [];
     }
 
-    if (hasPaymentCue(line)) {
+    if (hasPaymentCue(line, sourceCategory)) {
       const value = normalizePaymentMethod(line.replace(/\s*\$?\d[\d,]*[.]\d{2}\s*$/, "")) ?? line;
 
       candidates.push({
-        label: hasPaymentLabel(line) ? "Payment method line" : "Payment cue line",
+        label: hasPaymentLabel(line, sourceCategory) ? "Payment method line" : "Payment cue line",
         value,
-        kind: paymentKindFor(line),
+        kind: paymentKindFor(line, sourceCategory),
         hasVisibleLastFour: /\b(?:ending(?:\s+in)?|x{2,}|\*{2,})\s*\d{4}\b/i.test(line),
       });
     }
@@ -1037,11 +1086,11 @@ export function parseReceiptText(rawText: string): ExtractedReceiptInfo {
     /\b(\d{3}\s+\d{7}\s+\d{7})\b/,
     /\b(\d{3}\s*[=-]\s*\d{7}\s*[=-]\s*\d{7})\b/,
   ]));
-  const purchaseDateResult = getPurchaseDate(text, lines);
+  const purchaseDateResult = getPurchaseDate(text, lines, sourceClassification.category);
   const purchaseDate = purchaseDateResult?.value;
   const selectedTotal = getSelectedTotal(lines);
   const total = selectedTotal.total;
-  const paymentCandidates = getPaymentCandidates(lines);
+  const paymentCandidates = getPaymentCandidates(lines, sourceClassification.category);
   const selectedPayment = selectPaymentMethod(paymentCandidates);
   const paymentMethod = selectedPayment?.value;
   const currencyAmountCount = text.match(/\$?\d+[,.]\d{2}/g)?.length ?? 0;

@@ -382,9 +382,9 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
     type: "image",
     description: "Lowe's-style order email screenshot with order-card wording, delivered status, long order number, product detail, and totals.",
     expectedRisk: "Low",
-    expectedOutcome: "Lowe's email/order screenshots should classify as Lowe's without Amazon-specific order validation.",
+    expectedOutcome: "Lowe's email/order screenshots should classify as Lowe's and extract visible date/payment cues without Amazon-specific order validation.",
     tuningNotes:
-      "Use this to tune non-Amazon order email screenshots. The long Lowe's order number and email-card actions should not be treated as Amazon order-format issues.",
+      "Use this to tune non-Amazon order email screenshots. The long Lowe's order number and email-card actions should not be treated as Amazon order-format issues. Visible delivery/order date and payment-section cues should be extracted when present.",
     loadFile: () =>
       canvasToFile(
         drawReceiptCanvas([
@@ -393,7 +393,7 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
           "We've Received Your Order",
           "RO600-ORB Dual-stage Membrane",
           "1 item from Lowe's",
-          "Delivered Mon, May 11",
+          "Delivered Thursday, Apr 9, 2026",
           "Order number 300902124262935542",
           "View order",
           "Review store",
@@ -401,7 +401,8 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
           "Shipping: $0.00",
           "Estimated tax: $13.42",
           "Total: $212.19",
-          "Payment method Visa ending in 4242",
+          "Payment",
+          "Visa ending in 4242",
         ]),
         "lowes-email-order.jpg",
       ),
@@ -431,6 +432,34 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
         }.`,
         note:
           "A long Lowe's order number should not become an Amazon order-number issue.",
+      },
+      {
+        label: "Lowe's visible date cue is extracted",
+        status: expectationStatus(
+          Boolean(result.receipt.purchaseDate) &&
+            Boolean(result.receipt.structure.hasPurchaseDate) &&
+            /Lowe's/.test(result.receipt.parsingDetails.purchaseDateSource ?? ""),
+          "Warning",
+        ),
+        detail: `Date present ${Boolean(result.receipt.purchaseDate)}; source ${
+          result.receipt.parsingDetails.purchaseDateSource ?? "missing"
+        }.`,
+        note:
+          "Lowe's delivery/order date labels should populate the purchase date field when a visible date is present.",
+      },
+      {
+        label: "Lowe's payment section is extracted",
+        status: expectationStatus(
+          Boolean(result.receipt.paymentMethod) &&
+            Boolean(result.receipt.structure.hasPaymentMethod) &&
+            result.receipt.parsingDetails.paymentSource === "Payment detail after label",
+          "Warning",
+        ),
+        detail: `Payment present ${Boolean(result.receipt.paymentMethod)}; source ${
+          result.receipt.parsingDetails.paymentSource ?? "missing"
+        }; candidates ${result.receipt.parsingDetails.paymentCandidates.length}.`,
+        note:
+          "A visible Lowe's payment section should support proof-of-purchase matching without exposing real payment details.",
       },
       {
         label: "Lowe's email order stays low concern",
