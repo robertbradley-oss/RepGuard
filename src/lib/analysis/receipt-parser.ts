@@ -80,6 +80,10 @@ function isAmazonInvoiceOrDetailSource(sourceCategory?: ReceiptSourceCategory) {
   return sourceCategory === "amazon-invoice-detail" || sourceCategory === "amazon-print-order-details";
 }
 
+function hasGenericMerchantMarker(text: string) {
+  return /\b(walmart|target|best buy|costco|shopify|home\s*depot(?:\s+canada)?|homedepot(?:\.com|\.ca)?)\b/i.test(text);
+}
+
 function hasVisiblePaymentLastFour(line: string) {
   return /\b(?:ending(?:\s+(?:in|with))?|last\s*(?:four|4)|x{2,}|\*{2,}|\u2022{2,})\s*\d{4}\b/i.test(line);
 }
@@ -192,7 +196,7 @@ function getPurchaseDate(text: string, lines: string[], sourceCategory?: Receipt
     {
       source: "Order placed/date label",
       pattern: new RegExp(
-        String.raw`(?:order\s*placed|placed\s*on|order\s*date|ordered\s*on|order\s*of)\s*:?\s*${receiptDatePattern.source}`,
+        String.raw`(?:order\s*placed|placed\s*on|placed|order\s*date|ordered\s*on|ordered|order\s*of)\s*:?\s*${receiptDatePattern.source}`,
         "i",
       ),
     },
@@ -409,7 +413,7 @@ function paymentKindFor(line: string, sourceCategory?: ReceiptSourceCategory): R
     return "store-credit";
   }
 
-  if (/\b(?:visa|mastercard|amex|american express|discover|card)\b/i.test(line)) {
+  if (/\b(?:visa|mastercard|amex|american express|discover|credit card|debit card|card)\b/i.test(line)) {
     return "card";
   }
 
@@ -438,7 +442,7 @@ function hasPaymentCue(line: string, sourceCategory?: ReceiptSourceCategory) {
     return true;
   }
 
-  return /\b(payment method|payment information|paid with|visa|mastercard|amex|paypal|gift card|store credit|amazon(?:\.com)? store card|card ending|ending in|ending)\b/i.test(
+  return /\b(payment|payment method|payment information|payment details|payment summary|paid with|paid by|charged to|charged|tender|visa|mastercard|amex|american express|discover|credit card|debit card|paypal|gift card|store credit|amazon(?:\.com)? store card|card ending|ending(?:\s+(?:in|with))?|last\s*(?:four|4))\b/i.test(
     line,
   );
 }
@@ -452,7 +456,9 @@ function hasPaymentLabel(line: string, sourceCategory?: ReceiptSourceCategory) {
     return /\b(payment method|payment information|payment details|payment instrument|payment summary|paid with|paid by|charged to)\b/i.test(line);
   }
 
-  return /\b(payment method|payment information|paid with)\b/i.test(line);
+  return /^\s*(payment|payments|payment method|payment information|payment details|payment summary|paid with|paid by|charged to|tender)\s*:?\s*$/i.test(
+    line,
+  );
 }
 
 function getPaymentCandidates(lines: string[], sourceCategory?: ReceiptSourceCategory) {
@@ -730,7 +736,9 @@ function getSelectedTotal(lines: string[]) {
 }
 
 function getMerchantName(lines: string[]) {
-  const merchantLine = lines.find((line) => /amazon|walmart|target|best buy|costco|shopify|lowe'?s|ispring|ispringfilter|invoice|receipt/i.test(line));
+  const merchantLine = lines.find((line) =>
+    /amazon|walmart|target|best buy|costco|shopify|home\s*depot|homedepot|lowe'?s|ispring|ispringfilter|invoice|receipt/i.test(line),
+  );
 
   if (merchantLine) {
     return merchantLine.replace(/order|invoice|receipt/gi, "").trim() || merchantLine.trim();
@@ -751,6 +759,41 @@ function sourceLabelFor(category: ReceiptSourceCategory) {
   };
 
   return labels[category];
+}
+
+function genericReceiptCueLabels(text: string, lines: string[]) {
+  const hasLineWithAmountAndProduct = lines.some((line) => hasAmount(line) && amountCategoryFor(line) === "other" && hasProductLikeText(cleanAmountLabel(line)));
+  const cueTests: [string, boolean][] = [
+    ["Known generic merchant marker", hasGenericMerchantMarker(text)],
+    ["Receipt or invoice heading", /\b(receipt|invoice|order confirmation|sales order)\b/i.test(text)],
+    ["Order or transaction identifier cue", /\b(order\s*(?:#|id|number|no\.?)|invoice\s*(?:#|id|number|no\.?)|transaction\s*(?:#|id|number|no\.?))\b/i.test(text)],
+    ["Purchase/date label cue", /\b(date|order date|purchase date|purchased|ordered|placed|transaction date|invoice date)\b/i.test(text)],
+    ["Amount structure cue", /\b(subtotal|sub total|tax|sales tax|shipping|delivery|grand total|total paid|amount paid|payment total|total charged|amount charged|total)\b/i.test(text)],
+    ["Payment or tender cue", /\b(payment|paid with|paid by|charged to|tender|visa|mastercard|amex|american express|discover|paypal|gift card|store credit|credit card|debit card|ending(?:\s+(?:in|with))?|last\s*(?:four|4))\b/i.test(text)],
+    ["Shipping or delivery cue", /\b(shipping|delivery|delivered|ship to|shipped to|pickup|store pickup)\b/i.test(text)],
+    ["Product/price line cue", hasLineWithAmountAndProduct],
+  ];
+
+  return cueTests.filter(([, matched]) => matched).map(([label]) => label);
+}
+
+function classifyGenericReceiptSource(text: string, lines: string[]): ReceiptSourceClassification | undefined {
+  const cues = genericReceiptCueLabels(text, lines);
+
+  if (lines.length < 4 || cues.length < 2) {
+    return undefined;
+  }
+
+  const category: ReceiptSourceCategory = "generic-merchant-receipt";
+  const hasKnownGenericMerchant = cues.includes("Known generic merchant marker");
+  const confidence = Math.min(68, 38 + cues.length * 4 + (hasKnownGenericMerchant ? 8 : 0));
+
+  return {
+    category,
+    label: sourceLabelFor(category),
+    confidence,
+    cues: [...cues, "No supported narrow source marker matched"],
+  };
 }
 
 function classifyReceiptSource(text: string, lines: string[]): ReceiptSourceClassification {
@@ -821,14 +864,10 @@ function classifyReceiptSource(text: string, lines: string[]): ReceiptSourceClas
     };
   }
 
-  if (/\b(subtotal|total|payment|paid|shipping|tax|receipt|invoice|order\s*(?:#|id|number))\b/i.test(text) && lines.length >= 4) {
-    const category: ReceiptSourceCategory = "generic-merchant-receipt";
-    return {
-      category,
-      label: sourceLabelFor(category),
-      confidence: 62,
-      cues: ["Generic receipt/order structure"],
-    };
+  const genericClassification = classifyGenericReceiptSource(text, lines);
+
+  if (genericClassification) {
+    return genericClassification;
   }
 
   const category: ReceiptSourceCategory = "unknown-inconclusive";
@@ -1110,17 +1149,107 @@ function buildISpringDirectSummary(params: {
   };
 }
 
+function buildGenericMerchantSummary(params: {
+  text: string;
+  lineItems: string[];
+  amountCategories: Partial<Record<ReceiptAmountCategory, string[]>>;
+  paymentCandidates: ReceiptPaymentCandidate[];
+  classification: ReceiptSourceClassification;
+}): ReceiptSourceStructureSummary {
+  const fields = [
+    fieldSummary({
+      key: "merchantMarker",
+      label: "Known merchant marker present",
+      present: hasGenericMerchantMarker(params.text),
+      presentNote: "A known generic merchant marker was detected, but no supported narrow source category matched.",
+      missingNote: "No supported merchant-specific marker was detected.",
+    }),
+    fieldSummary({
+      key: "orderOrTransactionId",
+      label: "Order or transaction ID cue present",
+      present: /\b(order\s*(?:#|id|number|no\.?)|invoice\s*(?:#|id|number|no\.?)|transaction\s*(?:#|id|number|no\.?))\b/i.test(params.text),
+      presentNote: "Order, invoice, or transaction identifier label detected without exposing the identifier.",
+      missingNote: "Order, invoice, or transaction identifier label was not detected.",
+    }),
+    fieldSummary({
+      key: "dateLabel",
+      label: "Date cue present",
+      present: /\b(date|order date|purchase date|purchased|ordered|placed|transaction date|invoice date)\b/i.test(params.text),
+      presentNote: "A purchase/order/date cue was detected.",
+      missingNote: "Purchase/order/date cue was not detected.",
+    }),
+    fieldSummary({
+      key: "itemEvidence",
+      label: "Item or product detail present",
+      present: params.lineItems.length > 0,
+      count: params.lineItems.length,
+      presentNote: `${params.lineItems.length} item/product candidate(s) detected.`,
+      missingNote: "No item/product candidate was detected.",
+    }),
+    fieldSummary({
+      key: "amountStructure",
+      label: "Amount structure present",
+      present: Boolean(params.amountCategories.subtotal?.length || params.amountCategories.tax?.length || params.amountCategories.total?.length),
+      presentNote: "Subtotal, tax, or total amount structure detected.",
+      missingNote: "Subtotal, tax, or total amount structure was not detected.",
+    }),
+    fieldSummary({
+      key: "paymentCue",
+      label: "Payment or tender cue present",
+      present: params.paymentCandidates.length > 0,
+      count: params.paymentCandidates.length,
+      presentNote: `${params.paymentCandidates.length} payment/tender cue(s) detected without exposing payment values.`,
+      missingNote: "Payment/tender cue was not detected.",
+    }),
+    fieldSummary({
+      key: "shippingOrDelivery",
+      label: "Shipping or delivery cue present",
+      present: /\b(shipping|delivery|delivered|ship to|shipped to|pickup|store pickup)\b/i.test(params.text),
+      presentNote: "Shipping, delivery, or pickup context detected.",
+      missingNote: "Shipping, delivery, or pickup context was not detected.",
+    }),
+  ];
+  const coverage = sourceStructureConfidence(fields);
+
+  return {
+    category: "generic-merchant-receipt",
+    label: "Generic merchant parsed-field summary",
+    confidence: coverage.confidence,
+    fieldsPresent: coverage.present,
+    fieldsExpected: coverage.expected,
+    fields,
+    notes: [
+      "Privacy-safe generic summary: reports field presence and counts only, not raw merchant, order, payment, address, or customer values.",
+      "Generic merchant classification means receipt/order structure was visible, but no supported narrow source marker matched.",
+      params.classification.confidence < 60
+        ? "Generic source confidence is limited; use parsed fields for manual matching rather than applying merchant-specific expectations."
+        : "Generic source confidence is based on structural cues only and does not externally verify the receipt.",
+    ],
+  };
+}
+
 function buildSourceSpecificSummary(params: {
   classification: ReceiptSourceClassification;
   text: string;
   lineItems: string[];
   amountCategories: Partial<Record<ReceiptAmountCategory, string[]>>;
+  paymentCandidates: ReceiptPaymentCandidate[];
 }) {
   if (params.classification.category === "ispring-direct-invoice") {
     return buildISpringDirectSummary({
       text: params.text,
       lineItems: params.lineItems,
       amountCategories: params.amountCategories,
+    });
+  }
+
+  if (params.classification.category === "generic-merchant-receipt") {
+    return buildGenericMerchantSummary({
+      text: params.text,
+      lineItems: params.lineItems,
+      amountCategories: params.amountCategories,
+      paymentCandidates: params.paymentCandidates,
+      classification: params.classification,
     });
   }
 
@@ -1213,6 +1342,7 @@ export function parseReceiptText(rawText: string): ExtractedReceiptInfo {
     text,
     lineItems,
     amountCategories,
+    paymentCandidates,
   });
   const amountReviewNotes = buildAmountReviewNotes({ amountCategories, text });
   const paymentReviewNotes = buildPaymentReviewNotes(paymentCandidates);
@@ -1273,6 +1403,12 @@ export function parseReceiptText(rawText: string): ExtractedReceiptInfo {
       : undefined,
     sourceSpecificSummary
       ? `${sourceSpecificSummary.label}: ${sourceSpecificSummary.fieldsPresent}/${sourceSpecificSummary.fieldsExpected} expected structure fields detected (${sourceSpecificSummary.confidence}% confidence).`
+      : undefined,
+    sourceClassification.category === "generic-merchant-receipt"
+      ? "Generic merchant classification is based on receipt/order structure only; no supported narrow source marker matched."
+      : undefined,
+    sourceClassification.category === "generic-merchant-receipt" && sourceClassification.confidence < 60
+      ? "Generic source confidence is limited; verify merchant, date, total, and payment details manually before applying source-specific expectations."
       : undefined,
     sourceClassification.category === "unknown-inconclusive"
       ? "Receipt source classification is inconclusive; match available details manually before relying on source-specific rules."

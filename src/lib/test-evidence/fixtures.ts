@@ -5,6 +5,7 @@ export type SampleEvidenceFixtureId =
   | "clean-receipt"
   | "item-price-receipt"
   | "quantity-sku-receipt"
+  | "generic-order-confirmation"
   | "lowes-email-order"
   | "ispring-direct-invoice"
   | "adjusted-receipt"
@@ -323,6 +324,93 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
           result.riskLevel === "Low"
             ? "Common retail item-code layouts are not creating unnecessary review signals."
             : "Inspect whether item-code normalization, OCR, or summary-line rejection is reducing an otherwise readable receipt.",
+      },
+    ],
+  },
+  {
+    id: "generic-order-confirmation",
+    label: "Generic order confirmation",
+    fileName: "generic-order-confirmation.jpg",
+    type: "image",
+    description: "Readable non-Amazon order confirmation with generic merchant structure, date, total, and split payment label.",
+    expectedRisk: "Low",
+    expectedOutcome: "Generic fallback should stay generic but explain which structural cues were visible and extract date/payment fields.",
+    tuningNotes:
+      "Use this to tune receipts that have clear proof-of-purchase structure but do not yet justify a merchant-specific classifier. Generic classification should be explainable, lower-confidence than supported source categories, and free of Amazon-specific order validation.",
+    loadFile: () =>
+      canvasToFile(
+        drawReceiptCanvas([
+          "HARBOR HOME SUPPLY",
+          "Order Confirmation",
+          "Order ID HHS-2048",
+          "Order Date: May 3, 2026",
+          "iSpring filter housing $42.00",
+          "Subtotal: $42.00",
+          "Sales Tax: $3.15",
+          "Total Paid: $45.15",
+          "Payment",
+          "Credit card ending in 4242",
+          "Delivery: Store pickup",
+        ]),
+        "generic-order-confirmation.jpg",
+      ),
+    evaluate: (result) => [
+      {
+        label: "Generic order source remains generic but explained",
+        status: expectationStatus(
+          result.receipt.sourceClassification.category === "generic-merchant-receipt" &&
+            result.receipt.source === "merchant-receipt" &&
+            result.receipt.sourceClassification.confidence < 70 &&
+            result.receipt.sourceClassification.cues.includes("No supported narrow source marker matched") &&
+            result.receipt.sourceClassification.cues.length >= 4,
+          "Warning",
+        ),
+        detail: `Class ${result.receipt.sourceClassification.label}; confidence ${result.receipt.sourceClassification.confidence}%; cues ${result.receipt.sourceClassification.cues.join(
+          " | ",
+        )}.`,
+        note:
+          "Generic fallback should explain the aggregate structure it saw without pretending the source is a supported merchant-specific category.",
+      },
+      {
+        label: "Generic source summary is privacy-safe",
+        status: expectationStatus(
+          result.receipt.sourceSpecificSummary?.category === "generic-merchant-receipt" &&
+            (result.receipt.sourceSpecificSummary?.fieldsPresent ?? 0) >= 5 &&
+            !/HHS-2048|4242|Harbor Home Supply|May 3, 2026/i.test(JSON.stringify(result.receipt.sourceSpecificSummary)),
+          "Warning",
+        ),
+        detail: result.receipt.sourceSpecificSummary
+          ? `${result.receipt.sourceSpecificSummary.confidence}% confidence; ${result.receipt.sourceSpecificSummary.fieldsPresent}/${result.receipt.sourceSpecificSummary.fieldsExpected} fields.`
+          : "No source summary.",
+        note:
+          "Generic summaries should expose field presence and counts only, not raw merchant, order, payment, or date values.",
+      },
+      {
+        label: "Generic order date and payment are extracted",
+        status: expectationStatus(
+          Boolean(result.receipt.purchaseDate) &&
+            Boolean(result.receipt.paymentMethod) &&
+            result.receipt.parsingDetails.paymentSource === "Payment detail after label",
+          "Warning",
+        ),
+        detail: `Date source ${result.receipt.parsingDetails.purchaseDateSource ?? "missing"}; payment source ${
+          result.receipt.parsingDetails.paymentSource ?? "missing"
+        }; candidates ${result.receipt.parsingDetails.paymentCandidates.length}.`,
+        note:
+          "Generic receipts should still parse common date and payment labels without needing a known merchant classifier.",
+      },
+      {
+        label: "Generic order skips Amazon validation",
+        status: expectationStatus(
+          result.receipt.structure.amazonOrderFormat === "not-applicable" &&
+            !result.signals.some((signal) => /Amazon/i.test(signal.title)),
+          "Warning",
+        ),
+        detail: `Amazon format ${result.receipt.structure.amazonOrderFormat}; signals: ${
+          result.signals.map((signal) => signal.title).join(" | ") || "none"
+        }.`,
+        note:
+          "Generic receipts should use parsed proof-of-purchase fields for review instead of Amazon-only structure checks.",
       },
     ],
   },

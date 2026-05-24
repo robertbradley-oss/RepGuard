@@ -114,7 +114,12 @@ export const analyzerTuningSummary = {
     {
       label: "Source classification",
       value: "Amazon/iSpring/Lowe's/generic/unknown",
-      detail: "Classifies receipt source before source-specific checks so non-Amazon receipts are not evaluated against Amazon-only structure.",
+      detail: "Classifies receipt source before source-specific checks so non-Amazon receipts are not evaluated against Amazon-only structure; generic confidence is based on aggregate structural cues.",
+    },
+    {
+      label: "Generic source diagnostics",
+      value: "2+ generic cues, no narrow source match",
+      detail: "Generic merchant receipts now list which receipt/order cues were visible and expose a privacy-safe field-presence summary instead of a single broad fallback cue.",
     },
     {
       label: "Date labels",
