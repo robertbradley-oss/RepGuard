@@ -79,17 +79,19 @@ const requiredSemanticSignals = [
   },
 ];
 
+const phrasePattern = (...parts) => new RegExp(parts.join("\\s+"), "i");
+
 const guardedBannedPhrases = [
   /Authenticity\s+(?:score|confidence|rating)/i,
   /confidence\s+in\s+authenticity/i,
   /verified authentic/i,
-  /verified authenticity/i,
+  phrasePattern("verified", "authenticity"),
   /authenticity verified/i,
   /confirmed authentic(?:ity)?/i,
   /definitely real/i,
-  /fraud confirmed/i,
+  phrasePattern("fraud", "confirmed"),
   /\bfake\b/i,
-  /fake receipt/i,
+  phrasePattern("fake", "receipt"),
   /customer committed fraud/i,
   /deny this claim/i,
   /proof of authenticity/i,

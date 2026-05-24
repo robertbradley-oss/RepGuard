@@ -19,7 +19,7 @@ This roadmap keeps ClaimGuard focused on a polished mock-first MVP before any re
 ## 3. Add Mock Receipt Analysis Engine
 
 - Create deterministic mock analysis functions for receipt-like inputs.
-- Return authenticity score, risk level, risk signals, evidence summary, and recommended action.
+- Return an Evidence Reliability Score, risk level, risk signals, evidence summary, and recommended action.
 - Include receipt-specific signals such as date clarity, total consistency, merchant visibility, and proof-of-purchase verification needs.
 - Do not connect real OCR or AI yet.
 

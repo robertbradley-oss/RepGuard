@@ -76,12 +76,11 @@ Prefer:
 
 Avoid:
 
-- "Verified authentic"
-- "Definitely real"
-- "Fake receipt"
-- "Fraud confirmed"
-- "Customer committed fraud"
-- "Deny this claim"
+- Claims that a receipt is proven genuine
+- Definitive real/not-real labels
+- Confirmed wrongdoing language
+- Customer-accusation language
+- Automatic denial language
 
 ## Global Guardrails
 

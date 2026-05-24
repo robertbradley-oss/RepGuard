@@ -14,4 +14,4 @@ Before preparing Phase 1 work for commit:
 - Confirm committed fixtures are synthetic or privacy-safe only. Do not stage real customer receipts, raw OCR from customer evidence, copied private JSON, `.env*`, `.vercel/`, `.next/`, or `node_modules/`.
 - Run `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run check:report-semantics`.
 - Browser-check `/test-evidence` when practical, using synthetic fixtures or anonymized browser-local evidence only.
-- Preserve Phase 1 semantics: Evidence Reliability Score measures local evidence quality and internal consistency, not externally verified authenticity.
+- Preserve Phase 1 semantics: Evidence Reliability Score measures local evidence quality and internal consistency, not externally confirmed receipt truth.
