@@ -1,0 +1,119 @@
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+const repoRoot = process.cwd();
+
+const filesToCheck = [
+  "src/lib/analysis/analyzer.ts",
+  "src/lib/analysis/report-adapter.ts",
+  "src/components/AnalysisReport.tsx",
+  "src/components/AuthenticityResultCard.tsx",
+  "src/components/ClaimReviewWorkflow.tsx",
+  "src/components/RiskScoreCard.tsx",
+  "src/components/TestEvidenceHarness.tsx",
+  "src/app/test-evidence/page.tsx",
+  "TEST_EVIDENCE.md",
+];
+
+const readRequiredFile = (filePath) => {
+  const absolutePath = join(repoRoot, filePath);
+
+  if (!existsSync(absolutePath)) {
+    throw new Error(`Missing required semantic check file: ${filePath}`);
+  }
+
+  return readFileSync(absolutePath, "utf8");
+};
+
+const fileContents = new Map(filesToCheck.map((filePath) => [filePath, readRequiredFile(filePath)]));
+const corpus = [...fileContents.values()].join("\n");
+const sourceCorpus = [...fileContents]
+  .filter(([filePath]) => filePath.startsWith("src/"))
+  .map(([, contents]) => contents)
+  .join("\n");
+
+const requiredSemanticSignals = [
+  {
+    label: "Evidence Reliability Score or equivalent score label",
+    patterns: [/Evidence Reliability Score/i, /Receipt Reliability Score/i],
+  },
+  {
+    label: "Verification Status",
+    patterns: [/Verification Status/i],
+  },
+  {
+    label: "External Verification",
+    patterns: [/External Verification/i],
+  },
+  {
+    label: "Internal Structure Confidence",
+    patterns: [/Internal Structure Confidence/i],
+  },
+  {
+    label: "score meaning / interpretation",
+    patterns: [/scoreMeaning/i, /Score meaning/i, /High-score meaning/i],
+  },
+  {
+    label: "not externally verified language",
+    patterns: [/Not externally verified/i, /External verification (?:was )?not performed/i],
+  },
+  {
+    label: "privacy-safe tuning/export wording",
+    patterns: [/privacy-safe-tuning-observation/i, /Copy tuning observation/i, /redacted JSON/i],
+  },
+];
+
+const sourceOnlyBannedPhrases = [
+  /Authenticity score/i,
+  /verified authentic/i,
+  /definitely real/i,
+  /fraud confirmed/i,
+  /fake receipt/i,
+  /customer committed fraud/i,
+  /deny this claim/i,
+];
+
+const safeCountRedactionPattern =
+  /\b\d{1,6}\s+(?:[A-Za-z0-9.'-]+\s+){1,6}(?:street|st\.?|avenue|ave\.?|road|rd\.?|drive|dr\.?|lane|ln\.?|way|boulevard|blvd\.?|court|ct\.?|circle|cir\.?)(?=\s|,|\.|$)/gi;
+
+const failures = [];
+
+for (const signal of requiredSemanticSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(corpus))) {
+    failures.push(`Missing semantic signal: ${signal.label}`);
+  }
+}
+
+for (const bannedPhrase of sourceOnlyBannedPhrases) {
+  if (bannedPhrase.test(sourceCorpus)) {
+    failures.push(`Unsafe source wording found: ${bannedPhrase}`);
+  }
+}
+
+const testEvidenceHarness = fileContents.get("src/components/TestEvidenceHarness.tsx") ?? "";
+const safeProductTableNote = "6 product table row(s) detected as item evidence.";
+const redactedProductTableNote = safeProductTableNote.replace(safeCountRedactionPattern, "[REDACTED_ADDRESS]");
+const redactedAddressSample = "123 Main St.".replace(safeCountRedactionPattern, "[REDACTED_ADDRESS]");
+
+if (redactedProductTableNote !== safeProductTableNote) {
+  failures.push("Privacy redaction check failed: product table row counts must remain visible in tuning observations.");
+}
+
+if (!redactedAddressSample.includes("[REDACTED_ADDRESS]")) {
+  failures.push("Privacy redaction check failed: street-address samples should still be masked.");
+}
+
+if (testEvidenceHarness.includes("\\s+[A-Za-z0-9 .'-]+(?:street|st")) {
+  failures.push("Privacy redaction check failed: street-address pattern is broad enough to mask safe product-table count text.");
+}
+
+if (failures.length > 0) {
+  console.error("ClaimGuard report semantic smoke check failed:");
+  for (const failure of failures) {
+    console.error(`- ${failure}`);
+  }
+  process.exitCode = 1;
+} else {
+  console.log("ClaimGuard report semantic smoke check passed.");
+  console.log("Checked analyzer report adapters, score cards, /test-evidence, tuning exports, and docs.");
+}
