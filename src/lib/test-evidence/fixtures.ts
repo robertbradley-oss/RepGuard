@@ -7,6 +7,7 @@ export type SampleEvidenceFixtureId =
   | "quantity-sku-receipt"
   | "generic-order-confirmation"
   | "generic-split-summary"
+  | "generic-partial-coverage"
   | "home-depot-order"
   | "home-depot-split-order"
   | "home-depot-long-order-detail"
@@ -523,6 +524,115 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
           : "No source summary.",
         note:
           "Even richer generic extraction should keep source summaries to field presence and counts only.",
+      },
+    ],
+  },
+  {
+    id: "generic-partial-coverage",
+    label: "Generic partial-coverage order",
+    fileName: "generic-partial-coverage.jpg",
+    type: "image",
+    description:
+      "Readable generic order confirmation with order, product, total, and shipping cues, but no purchase date or payment method.",
+    expectedRisk: "Low",
+    expectedOutcome:
+      "Generic fallback should remain generic, keep Amazon validation out of scope, and mark purchase date and payment method as missing.",
+    tuningNotes:
+      "Use this to document the current Phase 1 generic fallback calibration for partial coverage. Clear OCR with order, product, total, and shipping cues but no date/payment currently remains low concern when structure is otherwise strong; future calibration can revisit whether missing date plus payment should raise the review label without changing this fixture.",
+    loadFile: () =>
+      canvasToFile(
+        drawReceiptCanvas([
+          "CEDAR WORKSHOP SUPPLY",
+          "Order Confirmation",
+          "Order ID CWS-24680",
+          "RCC7AK filter kit $84.00",
+          "Replacement membrane pack $4.00",
+          "Subtotal: $88.00",
+          "Shipping: $7.50",
+          "Tax: $0.62",
+          "Total: $96.12",
+          "Delivery: Standard shipping",
+          "Status: Ready for fulfillment",
+        ]),
+        "generic-partial-coverage.jpg",
+      ),
+    evaluate: (result) => [
+      {
+        label: "Generic partial source remains generic",
+        status: expectationStatus(
+          result.receipt.sourceClassification.category === "generic-merchant-receipt" &&
+            result.receipt.source === "merchant-receipt" &&
+            result.receipt.sourceClassification.confidence < 70 &&
+            result.receipt.sourceClassification.cues.includes("No supported narrow source marker matched") &&
+            result.receipt.sourceClassification.cues.includes("Order or transaction identifier cue") &&
+            result.receipt.sourceClassification.cues.includes("Amount structure cue") &&
+            result.receipt.sourceClassification.cues.includes("Shipping or delivery cue") &&
+            result.receipt.sourceClassification.cues.includes("Product/price line cue"),
+          "Warning",
+        ),
+        detail: `Class ${result.receipt.sourceClassification.label}; confidence ${result.receipt.sourceClassification.confidence}%; cues ${result.receipt.sourceClassification.cues.join(
+          " | ",
+        )}.`,
+        note:
+          "A clear generic receipt/order shape should use the fallback source lane only when no supported narrow vendor marker matched.",
+      },
+      {
+        label: "Generic partial parsed fields are intentionally incomplete",
+        status: expectationStatus(
+          Boolean(result.receipt.orderNumber) &&
+            Boolean(result.receipt.total) &&
+            result.receipt.structure.hasLineItems &&
+            result.receipt.structure.hasShippingIndicator &&
+            !result.receipt.purchaseDate &&
+            !result.receipt.paymentMethod &&
+            result.receipt.missingFields.includes("purchase date") &&
+            result.receipt.missingFields.includes("payment method"),
+          "Warning",
+        ),
+        detail: `Order ${result.receipt.orderNumber ? "present" : "missing"}; total ${
+          result.receipt.total ? "present" : "missing"
+        }; shipping ${result.receipt.structure.hasShippingIndicator ? "present" : "missing"}; missing fields ${
+          result.receipt.missingFields.join(", ") || "none"
+        }.`,
+        note:
+          "This fixture deliberately omits purchase-date and payment-method wording while keeping other proof-of-purchase structure visible.",
+      },
+      {
+        label: "Generic partial source summary remains privacy-safe",
+        status: expectationStatus(
+          result.receipt.sourceSpecificSummary?.category === "generic-merchant-receipt" &&
+            (result.receipt.sourceSpecificSummary?.fieldsPresent ?? 0) >= 4 &&
+            !/CWS-24680|96\.12|84\.00|88\.00|7\.50|0\.62|Cedar Workshop Supply|RCC7AK|Replacement membrane|Standard shipping/i.test(
+              JSON.stringify(result.receipt.sourceSpecificSummary),
+            ),
+          "Warning",
+        ),
+        detail: result.receipt.sourceSpecificSummary
+          ? `${result.receipt.sourceSpecificSummary.confidence}% confidence; ${result.receipt.sourceSpecificSummary.fieldsPresent}/${result.receipt.sourceSpecificSummary.fieldsExpected} fields.`
+          : "No source summary.",
+        note:
+          "Generic fallback summaries should expose presence/count-only structure, not raw merchant, order, amount, product, delivery, address, date, or payment values.",
+      },
+      {
+        label: "Generic partial skips Amazon validation",
+        status: expectationStatus(
+          result.receipt.structure.amazonOrderFormat === "not-applicable" &&
+            !result.receipt.structure.amazonSignals &&
+            !result.signals.some((signal) => /Amazon/i.test(`${signal.title} ${signal.explanation} ${signal.evidenceSource}`)),
+          "Warning",
+        ),
+        detail: `Amazon format ${result.receipt.structure.amazonOrderFormat}; signals: ${
+          result.signals.map((signal) => signal.title).join(" | ") || "none"
+        }.`,
+        note:
+          "Generic order identifiers should not invoke Amazon order-format validation or Amazon-specific source behavior.",
+      },
+      {
+        label: "Generic partial current score behavior is documented",
+        status: expectationStatus(result.riskLevel === "Low" && result.reviewLabel === "Low concern", "Warning"),
+        detail: `Received ${result.riskLevel} at ${result.score}; review label ${result.reviewLabel}; formula ${result.scoreBreakdown.formula}.`,
+        note:
+          "Current calibration keeps this partial generic fallback low concern when OCR and structure are otherwise clear; revisit thresholds only with broader tuning evidence.",
       },
     ],
   },

@@ -142,6 +142,12 @@ export const analyzerTuningSummary = {
       detail: "Generic merchant receipts remain the fallback after supported source checks and list which receipt/order cues were visible in a privacy-safe field-presence summary.",
     },
     {
+      label: "Generic partial coverage",
+      value: "missing date + payment",
+      detail:
+        "A clear generic fallback receipt with order/product/total/shipping cues but no purchase date or payment method currently documents the existing score/review-label behavior for future calibration; no generic scoring threshold changes are applied from the synthetic fixture alone.",
+    },
+    {
       label: "Date labels",
       value: "order/purchase/transaction/invoice/date plus ISO",
       detail: "The parser records the source label used for extracted purchase dates, including month-day-year, day-month-year, numeric, and ISO-style dates.",
