@@ -46,14 +46,13 @@ const navGroups = [
 export function AppSidebar() {
   return (
     <aside className="border-b border-white/10 bg-[#020713] px-4 py-5 text-white lg:min-h-screen lg:border-b-0 lg:border-r lg:border-white/10">
-      <div className="relative h-12 w-44 overflow-hidden rounded-lg border border-white/10 bg-[#020713] lg:w-full">
+      <div className="relative h-12 w-44 overflow-hidden lg:w-full">
         <Image
-          className="object-cover object-center"
-          src="/claimguard-logo.png"
-          alt="ClaimGuard"
+          className="object-contain object-left"
+          src="/brand/claimguard-logo-full.png"
+          alt="ClaimGuard logo"
           fill
           priority
-          unoptimized
           sizes="200px"
         />
       </div>

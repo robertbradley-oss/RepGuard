@@ -14,7 +14,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ClaimGuard",
-  description: "Support-safe claim authenticity screening dashboard.",
+  description: "Support-safe receipt evidence reliability analyzer.",
+  icons: {
+    icon: "/brand/claimguard-logo-mark.png",
+    shortcut: "/brand/claimguard-logo-mark.png",
+    apple: "/brand/claimguard-logo-mark.png",
+  },
 };
 
 export default function RootLayout({
