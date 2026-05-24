@@ -12,6 +12,7 @@ export type SampleEvidenceFixtureId =
   | "home-depot-long-order-detail"
   | "costco-order"
   | "lowes-email-order"
+  | "lowes-split-payment-order"
   | "ispring-direct-invoice"
   | "ispring-direct-order"
   | "lazada-order"
@@ -1012,6 +1013,111 @@ export const sampleEvidenceFixtures: SampleEvidenceFixture[] = [
           result.riskLevel !== "High"
             ? "Lowe's source classification is not creating unnecessary high-risk treatment."
             : "Inspect whether email-card structure, OCR limits, or missing fields are over-penalizing a readable non-Amazon receipt.",
+      },
+    ],
+  },
+  {
+    id: "lowes-split-payment-order",
+    label: "Lowe's split payment order",
+    fileName: "lowes-split-payment-order.jpg",
+    type: "image",
+    description: "Lowe's-style order email screenshot with split date and masked payment-summary rows.",
+    expectedRisk: "Low",
+    expectedOutcome:
+      "Lowe's email/order screenshots should keep the Lowe's source lane and extract masked payment-summary context without exposing payment values.",
+    tuningNotes:
+      "Use this to guard privacy-safe real receipt observations where Lowe's order screenshots classify correctly and parse date, total, and product detail, but miss split or masked payment summary rows.",
+    loadFile: () =>
+      canvasToFile(
+        drawReceiptCanvas([
+          "Lowe's Home Improvement",
+          "Thanks for your order",
+          "Order number SYNTHETIC-LOWES-ORDER",
+          "View order",
+          "Order placed",
+          "May 2, 2026",
+          "iSpring replacement cartridge",
+          "Delivery scheduled",
+          "Subtotal: $58.00",
+          "Shipping: $0.00",
+          "Estimated tax: $4.35",
+          "Order total: $62.35",
+          "Payment Summary",
+          "Payment Card",
+          "Masked account",
+        ]),
+        "lowes-split-payment-order.jpg",
+      ),
+    evaluate: (result) => [
+      {
+        label: "Lowe's split payment source is classified",
+        status: expectationStatus(
+          result.receipt.sourceClassification.category === "lowes-email-order" &&
+            result.receipt.source === "merchant-receipt",
+          "Warning",
+        ),
+        detail: `Class ${result.receipt.sourceClassification.label}; legacy source ${result.receipt.source}; cues ${result.receipt.sourceClassification.cues.join(
+          " | ",
+        )}.`,
+        note:
+          "Split payment tuning should stay inside the Lowe's source lane and avoid Amazon-specific validation.",
+      },
+      {
+        label: "Lowe's split payment extracts core fields",
+        status: expectationStatus(
+          Boolean(
+            result.receipt.purchaseDate &&
+              result.receipt.total &&
+              result.receipt.parsingDetails.lineItemCandidates.some((candidate) => /iSpring replacement cartridge/i.test(candidate)),
+          ),
+          "Warning",
+        ),
+        detail: `Date ${result.receipt.purchaseDate ?? "missing"}; total ${
+          result.receipt.total ?? "missing"
+        }; items ${result.receipt.parsingDetails.lineItemCandidates.join(" | ") || "none"}.`,
+        note:
+          "Date, total, and product detail should remain available while payment extraction is tuned.",
+      },
+      {
+        label: "Lowe's split payment summary is extracted",
+        status: expectationStatus(
+          Boolean(result.receipt.paymentMethod) &&
+            result.receipt.parsingDetails.paymentSource === "Payment detail after label" &&
+            result.receipt.parsingDetails.paymentCandidates.some((candidate) => candidate.kind === "card" && !candidate.hasVisibleLastFour),
+          "Warning",
+        ),
+        detail: `Payment present ${Boolean(result.receipt.paymentMethod)}; source ${
+          result.receipt.parsingDetails.paymentSource ?? "missing"
+        }; candidates ${result.receipt.parsingDetails.paymentCandidates.length}.`,
+        note:
+          "Masked Lowe's payment summaries should count as payment context without needing or exposing a payment value.",
+      },
+      {
+        label: "Lowe's split payment summary stays privacy-safe",
+        status: expectationStatus(
+          !result.receipt.sourceSpecificSummary ||
+            !/\b(?:synthetic-lowes-order|payment card|masked account|lowe'?s home improvement|may 2, 2026)\b/i.test(
+              JSON.stringify(result.receipt.sourceSpecificSummary),
+            ),
+          "Warning",
+        ),
+        detail: result.receipt.sourceSpecificSummary
+          ? `${result.receipt.sourceSpecificSummary.confidence}% confidence; ${result.receipt.sourceSpecificSummary.fieldsPresent}/${result.receipt.sourceSpecificSummary.fieldsExpected} fields.`
+          : "No source-specific summary emitted for Lowe's email/order.",
+        note:
+          "Source summaries must remain presence/count-only and should not expose raw order, payment, merchant, date, address, or private values.",
+      },
+      {
+        label: "Lowe's split payment preserves non-Amazon behavior",
+        status: expectationStatus(
+          result.receipt.structure.amazonOrderFormat === "not-applicable" &&
+            !result.signals.some((signal) => /Amazon/i.test(signal.title)) &&
+            result.riskLevel !== "High",
+          "Warning",
+        ),
+        detail: `Amazon format ${result.receipt.structure.amazonOrderFormat}; received ${result.riskLevel} at ${result.score}.`,
+        note:
+          "Lowe's payment tuning should not broaden Amazon checks or create automatic high-risk treatment.",
       },
     ],
   },

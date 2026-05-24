@@ -156,6 +156,10 @@ function isAmazonInvoiceOrDetailSource(sourceCategory?: ReceiptSourceCategory) {
   return sourceCategory === "amazon-invoice-detail" || sourceCategory === "amazon-print-order-details";
 }
 
+function isLowesSource(sourceCategory?: ReceiptSourceCategory) {
+  return sourceCategory === "lowes-email-order";
+}
+
 function isHomeDepotSource(sourceCategory?: ReceiptSourceCategory) {
   return sourceCategory === "home-depot-order";
 }
@@ -584,7 +588,11 @@ function paymentKindFor(line: string, sourceCategory?: ReceiptSourceCategory): R
     return "card";
   }
 
-  if ((sourceCategory === "lowes-email-order" || isAmazonInvoiceOrDetailSource(sourceCategory)) && hasVisiblePaymentLastFour(line)) {
+  if ((isLowesSource(sourceCategory) || isAmazonInvoiceOrDetailSource(sourceCategory)) && hasVisiblePaymentLastFour(line)) {
+    return "card";
+  }
+
+  if (isLowesSource(sourceCategory) && /\b(?:card|credit|debit|visa|mastercard|amex|american express|discover|masked|redacted)\b/i.test(line)) {
     return "card";
   }
 
@@ -612,7 +620,12 @@ function hasPaymentCue(line: string, sourceCategory?: ReceiptSourceCategory) {
     return true;
   }
 
-  if (sourceCategory === "lowes-email-order" && /\b(?:visa|mastercard|amex|paypal|gift card|store credit|ending(?:\s+in)?|x{2,}|\*{2,})\s*\d{0,4}\b/i.test(line)) {
+  if (
+    isLowesSource(sourceCategory) &&
+    /\b(?:payment(?:\s+(?:method|details|summary|information))?|paid with|paid by|charged to|tender(?:\s+type)?|visa|mastercard|amex|american express|discover|paypal|wallet|gift card|store credit|payment card|credit card|debit card|\bcard\b|ending(?:\s+(?:in|with))?|last\s*(?:four|4)|x{2,}|\*{2,}|\u2022{2,}|masked|redacted)\b/i.test(
+      line,
+    )
+  ) {
     return true;
   }
 
@@ -635,7 +648,12 @@ function hasPaymentLabel(line: string, sourceCategory?: ReceiptSourceCategory) {
     return true;
   }
 
-  if (sourceCategory === "lowes-email-order" && /^\s*(payment|payments|payment details|payment summary)\s*:?\s*$/i.test(line)) {
+  if (
+    isLowesSource(sourceCategory) &&
+    /^\s*(payment|payments|payment method|payment details|payment summary|payment information|paid with|paid by|charged to|tender|tender type)\s*:?\s*$/i.test(
+      line,
+    )
+  ) {
     return true;
   }
 
@@ -656,7 +674,7 @@ function getPaymentCandidates(lines: string[], sourceCategory?: ReceiptSourceCat
     const nextLine = lines[lineIndex + 1];
     const nextNextLine = lines[lineIndex + 2];
     const amazonInvoiceOrDetail = isAmazonInvoiceOrDetailSource(sourceCategory);
-    const supportsTwoLinePaymentDetail = amazonInvoiceOrDetail || isHomeDepotSource(sourceCategory);
+    const supportsTwoLinePaymentDetail = amazonInvoiceOrDetail || isHomeDepotSource(sourceCategory) || isLowesSource(sourceCategory);
 
     if (hasPaymentLabel(line, sourceCategory) && nextLine && !hasPaymentLabel(nextLine, sourceCategory) && hasPaymentCue(nextLine, sourceCategory)) {
       const paymentDetailLines =
