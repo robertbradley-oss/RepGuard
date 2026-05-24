@@ -45,7 +45,7 @@ Important local files:
 - `src/app/test-evidence/`: developer/manual QA evidence harness route.
 - `src/components/TestEvidenceHarness.tsx`: `/test-evidence` manual QA UI.
 - `src/lib/analysis/`: local analyzer modules.
-- `src/lib/test-evidence/`: fake fixtures and fixture helpers.
+- `src/lib/test-evidence/`: synthetic fixtures and fixture helpers.
 - `TEST_EVIDENCE.md`: manual QA and fixture guidance.
 - `ROUTING.md`: short agent-routing reference.
 - `NEXT_STEPS.md`: current roadmap notes.
@@ -81,7 +81,7 @@ If a task touches multiple areas:
 
 - Never claim fraud is confirmed.
 - Never accuse customers.
-- Never say a customer submitted a fake receipt.
+- Never accuse a customer of submitting intentionally invalid evidence.
 - Never imply local analysis proves a receipt is real.
 - Do not store or commit real customer receipts.
 - Real customer receipts must stay browser-local unless Robert explicitly approves a different workflow.
@@ -90,7 +90,7 @@ If a task touches multiple areas:
 - Do not add auth, billing, dashboards, marketing pages, or integrations during Phase 1 unless Robert explicitly says to.
 - Keep all work modular and testable.
 - Prefer useful analyzer improvements over cosmetic polish.
-- Use fake data only for committed fixtures.
+- Use synthetic data only for committed fixtures.
 - Do not make OCR expectations CI-blocking yet.
 - Preserve unrelated user changes in the working tree.
 - Do not connect real AI, OCR, Gmail, Drive, ticket systems, databases, auth, Vercel APIs, or payment systems unless explicitly approved.
@@ -149,7 +149,7 @@ Use for:
 - Source-specific logic
 - Score breakdown implementation
 - `/test-evidence` functionality
-- Fixture generation using fake data only
+- Fixture generation using synthetic data only
 - Local QA workflow improvements
 - Small high-value improvements
 
@@ -159,7 +159,7 @@ Should be excellent at:
 - Analyzer pipeline improvements
 - Receipt parsing
 - Source-specific logic
-- Fixtures with fake data only
+- Fixtures with synthetic data only
 - `/test-evidence` workflow
 - Score breakdown implementation
 - Small high-value improvements
@@ -317,7 +317,7 @@ Decision rules:
 - Do not commit real evidence.
 - Do not expose names, addresses, emails, phones, payment details, full order IDs, tracking numbers, or raw OCR by default.
 - Tuning observation export should be the preferred sharing format.
-- Fixtures must use fake data only.
+- Fixtures must use synthetic data only.
 - Logs and docs should avoid raw private evidence.
 
 ### 6. Architecture & Maintainability Agent
