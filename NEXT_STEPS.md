@@ -56,6 +56,40 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 9. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
 10. Preserve a clean operational queue after each completed agent task.
 
+## Phase 2.2 Staged Live Analyzer-Routing Integration Plan
+
+This is a docs-only integration plan. It records the safest future path for analyzer routing without opening runtime behavior, wiring product-photo analysis into the UI, or changing the shipped receipt analyzer path.
+
+Staged order:
+
+1. Complete this docs-only live-routing integration plan and keep `routeAnalyzerEvidenceInput` decision-only and unwired.
+2. Expand probe coverage for the planned contract before any runtime wiring is attempted.
+3. Refine type-only/shared-result boundaries only if the staged plan requires a result model that can safely represent receipts and product photos without forcing one into the other's shape.
+4. Add a non-live product-photo adapter/result boundary that returns a future-safe result shape and remains separate from `LocalAnalysisResult`.
+5. Add a guarded internal route-to-adapter path that is still not callable by UI/upload/report/scoring/parser paths.
+6. Seek separate approval for live analyzer/UI/upload integration only after the result shape, report mapping, probes, and safety wording are ready.
+
+Live-use conditions before any future integration:
+
+- Receipt files must preserve current `LocalAnalysisResult` behavior, including the existing `analyzeEvidenceFile` live receipt entrypoint.
+- Product-photo results must not be forced into receipt-shaped `LocalAnalysisResult` without a planned shared result model.
+- `src/lib/analysis/report-adapter.ts` must support product-photo-safe mapping before any product-photo result can be displayed in the UI.
+- UI language must stay manual-review-only and must not imply proof, customer wrongdoing, or automatic denial.
+- Product-photo analysis must remain local-heuristics-only, provider-ready, and not externally verified unless a future approved provider slice explicitly changes that.
+- No real photos, real metadata fixtures, providers, storage, integrations, or case queues are part of this staged path.
+- The product-photo runtime flag remains guarded until Robert explicitly opens it.
+
+Required probes before live integration:
+
+- Receipt-like object/file preserves the receipt path.
+- Actual receipt analyzer output remains unchanged.
+- PDF-like and screenshot-like inputs remain classification-only unless explicitly supported.
+- Product-photo runtime flag remains non-live unless Robert explicitly opens it.
+- `damage-photo` compatibility alias maps only to the canonical `product-photo` planning path.
+- No product-photo details leak into `LocalAnalysisResult`.
+- Decision-only wrapper does not invoke adapter/analyzer/UI/report paths.
+- Safety-wording scan remains clean.
+
 ## Future Evidence Review UX Direction
 
 Robert wants the eventual result screen to feel like an evidence triage workspace, not a stack of competing result cards. This is product direction only; do not implement it during the current Phase 2.2 runtime-boundary work.
