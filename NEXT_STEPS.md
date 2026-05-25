@@ -11,23 +11,32 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - Phase 2.0 scaffold work is closed.
 - Phase 2.1 Product Photo Local Heuristic Design is reviewed and closed for the current planning slice.
 - Phase 2.2 helper implementation has started as small, local-only, manual-review-support-only, intentionally unwired helper work.
-- The first two Phase 2.2 helper commits are done and pushed:
+- Current pushed Phase 2.2 work includes:
   - `44d09f0` added unwired product-photo signal builders.
   - `50f8284` added unwired product-photo file summary, review completeness, and local review signal helpers.
-- Shared evidence model types, product-photo scaffold/defaults, signal builders, and summary helpers exist.
-- No product-photo analyzer behavior is live yet.
-- No runtime analyzer, upload, UI, report, scoring, parser, metadata extraction, or fixture behavior changed during Phase 2.0, Phase 2.1, or the first two Phase 2.2 helper commits.
+  - `3496ede` updated Phase 2.2 helper status docs.
+  - `82376bb` added a compile-only product-photo helper probe.
+  - `78ad7bb` added an exported-only product-photo analyzer builder.
+  - `dca1177` captured future evidence review UX direction as docs-only product direction.
+  - `bf46949` added a dev-only product-photo recognition boundary.
+- Shared evidence model types, product-photo scaffold/defaults, signal builders, summary/completeness helpers, compile probes, an exported-only analyzer builder, an analyzer probe, and a dev-only recognition boundary exist.
+- The recognition boundary is isolated and dev-only. `recognizeProductPhotoEvidence` is not called by `analyzeEvidenceFile`.
+- Product-photo runtime analyzer behavior is still not live.
+- `analyzeEvidenceFile` still protects the shipped receipt pipeline, and `LocalAnalysisResult` remains receipt-path shaped.
+- No runtime analyzer routing, upload, UI, report, scoring, parser, metadata extraction, or fixture behavior changed during Phase 2.0, Phase 2.1, or Phase 2.2 helper/boundary work.
 - `product-photo` is canonical.
 - `damage-photo` remains only a compatibility alias to `product-photo` / `damage-close-up`.
 
 ## Next Safe Tasks
 
-1. Review the current Phase 2.2 helper-only state before adding any more product-photo code.
-2. Add developer-only tests or probes for the unwired product-photo helper functions using synthetic metadata/review objects, if Robert opens that slice.
-3. Keep image-consistency uncertainty dormant until a future explicitly opened provider, validated local-metrics, and QA-evidence slice.
-4. Confirm the product-photo helpers remain unwired from runtime analyzer, upload, UI, report, scoring, parser, metadata extraction, and fixture behavior.
-5. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
-6. Preserve a clean operational queue after each completed agent task.
+1. Plan the first dev-only routing-adapter boundary before implementing it.
+2. Treat a dev-only routing adapter as the next risk step; do not start it without a separate planning prompt.
+3. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
+4. Keep `LocalAnalysisResult` receipt-path shaped until a separate shared-result migration slice is planned.
+5. Keep image-consistency uncertainty dormant until a future explicitly opened provider, validated local-metrics, and QA-evidence slice.
+6. Confirm the product-photo helpers, analyzer builder, probes, and recognition boundary remain unwired from runtime analyzer, upload, UI, report, scoring, parser, metadata extraction, and fixture behavior.
+7. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
+8. Preserve a clean operational queue after each completed agent task.
 
 ## Future Evidence Review UX Direction
 
@@ -44,6 +53,9 @@ Robert wants the eventual result screen to feel like an evidence triage workspac
 ## Do Not Touch Right Now
 
 - Do not wire product-photo scaffold into runtime analyzer behavior.
+- Do not call `recognizeProductPhotoEvidence` from `analyzeEvidenceFile`.
+- Do not change `analyzeEvidenceFile`.
+- Do not change `LocalAnalysisResult`.
 - Do not add live product damage photo analysis.
 - Do not modify app UI.
 - Do not modify upload/input/reset behavior.
@@ -55,5 +67,5 @@ Robert wants the eventual result screen to feel like an evidence triage workspac
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent review the current Phase 2.2 product-photo helper-only state and, if safe, add developer-only synthetic tests/probes for the unwired helpers; do not make runtime, UI, upload, analyzer, scoring, parser, report, metadata extraction, or fixture changes
+/claimguardagent plan the first dev-only product-photo routing-adapter boundary; do not implement; do not call recognizeProductPhotoEvidence from analyzeEvidenceFile; do not change LocalAnalysisResult, upload, UI, scoring, report mapping, parser behavior, fixtures, providers, storage, integrations, or case queues
 ```
