@@ -151,15 +151,15 @@ export function UploadPanel({
     <section className="cg-forensic-panel rounded-[1.35rem] p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cg-cyan)]">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--cg-cyan)]">
             Evidence
           </p>
-          <h2 className="mt-2 text-xl font-semibold text-white">Evidence under review</h2>
+          <h2 className="mt-2 text-xl font-medium text-white">Evidence under review</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--cg-text-muted)]">
             Inspect the submitted receipt, screenshot, PDF, or product photo in the scan frame.
           </p>
         </div>
-        <span className="cg-security-badge rounded-full px-3 py-1 text-xs font-semibold">
+        <span className="cg-security-badge rounded-full px-3 py-1 text-xs font-medium">
           Mock analysis only
         </span>
       </div>
@@ -177,10 +177,10 @@ export function UploadPanel({
         <div className="rounded-2xl border border-[var(--cg-border-strong)] bg-[#020713]/70 p-3 shadow-[var(--cg-shadow-blue)]">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--cg-text-muted)]">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--cg-text-muted)]">
                 {evidenceId}
               </p>
-              <h3 className="mt-1 text-lg font-semibold text-white">{viewerTitle}</h3>
+              <h3 className="mt-1 text-lg font-medium text-white">{viewerTitle}</h3>
             </div>
             <div className="flex items-center gap-1.5">
               {[Minus, Plus, RotateCw, Maximize2].map((Icon, index) => (
@@ -197,14 +197,14 @@ export function UploadPanel({
           </div>
 
           <div className="relative mt-3 overflow-hidden rounded-xl border border-white/10 bg-[#07101d]">
-            <div className="pointer-events-none absolute inset-x-5 top-0 z-10 flex justify-between text-[9px] font-semibold text-[var(--cg-cyan)]/50">
+            <div className="pointer-events-none absolute inset-x-5 top-0 z-10 flex justify-between text-xs font-medium text-[var(--cg-cyan)]/50">
               {Array.from({ length: 11 }, (_, index) => (
                 <span className="h-3 border-l border-[var(--cg-cyan)]/35 pl-1" key={index}>
                   {index}
                 </span>
               ))}
             </div>
-            <div className="pointer-events-none absolute inset-y-5 left-0 z-10 grid content-between text-[9px] font-semibold text-[var(--cg-cyan)]/50">
+            <div className="pointer-events-none absolute inset-y-5 left-0 z-10 grid content-between text-xs font-medium text-[var(--cg-cyan)]/50">
               {Array.from({ length: 7 }, (_, index) => (
                 <span className="w-5 border-t border-[var(--cg-cyan)]/35 pt-1 text-right" key={index}>
                   {index}
@@ -252,14 +252,14 @@ export function UploadPanel({
                     <div className="relative z-10">
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <p className={report.evidenceType === "damage-photo" ? "text-xs font-bold uppercase tracking-[0.18em] text-cyan-100/80" : "text-xs font-bold uppercase tracking-[0.18em] text-[#526175]"}>
+                          <p className={report.evidenceType === "damage-photo" ? "text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/80" : "text-xs font-medium uppercase tracking-[0.18em] text-[#526175]"}>
                             {viewerFileName}
                           </p>
-                          <p className={report.evidenceType === "damage-photo" ? "mt-2 text-2xl font-semibold text-white" : "mt-2 text-2xl font-bold text-[var(--cg-text-paper)]"}>
+                          <p className={report.evidenceType === "damage-photo" ? "mt-2 text-xl font-medium text-white" : "mt-2 text-xl font-medium text-[var(--cg-text-paper)]"}>
                             {report.evidenceType === "damage-photo" ? "Product damage image" : "Purchase evidence"}
                           </p>
                         </div>
-                        <span className={report.evidenceType === "damage-photo" ? "rounded-md border border-cyan-200/25 bg-cyan-200/10 px-2 py-1 text-xs font-bold text-cyan-100" : "rounded-md border border-[rgba(20,33,51,0.14)] bg-white/60 px-2 py-1 text-xs font-bold text-[#526175]"}>
+                        <span className={report.evidenceType === "damage-photo" ? "rounded-md border border-cyan-200/25 bg-cyan-200/10 px-2 py-1 text-xs font-medium text-cyan-100" : "rounded-md border border-[rgba(20,33,51,0.14)] bg-white/60 px-2 py-1 text-xs font-medium text-[#526175]"}>
                           {report.reviewLabel}
                         </span>
                       </div>
@@ -268,7 +268,7 @@ export function UploadPanel({
                         <div className="mt-8 grid min-h-48 place-items-center rounded-lg border border-dashed border-cyan-200/28 bg-black/16">
                           <div className="text-center">
                             <FileImage className="mx-auto size-12 text-[var(--cg-cyan)]" aria-hidden="true" />
-                            <p className="mt-3 text-sm font-semibold text-white">Damage area marked for manual review</p>
+                            <p className="mt-3 text-sm font-medium text-white">Damage area marked for manual review</p>
                             <p className="mt-1 text-xs text-cyan-100/70">Request wider product context before resolution.</p>
                           </div>
                         </div>
@@ -280,11 +280,11 @@ export function UploadPanel({
                           <div className="my-6 border-t border-dashed border-[#142133]/18" />
                           <div className="grid grid-cols-2 gap-3">
                             <span>Order</span>
-                            <span className="text-right font-bold">{caseRecord?.ticket.orderNumber ?? "Pending match"}</span>
+                            <span className="text-right font-medium">{caseRecord?.ticket.orderNumber ?? "Pending match"}</span>
                             <span>Total/date</span>
-                            <span className="text-right font-bold">Requires verification</span>
+                            <span className="text-right font-medium">Requires verification</span>
                             <span>Source</span>
-                            <span className="text-right font-bold">{caseRecord?.ticket.purchaseChannel ?? "Local upload"}</span>
+                            <span className="text-right font-medium">{caseRecord?.ticket.purchaseChannel ?? "Local upload"}</span>
                           </div>
                         </div>
                       )}
@@ -318,7 +318,7 @@ export function UploadPanel({
                 >
                   <span>
                     <UploadCloud className="mx-auto size-12 text-[var(--cg-cyan)]" aria-hidden="true" />
-                    <span className="mt-4 block text-lg font-semibold text-white">
+                    <span className="mt-4 block text-lg font-medium text-white">
                       {isDragging ? "Release to attach evidence" : "Drop evidence into the scan frame"}
                     </span>
                     <span className="mt-2 block max-w-md text-sm leading-6 text-[var(--cg-text-muted)]">
@@ -331,7 +331,7 @@ export function UploadPanel({
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-4 py-3 text-xs">
-              <span className="inline-flex items-center gap-2 rounded-lg border border-[rgba(74,222,128,0.28)] bg-[rgba(74,222,128,0.1)] px-3 py-2 font-semibold text-[var(--cg-green)]">
+              <span className="inline-flex items-center gap-2 rounded-lg border border-[rgba(74,222,128,0.28)] bg-[rgba(74,222,128,0.1)] px-3 py-2 font-medium text-[var(--cg-green)]">
                 <Fingerprint className="size-4" aria-hidden="true" />
                 Document detected: {report.evidenceLabel}
               </span>
@@ -342,7 +342,7 @@ export function UploadPanel({
 
         <aside className="grid content-start gap-3">
           <div className="rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/62 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
               File metadata
             </p>
             <dl className="mt-3 space-y-3 text-sm">
@@ -354,7 +354,7 @@ export function UploadPanel({
                 { label: "Hash", value: hashValue },
               ].map((item) => (
                 <div className="rounded-lg border border-white/10 bg-white/[0.025] p-3" key={item.label}>
-                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">{item.label}</dt>
+                  <dt className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-muted)]">{item.label}</dt>
                   <dd className="mt-1 break-words font-mono text-xs text-[var(--cg-text-soft)]">{item.value}</dd>
                 </div>
               ))}
@@ -363,7 +363,7 @@ export function UploadPanel({
 
           {selectedFile ? (
             <button
-              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-left text-sm font-semibold text-[var(--cg-text-soft)] transition hover:border-[var(--cg-border-strong)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-left text-sm font-medium text-[var(--cg-text-soft)] transition hover:border-[var(--cg-border-strong)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
               type="button"
               onClick={handleResetSelection}
               disabled={isAnalyzing}
@@ -373,7 +373,7 @@ export function UploadPanel({
             </button>
           ) : (
             <button
-              className="flex items-center justify-between rounded-xl border border-[var(--cg-border-strong)] bg-[rgba(24,183,255,0.1)] px-4 py-3 text-left text-sm font-semibold text-white transition hover:bg-[rgba(24,183,255,0.16)]"
+              className="flex items-center justify-between rounded-xl border border-[var(--cg-border-strong)] bg-[rgba(24,183,255,0.1)] px-4 py-3 text-left text-sm font-medium text-white transition hover:bg-[rgba(24,183,255,0.16)]"
               type="button"
               onClick={() => fileInputRef.current?.click()}
             >
@@ -389,7 +389,7 @@ export function UploadPanel({
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 size-5 shrink-0 text-[var(--cg-red)]" aria-hidden="true" />
             <div>
-              <p className="font-semibold text-white">Evidence upload needs attention</p>
+              <p className="font-medium text-white">Evidence upload needs attention</p>
               <p className="mt-1 text-rose-100/85">{uploadError}</p>
             </div>
           </div>
@@ -401,7 +401,7 @@ export function UploadPanel({
           <div className="flex items-center gap-3">
             <Loader2 className="size-4 shrink-0 animate-spin text-[var(--cg-cyan)]" aria-hidden="true" />
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-white">Evidence review in progress</p>
+              <p className="text-sm font-medium text-white">Evidence review in progress</p>
               <p className="mt-1 truncate text-xs text-[var(--cg-text-muted)]">{currentStep}</p>
             </div>
             <ScanLine className="size-5 text-[var(--cg-green)]" aria-hidden="true" />
@@ -414,7 +414,7 @@ export function UploadPanel({
 
       <div className="mt-5 grid gap-3 lg:grid-cols-[220px_1fr]">
         <button
-          className="cg-primary-button inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold transition disabled:cursor-not-allowed"
+          className="cg-primary-button inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-medium transition disabled:cursor-not-allowed"
           type="button"
           onClick={onRunAnalysis}
           disabled={!canAnalyze}
@@ -428,7 +428,7 @@ export function UploadPanel({
         </button>
 
         <div className="rounded-xl border border-[var(--cg-border)] bg-[#06101f]/64 px-4 py-3 text-xs leading-5 text-[var(--cg-text-muted)]">
-          <span className="inline-flex items-center gap-2 font-semibold text-[var(--cg-text-soft)]">
+          <span className="inline-flex items-center gap-2 font-medium text-[var(--cg-text-soft)]">
             <Fingerprint className="size-3.5 text-[var(--cg-cyan)]" aria-hidden="true" />
             Current state:
           </span>{" "}

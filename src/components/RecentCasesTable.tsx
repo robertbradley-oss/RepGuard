@@ -23,11 +23,11 @@ export function RecentCasesTable({
     <section className="cg-command-panel rounded-[1.15rem] p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--cg-cyan)]">Review queue</p>
-          <h2 className="mt-1 text-xl font-semibold text-white">Evidence queue</h2>
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--cg-cyan)]">Review queue</p>
+          <h2 className="mt-1 text-xl font-medium text-white">Evidence queue</h2>
         </div>
         <button
-          className="rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-[var(--cg-text-soft)] hover:border-[var(--cg-border-strong)] hover:text-white"
+          className="rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-medium text-[var(--cg-text-soft)] hover:border-[var(--cg-border-strong)] hover:text-white"
           type="button"
         >
           View all
@@ -38,12 +38,12 @@ export function RecentCasesTable({
         <table className="w-full min-w-[720px] border-separate border-spacing-0 text-left text-sm">
           <thead>
             <tr className="text-xs uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
-              <th className="border-b border-white/10 pb-3 font-semibold">Case</th>
-              <th className="border-b border-white/10 pb-3 font-semibold">Customer</th>
-              <th className="border-b border-white/10 pb-3 font-semibold">Item</th>
-              <th className="border-b border-white/10 pb-3 font-semibold">Review state</th>
-              <th className="border-b border-white/10 pb-3 font-semibold">Score</th>
-              <th className="border-b border-white/10 pb-3 font-semibold">Queue</th>
+              <th className="border-b border-white/10 pb-3 font-medium">Case</th>
+              <th className="border-b border-white/10 pb-3 font-medium">Customer</th>
+              <th className="border-b border-white/10 pb-3 font-medium">Item</th>
+              <th className="border-b border-white/10 pb-3 font-medium">Review state</th>
+              <th className="border-b border-white/10 pb-3 font-medium">Score</th>
+              <th className="border-b border-white/10 pb-3 font-medium">Queue</th>
             </tr>
           </thead>
           <tbody>
@@ -71,14 +71,14 @@ export function RecentCasesTable({
                 >
                   <td className="border-b border-white/8 py-3.5 pl-2">
                     <div className="flex items-center gap-2">
-                      <p className="font-mono font-semibold text-white">{claim.id}</p>
+                      <p className="font-mono font-medium text-white">{claim.id}</p>
                       {isActive ? (
-                        <span className="rounded-md border border-[var(--cg-border-strong)] bg-[rgba(24,183,255,0.12)] px-2 py-0.5 text-[11px] font-semibold text-[var(--cg-cyan)]">
+                        <span className="rounded-md border border-[var(--cg-border-strong)] bg-[rgba(24,183,255,0.12)] px-2 py-0.5 text-xs font-medium text-[var(--cg-cyan)]">
                           Selected
                         </span>
                       ) : null}
                       {!isActive && isNewAnalysis ? (
-                        <span className="rounded-md border border-[rgba(74,222,128,0.38)] bg-[rgba(74,222,128,0.12)] px-2 py-0.5 text-[11px] font-semibold text-[var(--cg-green)]">
+                        <span className="rounded-md border border-[rgba(74,222,128,0.38)] bg-[rgba(74,222,128,0.12)] px-2 py-0.5 text-xs font-medium text-[var(--cg-green)]">
                           New
                         </span>
                       ) : null}
@@ -91,7 +91,7 @@ export function RecentCasesTable({
                     {claim.evidence ? <p className="text-xs text-[var(--cg-text-muted)]">{claim.evidence}</p> : null}
                   </td>
                   <td className="border-b border-white/8 py-3.5">
-                    <span className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${riskClass[claim.risk]}`}>
+                    <span className={`rounded-lg border px-2.5 py-1 text-xs font-medium ${riskClass[claim.risk]}`}>
                       {claim.risk === "Low" ? "Low Concern" : claim.risk === "Medium" ? "Review Suggested" : "Manual Review"}
                     </span>
                   </td>

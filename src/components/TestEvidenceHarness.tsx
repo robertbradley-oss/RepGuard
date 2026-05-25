@@ -162,7 +162,7 @@ function findingStatusClass(status: FindingStatus) {
 function FieldRow({ label, value }: { label: string; value?: string | number | boolean }) {
   return (
     <div className="grid grid-cols-[138px_minmax(0,1fr)] gap-3 border-b border-white/8 py-2 last:border-b-0">
-      <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">{label}</dt>
+      <dt className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-muted)]">{label}</dt>
       <dd className="min-w-0 break-words font-mono text-sm text-white">{value === undefined || value === "" ? "Not extracted" : String(value)}</dd>
     </div>
   );
@@ -771,21 +771,21 @@ function ThresholdSummary() {
     <section className="cg-command-panel rounded-xl p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cg-cyan)]">Threshold summary</p>
-          <h2 className="mt-1 text-lg font-semibold text-white">Current analyzer tuning reference</h2>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--cg-cyan)]">Threshold summary</p>
+          <h2 className="mt-1 text-lg font-medium text-white">Current analyzer tuning reference</h2>
         </div>
-        <span className="rounded-full border border-[rgba(251,191,36,0.45)] bg-[rgba(251,191,36,0.1)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-100">
+        <span className="rounded-full border border-[rgba(251,191,36,0.45)] bg-[rgba(251,191,36,0.1)] px-3 py-1 text-xs font-medium uppercase tracking-wide text-amber-100">
           Manual QA only
         </span>
       </div>
       <div className="mt-4 grid min-w-0 gap-3 md:grid-cols-2 2xl:grid-cols-4">
         {Object.entries(analyzerTuningSummary).map(([group, items]) => (
           <div className="min-w-0 rounded-lg border border-white/10 bg-[#020713]/45 p-3" key={group}>
-            <h3 className="text-sm font-semibold capitalize text-white">{group.replace(/([A-Z])/g, " $1")}</h3>
+            <h3 className="text-sm font-medium capitalize text-white">{group.replace(/([A-Z])/g, " $1")}</h3>
             <div className="mt-3 grid gap-2">
               {items.map((item) => (
                 <div className="min-w-0 rounded-md border border-white/8 bg-white/[0.03] p-2" key={`${group}-${item.label}`}>
-                  <p className="break-words text-xs font-semibold text-[var(--cg-text-soft)]">{item.label}</p>
+                  <p className="break-words text-xs font-medium text-[var(--cg-text-soft)]">{item.label}</p>
                   <p className="mt-1 break-words font-mono text-xs text-white">{item.value}</p>
                   <p className="mt-1 break-words text-xs leading-5 text-[var(--cg-text-muted)]">{item.detail}</p>
                 </div>
@@ -814,7 +814,7 @@ function FixturePreview({ run }: { run: HarnessRun }) {
     <div className="grid min-h-64 place-items-center rounded-lg border border-white/10 bg-[#020713]/80 text-center">
       <div>
         <FileText className="mx-auto size-12 text-[var(--cg-cyan)]" aria-hidden="true" />
-        <p className="mt-3 font-semibold text-white">{run.file.name}</p>
+        <p className="mt-3 font-medium text-white">{run.file.name}</p>
         <p className="mt-1 text-sm text-[var(--cg-text-muted)]">{formatFileSize(run.file.size)} PDF fixture</p>
       </div>
     </div>
@@ -837,7 +837,7 @@ function EvidencePreview({ file, previewUrl }: { file: File; previewUrl?: string
     <div className="grid min-h-64 place-items-center rounded-lg border border-white/10 bg-[#020713]/80 text-center">
       <div>
         <FileText className="mx-auto size-12 text-[var(--cg-cyan)]" aria-hidden="true" />
-        <p className="mt-3 font-semibold text-white">{file.name}</p>
+        <p className="mt-3 font-medium text-white">{file.name}</p>
         <p className="mt-1 text-sm text-[var(--cg-text-muted)]">{formatFileSize(file.size)} PDF/document</p>
       </div>
     </div>
@@ -877,12 +877,12 @@ function ScoreBreakdown({ result }: { result: LocalAnalysisResult }) {
         <FieldRow label="Field bonus rule" value={`${breakdown.fieldBonusDetails.maxBonus} max, -${breakdown.fieldBonusDetails.deductionPerMissingField} per missing field`} />
       </dl>
       <div className="grid gap-2">
-        <h3 className="text-sm font-semibold text-white">Rule/category impact</h3>
+        <h3 className="text-sm font-medium text-white">Rule/category impact</h3>
         <div className="grid gap-2 md:grid-cols-2">
           {scoreRuleSummary(result).map((row) => (
             <div className="rounded-lg border border-white/10 bg-[#020713]/45 p-3" key={row.label}>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-white">{row.label}</p>
+                <p className="text-sm font-medium text-white">{row.label}</p>
                 <span className="font-mono text-xs text-[var(--cg-text-soft)]">{row.value}</span>
               </div>
               <p className="mt-2 text-xs leading-5 text-[var(--cg-text-muted)]">{row.detail}</p>
@@ -936,13 +936,13 @@ function ReviewModulesPanel() {
       <div className="border-b border-white/10 bg-[#020713]/32 px-4 py-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cg-cyan)]">Review modules</p>
-            <h2 className="mt-1 text-xl font-semibold text-white">Receipt evidence check pipeline</h2>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--cg-cyan)]">Review modules</p>
+            <h2 className="mt-1 text-xl font-medium text-white">Receipt evidence check pipeline</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--cg-dark-muted)]">
               Signal contributors show which local review modules ran and what evidence checks they support. They help manual review and do not independently prove a receipt outcome.
             </p>
           </div>
-          <span className="inline-flex w-fit items-center rounded-full border border-[rgba(251,191,36,0.38)] bg-[rgba(251,191,36,0.1)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-100">
+          <span className="inline-flex w-fit items-center rounded-full border border-[rgba(251,191,36,0.38)] bg-[rgba(251,191,36,0.1)] px-3 py-1 text-xs font-medium uppercase tracking-wide text-amber-100">
             Supports manual review
           </span>
         </div>
@@ -952,13 +952,13 @@ function ReviewModulesPanel() {
         {phaseOneReviewModules.map((module) => (
           <article className="rounded-lg border border-white/10 bg-white/[0.035] p-3" key={module.name}>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold text-white">{module.name}</h3>
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--cg-dark-subtle)]">
+              <h3 className="text-sm font-medium text-white">{module.name}</h3>
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">
                 {module.status}
               </span>
             </div>
             <p className="mt-2 text-sm leading-5 text-[var(--cg-dark-muted)]">{module.support}</p>
-            <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-[var(--cg-dark-subtle)]">Evidence checks / signal support</p>
+            <p className="mt-3 text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Evidence checks / signal support</p>
           </article>
         ))}
       </div>
@@ -985,7 +985,7 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
   return (
     <section className="grid gap-4">
       <div className="cg-command-panel rounded-xl p-4">
-        <h2 className="text-lg font-semibold text-white">Verification and score semantics</h2>
+        <h2 className="text-lg font-medium text-white">Verification and score semantics</h2>
         <dl className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           <FieldRow label="Evidence Reliability Score" value={result.score} />
           <FieldRow label="Verification Status" value={result.verificationStatus.status} />
@@ -998,13 +998,13 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
       </div>
 
       <div className="cg-command-panel rounded-xl p-4">
-        <h2 className="text-lg font-semibold text-white">Grouped findings</h2>
+        <h2 className="text-lg font-medium text-white">Grouped findings</h2>
         <div className="mt-3 grid gap-3 xl:grid-cols-5">
           {result.findingGroups.map((group) => (
             <div className={`rounded-lg border p-3 ${findingStatusClass(group.status)}`} key={group.category}>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-sm font-semibold text-white">{group.category}</h3>
-                <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-bold uppercase tracking-wide">
+                <h3 className="text-sm font-medium text-white">{group.category}</h3>
+                <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-xs font-medium uppercase tracking-wide">
                   {group.status}
                 </span>
               </div>
@@ -1012,7 +1012,7 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
               <dl className="mt-3 grid gap-1">
                 {group.details.slice(0, 3).map((detail) => (
                   <div className="grid gap-1 border-t border-white/10 pt-2" key={`${group.category}-${detail.label}`}>
-                    <dt className="text-[10px] font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">{detail.label}</dt>
+                    <dt className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-muted)]">{detail.label}</dt>
                     <dd className="break-words text-xs text-white">{detail.value}</dd>
                   </div>
                 ))}
@@ -1023,7 +1023,7 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
       </div>
 
       <div className="cg-command-panel rounded-xl p-4">
-        <h2 className="text-lg font-semibold text-white">OCR text</h2>
+        <h2 className="text-lg font-medium text-white">OCR text</h2>
         <dl className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           <FieldRow label="Quality" value={result.ocr.quality.label} />
           <FieldRow label="Confidence" value={`${result.ocr.averageConfidence}%`} />
@@ -1037,14 +1037,14 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
           {result.ocr.text || "No OCR text extracted."}
         </pre>
         <div className="mt-3">
-          <h3 className="text-sm font-semibold text-white">OCR uncertainty notes</h3>
+          <h3 className="text-sm font-medium text-white">OCR uncertainty notes</h3>
           {result.ocr.uncertaintyNotes.length > 0 ? (
             <div className="mt-2 grid gap-2 md:grid-cols-2">
               {result.ocr.uncertaintyNotes.map((note) => (
                 <div className="rounded-lg border border-white/10 bg-[#020713]/45 p-3" key={note.label}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-white">{note.label}</p>
-                    <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-[var(--cg-text-soft)]">
+                    <p className="text-sm font-medium text-white">{note.label}</p>
+                    <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-xs font-medium uppercase tracking-wide text-[var(--cg-text-soft)]">
                       {note.severity}
                     </span>
                   </div>
@@ -1069,7 +1069,7 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
           )}
         </div>
         <div className="mt-3">
-          <h3 className="text-sm font-semibold text-white">Low-confidence word samples</h3>
+          <h3 className="text-sm font-medium text-white">Low-confidence word samples</h3>
           {result.ocr.lowConfidenceRegions.length > 0 ? (
             <div className="mt-2 flex flex-wrap gap-2">
               {result.ocr.lowConfidenceRegions.map((region, index) => (
@@ -1089,7 +1089,7 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="cg-command-panel rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white">Parsed fields</h2>
+          <h2 className="text-lg font-medium text-white">Parsed fields</h2>
           <dl className="mt-3">
             <FieldRow label="Merchant" value={result.receipt.merchantName} />
             <FieldRow label="Source class" value={result.receipt.sourceClassification.label} />
@@ -1137,15 +1137,15 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
             <FieldRow label="Missing" value={result.receipt.missingFields.join(", ") || "None"} />
           </dl>
           <div className="mt-4">
-            <h3 className="text-sm font-semibold text-white">Field OCR reliability</h3>
+            <h3 className="text-sm font-medium text-white">Field OCR reliability</h3>
             <div className="mt-2 grid gap-2">
               {result.receipt.fieldReliability.map((field) => (
                 <div className="rounded-lg border border-white/10 bg-[#020713]/45 p-3" key={field.field}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold capitalize text-white">{field.field}</p>
+                    <p className="text-sm font-medium capitalize text-white">{field.field}</p>
                     <span className="font-mono text-xs text-[var(--cg-text-soft)]">{field.confidence}%</span>
                   </div>
-                  <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">{field.status}</p>
+                  <p className="mt-1 text-xs font-medium uppercase tracking-wide text-[var(--cg-text-muted)]">{field.status}</p>
                   <p className="mt-2 text-xs leading-5 text-[var(--cg-text-muted)]">{field.note}</p>
                   {field.value ? <p className="mt-2 break-words font-mono text-xs text-white">{field.value}</p> : null}
                 </div>
@@ -1155,7 +1155,7 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
         </div>
 
         <div className="cg-command-panel rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white">Receipt structure</h2>
+          <h2 className="text-lg font-medium text-white">Receipt structure</h2>
           <dl className="mt-3">
             <FieldRow label="Line items" value={result.receipt.structure.hasLineItems ? "Detected" : "Not detected"} />
             <FieldRow label="Subtotal" value={result.receipt.structure.hasSubtotal ? "Detected" : "Not detected"} />
@@ -1230,7 +1230,7 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="cg-command-panel rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white">Metadata findings</h2>
+          <h2 className="text-lg font-medium text-white">Metadata findings</h2>
           <dl className="mt-3">
             <FieldRow label="Context" value={result.metadata.context.status} />
             <FieldRow label="Summary" value={result.metadata.context.summary} />
@@ -1242,7 +1242,7 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
         </div>
 
         <div className="cg-command-panel rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white">Image-quality findings</h2>
+          <h2 className="text-lg font-medium text-white">Image-quality findings</h2>
           <dl className="mb-3">
             <FieldRow label="Quality" value={result.imageHeuristics.qualityLevel} />
             <FieldRow label="Summary" value={result.imageHeuristics.qualitySummary} />
@@ -1256,7 +1256,7 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="cg-command-panel rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white">Score breakdown</h2>
+          <h2 className="text-lg font-medium text-white">Score breakdown</h2>
           <div className="mt-3">
             <ScoreBreakdown result={result} />
           </div>
@@ -1267,12 +1267,12 @@ function AnalysisDetailPanels({ result }: { result: LocalAnalysisResult }) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="cg-command-panel rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white">Review signals</h2>
+          <h2 className="text-lg font-medium text-white">Review signals</h2>
           <JsonBlock value={result.signals} />
         </div>
 
         <div className="cg-command-panel rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white">Customer-safe recommendation</h2>
+          <h2 className="text-lg font-medium text-white">Customer-safe recommendation</h2>
           <dl className="mt-3">
             <FieldRow label="Support action" value={result.recommendedSupportAction} />
             <FieldRow label="Customer wording" value={result.customerSafeWording} />
@@ -1291,13 +1291,13 @@ function FixtureComparison({ runs }: { runs: HarnessRun[] }) {
 
   return (
     <section className="cg-command-panel overflow-hidden rounded-xl p-4">
-      <h2 className="text-lg font-semibold text-white">Side-by-side fixture comparison</h2>
+      <h2 className="text-lg font-medium text-white">Side-by-side fixture comparison</h2>
       <div className="mt-3 overflow-x-auto">
         <table className="w-full min-w-[980px] border-separate border-spacing-0 text-left text-sm">
           <thead className="text-xs uppercase tracking-wide text-[var(--cg-text-muted)]">
             <tr>
               {["Fixture", "Expected risk", "Actual risk", "Evidence Reliability Score", "OCR", "Review signals", "Recommendation"].map((heading) => (
-                <th className="border-b border-white/10 px-3 py-2 font-semibold" key={heading}>
+                <th className="border-b border-white/10 px-3 py-2 font-medium" key={heading}>
                   {heading}
                 </th>
               ))}
@@ -1306,7 +1306,7 @@ function FixtureComparison({ runs }: { runs: HarnessRun[] }) {
           <tbody>
             {runs.map((run) => (
               <tr className="align-top" key={run.fixture.id}>
-                <td className="border-b border-white/8 px-3 py-3 font-semibold text-white">{run.fixture.label}</td>
+                <td className="border-b border-white/8 px-3 py-3 font-medium text-white">{run.fixture.label}</td>
                 <td className="border-b border-white/8 px-3 py-3 text-[var(--cg-text-soft)]">{run.fixture.expectedRisk}</td>
                 <td className="border-b border-white/8 px-3 py-3 text-[var(--cg-text-soft)]">{run.result?.riskLevel ?? "Not run"}</td>
                 <td className="border-b border-white/8 px-3 py-3 font-mono text-white">
@@ -1339,7 +1339,7 @@ function QaSelect({
 }) {
   return (
     <label className="grid gap-2">
-      <span className="text-xs font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">{label}</span>
+      <span className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-muted)]">{label}</span>
       <select
         className="rounded-lg border border-white/10 bg-[#020713] px-3 py-2 text-sm text-white outline-none transition focus:border-[var(--cg-border-strong)]"
         value={value}
@@ -1415,13 +1415,13 @@ function RealReceiptQaSection({
     <section className="cg-command-panel rounded-xl p-4">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cg-cyan)]">Real Receipt QA</p>
-          <h2 className="mt-1 text-xl font-semibold text-white">Temporary real anonymized receipt testing</h2>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--cg-cyan)]">Real Receipt QA</p>
+          <h2 className="mt-1 text-xl font-medium text-white">Temporary real anonymized receipt testing</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--cg-text-muted)]">
             Upload an anonymized receipt image or PDF for local manual QA. The file stays in browser memory for this session and is not saved to the repo or sent to a server by this harness.
           </p>
         </div>
-        <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(251,113,133,0.45)] bg-[rgba(251,113,133,0.1)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-rose-100">
+        <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(251,113,133,0.45)] bg-[rgba(251,113,133,0.1)] px-3 py-1 text-xs font-medium uppercase tracking-wide text-rose-100">
           <ShieldAlert className="size-3.5" aria-hidden="true" />
           Do not commit customer evidence
         </span>
@@ -1437,14 +1437,14 @@ function RealReceiptQaSection({
         <div className="mt-4 rounded-xl border border-white/10 bg-[#020713]/45 p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h3 className="text-lg font-semibold text-white">Real Receipt Session</h3>
+              <h3 className="text-lg font-medium text-white">Real Receipt Session</h3>
               <p className="mt-1 text-sm text-[var(--cg-text-muted)]">
                 Browser-memory comparison table for this QA session. Uploaded files are not persisted by the harness.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button
-                className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-white transition hover:border-[var(--cg-border-strong)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-medium text-white transition hover:border-[var(--cg-border-strong)] disabled:cursor-not-allowed disabled:opacity-50"
                 type="button"
                 onClick={onCopySessionSummary}
                 disabled={!runs.some((run) => run.result)}
@@ -1454,7 +1454,7 @@ function RealReceiptQaSection({
                 {copiedMode === "session" ? "Copied session summary" : "Copy tuning summary"}
               </button>
               <button
-                className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-white transition hover:border-[var(--cg-border-strong)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-medium text-white transition hover:border-[var(--cg-border-strong)] disabled:cursor-not-allowed disabled:opacity-50"
                 type="button"
                 onClick={onExportSessionSummary}
                 disabled={!runs.some((run) => run.result)}
@@ -1464,7 +1464,7 @@ function RealReceiptQaSection({
                 Export session summary
               </button>
               <button
-                className="rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-white transition hover:border-[var(--cg-border-strong)]"
+                className="rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-medium text-white transition hover:border-[var(--cg-border-strong)]"
                 type="button"
                 onClick={onClearSession}
                 disabled={isRunning}
@@ -1490,7 +1490,7 @@ function RealReceiptQaSection({
                     "Privacy hits",
                     "Status",
                   ].map((heading) => (
-                    <th className="border-b border-white/10 px-3 py-2 font-semibold" key={heading}>
+                    <th className="border-b border-white/10 px-3 py-2 font-medium" key={heading}>
                       {heading}
                     </th>
                   ))}
@@ -1501,7 +1501,7 @@ function RealReceiptQaSection({
                   <tr className={activeRun?.id === run.id ? "bg-[rgba(53,217,255,0.07)]" : ""} key={run.id}>
                     <td className="border-b border-white/8 px-3 py-3">
                       <button
-                        className="max-w-72 text-left font-semibold text-white underline decoration-[rgba(53,217,255,0.4)] underline-offset-4"
+                        className="max-w-72 text-left font-medium text-white underline decoration-[rgba(53,217,255,0.4)] underline-offset-4"
                         type="button"
                         onClick={() => onSelectRun(run.id)}
                       >
@@ -1570,7 +1570,7 @@ function RealReceiptQaSection({
           >
             <span>
               <UploadCloud className="mx-auto size-10 text-[var(--cg-cyan)]" aria-hidden="true" />
-              <span className="mt-3 block font-semibold text-white">
+              <span className="mt-3 block font-medium text-white">
                 {isRunning ? "Analyzing uploaded receipt" : "Upload anonymized receipts"}
               </span>
               <span className="mt-2 block text-sm text-[var(--cg-text-muted)]">PNG, JPG, WEBP, or PDF. Multiple files stay local to this browser session.</span>
@@ -1587,13 +1587,13 @@ function RealReceiptQaSection({
             <div className="rounded-xl border border-white/10 bg-[#020713]/55 p-3">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-white">{activeRun.file.name}</p>
+                  <p className="font-medium text-white">{activeRun.file.name}</p>
                   <p className="mt-1 text-sm text-[var(--cg-text-muted)]">
                     {formatFileSize(activeRun.file.size)} | {activeRun.file.type || "unknown type"}
                   </p>
                 </div>
                 <button
-                  className="rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-white transition hover:border-[var(--cg-border-strong)]"
+                  className="rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-medium text-white transition hover:border-[var(--cg-border-strong)]"
                   type="button"
                   onClick={() => onClearRun(activeRun.id)}
                 >
@@ -1605,7 +1605,7 @@ function RealReceiptQaSection({
                   <div className="grid min-h-64 place-items-center rounded-lg border border-white/10 bg-[#020713]/80 text-center">
                     <div>
                       <Loader2 className="mx-auto size-10 animate-spin text-[var(--cg-cyan)]" aria-hidden="true" />
-                      <p className="mt-3 text-sm font-semibold text-white">Running local analyzer</p>
+                      <p className="mt-3 text-sm font-medium text-white">Running local analyzer</p>
                     </div>
                   </div>
                 ) : (
@@ -1620,13 +1620,13 @@ function RealReceiptQaSection({
           <div className="rounded-xl border border-white/10 bg-[#020713]/45 p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h3 className="text-lg font-semibold text-white">QA notes</h3>
+                <h3 className="text-lg font-medium text-white">QA notes</h3>
                 <p className="mt-1 text-sm text-[var(--cg-text-muted)]">Notes are local-only browser state and are not saved permanently.</p>
               </div>
               {activeRun?.result ? (
                 <div className="flex flex-wrap gap-2">
                   <button
-                    className="cg-primary-button inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold transition"
+                    className="cg-primary-button inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition"
                     type="button"
                     onClick={onCopyObservation}
                     title="Preferred sharing format for tuning because it excludes raw OCR and parsed private values by default"
@@ -1635,7 +1635,7 @@ function RealReceiptQaSection({
                     {copiedMode === "observation" ? "Copied tuning summary" : "Copy tuning summary"}
                   </button>
                   <button
-                    className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-white transition hover:border-[var(--cg-border-strong)]"
+                    className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-medium text-white transition hover:border-[var(--cg-border-strong)]"
                     type="button"
                     onClick={() => onCopyJson(true)}
                     title="Copy a diagnostic JSON shape with raw OCR and private-bearing parsed structures omitted"
@@ -1644,7 +1644,7 @@ function RealReceiptQaSection({
                     {copiedMode === "redacted" ? "Copied redacted observation" : "Copy redacted QA observation"}
                   </button>
                   <button
-                    className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-white transition hover:border-[var(--cg-border-strong)] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-medium text-white transition hover:border-[var(--cg-border-strong)] disabled:cursor-not-allowed disabled:opacity-50"
                     type="button"
                     onClick={() => onCopyJson(false)}
                     disabled={!canCopyFull}
@@ -1665,7 +1665,7 @@ function RealReceiptQaSection({
             </div>
 
             <div className="mt-4 grid gap-2 rounded-lg border border-[rgba(251,191,36,0.28)] bg-[rgba(251,191,36,0.06)] p-3">
-              <h4 className="text-sm font-semibold text-white">Privacy review before full copy</h4>
+              <h4 className="text-sm font-medium text-white">Privacy review before full copy</h4>
               {checklistItems.map((item) => (
                 <label className="flex items-start gap-3 text-sm text-[var(--cg-text-soft)]" key={item.key}>
                   <input
@@ -1675,7 +1675,7 @@ function RealReceiptQaSection({
                     onChange={(event) => onChecklistChange({ ...privacyChecklist, [item.key]: event.currentTarget.checked })}
                   />
                   <span>
-                    <span className="block font-semibold text-white">{item.label}</span>
+                    <span className="block font-medium text-white">{item.label}</span>
                     <span className="mt-1 block text-xs leading-5 text-[var(--cg-text-muted)]">{item.detail}</span>
                   </span>
                 </label>
@@ -1715,7 +1715,7 @@ function RealReceiptQaSection({
             </div>
 
             <label className="mt-3 grid gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">Suggested threshold adjustment</span>
+              <span className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-muted)]">Suggested threshold adjustment</span>
               <textarea
                 className="min-h-28 resize-y rounded-lg border border-white/10 bg-[#020713] px-3 py-2 text-sm leading-6 text-white outline-none transition placeholder:text-[var(--cg-text-muted)] focus:border-[var(--cg-border-strong)]"
                 placeholder="Example: OCR confidence was accurate at 52%, but reliability score was too harsh because all key fields were readable."
@@ -2020,15 +2020,15 @@ export function TestEvidenceHarness() {
       <header className="px-1 py-2">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cg-cyan)]">Developer-only route</p>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Sample evidence analyzer harness</h1>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--cg-cyan)]">Developer-only route</p>
+            <h1 className="mt-2 text-2xl font-medium text-white">Sample evidence analyzer harness</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--cg-text-muted)]">
               Manual QA mode for local OCR, parsing, metadata, image-quality, reliability scoring, and report tuning. Scores reflect internal consistency, not external verification.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <button
-              className="cg-primary-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition disabled:cursor-not-allowed"
+              className="cg-primary-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed"
               type="button"
               onClick={runAllFixtures}
               disabled={Object.values(runs).some((run) => run?.status === "running")}
@@ -2037,7 +2037,7 @@ export function TestEvidenceHarness() {
               Run all fixtures
             </button>
             <button
-              className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-4 py-2 text-sm font-semibold text-white transition hover:border-[var(--cg-border-strong)]"
+              className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-4 py-2 text-sm font-medium text-white transition hover:border-[var(--cg-border-strong)]"
               type="button"
               onClick={resetRuns}
             >
@@ -2103,9 +2103,9 @@ export function TestEvidenceHarness() {
                   <XCircle className="size-5 text-[var(--cg-red)]" aria-hidden="true" />
                 ) : null}
               </div>
-              <h2 className="mt-3 font-semibold text-white">{fixture.label}</h2>
+              <h2 className="mt-3 font-medium text-white">{fixture.label}</h2>
               <p className="mt-2 text-sm leading-5 text-[var(--cg-text-muted)]">{fixture.description}</p>
-              <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-[var(--cg-text-soft)]">{fixture.expectedOutcome}</p>
+              <p className="mt-3 text-xs font-medium uppercase tracking-wide text-[var(--cg-text-soft)]">{fixture.expectedOutcome}</p>
               {run?.result ? (
                 <p className="mt-3 font-mono text-sm text-white">
                   {run.result.score} reliability / {run.result.riskLevel} / {run.result.ocr.averageConfidence}% OCR
@@ -2121,12 +2121,12 @@ export function TestEvidenceHarness() {
         <section className="rounded-xl border border-white/10 bg-white/[0.035] p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="text-lg font-semibold text-white">Manual QA expectations</h2>
+              <h2 className="text-lg font-medium text-white">Manual QA expectations</h2>
               <p className="mt-1 text-sm text-[var(--cg-text-muted)]">
                 These checks are advisory. Warning and Needs Tuning labels are review prompts, not CI failures.
               </p>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(53,217,255,0.35)] bg-[rgba(53,217,255,0.08)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-100">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(53,217,255,0.35)] bg-[rgba(53,217,255,0.08)] px-3 py-1 text-xs font-medium uppercase tracking-wide text-cyan-100">
               <Info className="size-3.5" aria-hidden="true" />
               Manual QA
             </span>
@@ -2139,7 +2139,7 @@ export function TestEvidenceHarness() {
                   key={`${run.fixture.id}-${expectation.label}`}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-2 font-semibold text-white">
+                    <span className="inline-flex items-center gap-2 font-medium text-white">
                       {(() => {
                         const StatusIcon = qaStatusIcon(expectation.status);
                         return <StatusIcon className="size-4" aria-hidden="true" />;
@@ -2160,7 +2160,7 @@ export function TestEvidenceHarness() {
 
       {activeRun?.status === "error" ? (
         <section className="rounded-xl border border-[rgba(251,113,133,0.42)] bg-[rgba(251,113,133,0.1)] p-4 text-rose-100">
-          <h2 className="font-semibold">Fixture failed</h2>
+          <h2 className="font-medium">Fixture failed</h2>
           <p className="mt-2 text-sm">{activeRun.error}</p>
         </section>
       ) : null}
@@ -2170,15 +2170,15 @@ export function TestEvidenceHarness() {
           <section className="cg-command-panel rounded-xl p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cg-cyan)]">Fixture input</p>
-                <h2 className="mt-1 text-xl font-semibold text-white">{activeRun.fixture.label}</h2>
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--cg-cyan)]">Fixture input</p>
+                <h2 className="mt-1 text-xl font-medium text-white">{activeRun.fixture.label}</h2>
                 <p className="mt-2 text-sm text-[var(--cg-text-muted)]">
                   {activeRun.file.name} | {formatFileSize(activeRun.file.size)} | {activeRun.file.type}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
-                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-white transition hover:border-[var(--cg-border-strong)]"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-medium text-white transition hover:border-[var(--cg-border-strong)]"
                   type="button"
                   onClick={copyActiveFixtureSummary}
                 >
@@ -2190,7 +2190,7 @@ export function TestEvidenceHarness() {
                   {copiedFixtureId === activeRun.fixture.id ? "Copied summary" : "Copy fixture result summary"}
                 </button>
                 <button
-                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-white transition hover:border-[var(--cg-border-strong)]"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-medium text-white transition hover:border-[var(--cg-border-strong)]"
                   type="button"
                   onClick={exportActiveFixtureSummary}
                 >
@@ -2198,7 +2198,7 @@ export function TestEvidenceHarness() {
                   Export fixture result summary
                 </button>
                 <button
-                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-semibold text-white transition hover:border-[var(--cg-border-strong)]"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--cg-border)] px-3 py-2 text-sm font-medium text-white transition hover:border-[var(--cg-border-strong)]"
                   type="button"
                   onClick={() => runFixture(activeRun.fixture.id)}
                 >
@@ -2211,7 +2211,7 @@ export function TestEvidenceHarness() {
               <FixturePreview run={activeRun} />
             </div>
             <div className="mt-4 rounded-lg border border-white/10 bg-[#020713]/55 p-3">
-              <h3 className="text-sm font-semibold text-white">Fixture notes</h3>
+              <h3 className="text-sm font-medium text-white">Fixture notes</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--cg-text-muted)]">{activeRun.fixture.tuningNotes}</p>
               <p className="mt-2 text-sm leading-6 text-[var(--cg-text-muted)]">
                 Expected: {activeRun.fixture.expectedRisk} risk. {activeRun.fixture.expectedOutcome}

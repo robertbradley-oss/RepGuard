@@ -61,7 +61,7 @@ export function AppSidebar() {
       <nav className="mt-7 grid gap-5 sm:grid-cols-2 lg:block lg:space-y-6">
         {navGroups.map((group) => (
           <section key={group.label}>
-            <p className="px-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--cg-text-muted)]">
+            <p className="px-2 text-xs font-medium uppercase tracking-[0.18em] text-[var(--cg-text-muted)]">
               {group.label}
             </p>
             <div className="mt-2 space-y-1.5">
@@ -83,7 +83,7 @@ export function AppSidebar() {
                     {item.label}
                   </span>
                   {item.count ? (
-                    <span className="rounded-md bg-[var(--cg-blue)] px-1.5 py-0.5 text-xs font-bold text-[#02111f]">
+                    <span className="rounded-md bg-[var(--cg-blue)] px-1.5 py-0.5 text-xs font-medium text-[#02111f]">
                       {item.count}
                     </span>
                   ) : null}
@@ -96,11 +96,11 @@ export function AppSidebar() {
 
       <div className="mt-8 hidden border-t border-white/10 pt-5 lg:block">
         <div className="flex items-center gap-3">
-          <div className="grid size-10 place-items-center rounded-full bg-[rgba(24,183,255,0.14)] font-semibold text-white ring-1 ring-[var(--cg-border)]">
+          <div className="grid size-10 place-items-center rounded-full bg-[rgba(24,183,255,0.14)] font-medium text-white ring-1 ring-[var(--cg-border)]">
             JD
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">Jordan Davis</p>
+            <p className="text-sm font-medium text-white">Jordan Davis</p>
             <p className="text-xs text-[var(--cg-text-muted)]">Support Lead</p>
           </div>
         </div>
