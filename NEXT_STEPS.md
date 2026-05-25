@@ -23,7 +23,8 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - `1e5c928` added a dev-only analyzer routing guard.
 - `e8636e4` added an optional file-aware analyzer routing boundary.
 - `7459a15` added a dev-only analyzer-routing preservation/status probe.
-- Shared evidence model types, product-photo scaffold/defaults, signal builders, summary/completeness helpers, compile probes, an exported-only analyzer builder, analyzer and routing-adapter probes, a dev-only recognition boundary, a dev-only routing adapter, a dev-only analyzer routing guard, an optional file-aware routing boundary, and a dev-only analyzer-routing preservation/status probe exist.
+- `2071374` added a decision-only public analyzer routing wrapper.
+- Shared evidence model types, product-photo scaffold/defaults, signal builders, summary/completeness helpers, compile probes, an exported-only analyzer builder, analyzer and routing-adapter probes, a dev-only recognition boundary, a dev-only routing adapter, a dev-only analyzer routing guard, an optional file-aware routing boundary, a dev-only analyzer-routing preservation/status probe, and a decision-only public analyzer routing wrapper exist.
 - The recognition boundary is isolated and dev-only. `recognizeProductPhotoEvidence` is not called by `analyzeEvidenceFile`.
 - The routing adapter composes the recognition boundary and product-photo analyzer builder only inside an isolated dev-only module.
 - The routing adapter returns its own adapter-specific result, not `LocalAnalysisResult`.
@@ -32,6 +33,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - The analyzer routing guard is isolated and dev-only. It does not call the product-photo routing adapter, and product-photo candidates remain guarded as an unsupported live path.
 - The optional file-aware routing boundary uses synthetic file-like context only, keeps runtime routing disabled by default, and is not called by the live UI or upload flow.
 - The analyzer-routing preservation probe strengthens confidence that receipt-like inputs preserve the receipt path conceptually, product-photo candidates return guarded unsupported-live-path status when runtime routing is disabled, unknown inputs remain inconclusive, and product-photo candidate output does not require `LocalAnalysisResult`.
+- `routeAnalyzerEvidenceInput` returns `PublicAnalyzerRoutingDecision` only, stays unwired from live UI/upload/report/scoring/parser paths, does not call `analyzeEvidenceFile`, does not call the product-photo routing adapter, and keeps product-photo candidates guarded/non-live even when runtime routing is requested.
 - `analyzer-routing` remains unwired from live UI, upload, report, scoring, and parser paths.
 - Product-photo runtime analyzer behavior is still not live.
 - `analyzeEvidenceFile` remains the live receipt analyzer entrypoint and still protects the shipped receipt pipeline.
@@ -43,14 +45,14 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 
 ## Next Safe Tasks
 
-1. Plan whether the next boundary should introduce a separate public wrapper entrypoint for analyzer routing, still not `analyzeEvidenceFile`.
-2. Plan any live analyzer integration in a separate planning prompt before implementation.
+1. Plan any live analyzer integration in a separate planning prompt before implementation.
+2. Keep the decision-only public analyzer routing wrapper out of live UI/upload/report/scoring/parser paths until a separate live-routing plan is explicitly opened.
 3. Keep the dev-only routing adapter out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 4. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 5. Keep the analyzer routing guard and optional file-aware boundary out of the live UI/upload flow until a separate live-routing plan is explicitly opened.
 6. Keep `LocalAnalysisResult` receipt-path shaped until a separate shared-result migration slice is planned.
 7. Keep image-consistency uncertainty dormant until a future explicitly opened provider, validated local-metrics, and QA-evidence slice.
-8. Confirm the product-photo helpers, analyzer builder, probes, recognition boundary, routing adapter, analyzer routing guard, optional file-aware boundary, and preservation probe remain unwired from runtime analyzer, upload, UI, report, scoring, parser, metadata extraction, and fixture behavior.
+8. Confirm the product-photo helpers, analyzer builder, probes, recognition boundary, routing adapter, analyzer routing guard, optional file-aware boundary, preservation probe, and public wrapper remain unwired from runtime analyzer, upload, UI, report, scoring, parser, metadata extraction, and fixture behavior.
 9. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
 10. Preserve a clean operational queue after each completed agent task.
 
@@ -83,5 +85,5 @@ Robert wants the eventual result screen to feel like an evidence triage workspac
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent plan whether the next analyzer-routing boundary should introduce a separate public wrapper entrypoint; do not implement; do not touch analyzeEvidenceFile; do not call the routing adapter or recognizeProductPhotoEvidence from analyzeEvidenceFile; do not change LocalAnalysisResult, upload, UI, scoring, report mapping, parser behavior, fixtures, providers, storage, integrations, or case queues
+/claimguardagent plan any future live analyzer routing integration separately; do not implement; keep routeAnalyzerEvidenceInput decision-only and unwired; do not touch analyzeEvidenceFile; do not call the routing adapter or recognizeProductPhotoEvidence from analyzeEvidenceFile; do not change LocalAnalysisResult, upload, UI, scoring, report mapping, parser behavior, fixtures, providers, storage, integrations, or case queues
 ```
