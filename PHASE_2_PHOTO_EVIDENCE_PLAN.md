@@ -485,6 +485,33 @@ Before Robert opens Phase 2 runtime implementation, the project should have:
 - Explicit confirmation that no AI/vision provider will be connected unless separately opened.
 - A rollback-safe implementation order.
 
+## 16A. Product-Photo-Safe Report/UI Mapping Gate
+
+Product-photo report/UI mapping must be planned and reviewed before product-photo results appear in any support surface.
+
+This gate means an isolated adapter or view-model can translate the shared product-photo result into a support-safe summary. It does not mean live upload routing, live analyzer routing, UI display, report display, scoring changes, parser changes, fixture changes, provider calls, storage, integrations, or case queues.
+
+The first mapping implementation slice should:
+
+- Keep receipt report behavior unchanged.
+- Keep `LocalAnalysisResult` receipt-shaped.
+- Keep product-photo in `ProductPhotoEvidenceAnalysisResult` or the shared `EvidenceAnalysisResult` envelope.
+- Keep `analyzeEvidenceFile` as the live receipt analyzer entrypoint.
+- Keep product-photo runtime non-live.
+- Map only derived review-support fields such as review readiness, local evidence quality, product context, damage visibility review context, image quality limits, image consistency review signals, requested next views, manual-review recommendation, score meaning, review priority, confidence, and external verification not performed.
+- Omit raw photo bytes, raw metadata, raw EXIF, original filenames, GPS coordinates, raw serial/model/label values, barcode or QR contents, people, faces, addresses, private backgrounds, customer identifiers, provider output, storage handles, integration IDs, and case queue IDs.
+- Keep customer and reviewer language neutral, inconclusive where needed, manual-review-only, and focused on the next useful evidence request.
+
+Required checks before product-photo mapping can be displayed:
+
+- A product-photo mapping probe that proves product-photo maps to a separate display-safe shape, not `LocalAnalysisResult`.
+- A result-shape probe that forbids receipt-only fields, final-decision fields, raw metadata fields, provider output, storage handles, integration handles, and case queue fields.
+- A privacy probe that proves display/export output omits private-bearing fields.
+- A wording probe or semantic check expansion that covers product-photo mapping and future display surfaces.
+- Isolation checks proving mapping does not invoke upload routing, live analyzer routing, `analyzeEvidenceFile`, parser, scoring changes, fixtures, providers, storage, integrations, or queues.
+
+Stop if implementation requires receipt-only result fields, changes receipt report output, exposes private photo or metadata content, implies evidence truth or customer wrongdoing, or needs live routing before a separate runtime slice is opened.
+
 ## 17. Phase 2.1 First-Pass Local Heuristic Signals
 
 Phase 2.1 starts with a small signal catalog only. These signals are manual-review support language and future implementation guidance; they do not run in `analyzeEvidenceFile`, do not change `LocalAnalysisResult`, do not affect scoring, and do not change upload, UI, report mapping, fixtures, receipt parsing, metadata extraction behavior, routing, storage, integrations, or case queues.

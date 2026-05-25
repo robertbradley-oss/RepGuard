@@ -24,6 +24,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - `e8636e4` added an optional file-aware analyzer routing boundary.
 - `7459a15` added a dev-only analyzer-routing preservation/status probe.
 - `2071374` added a decision-only public analyzer routing wrapper.
+- `0d64ff4` added a guarded internal analyzer-routing boundary.
 - A type-only shared `EvidenceAnalysisResult` envelope and compile-only shared-result probe now exist for future analyzer routing.
 - A non-live product-photo shared-result boundary now prepares `ProductPhotoEvidenceAnalysisResult` for dev/probe use only.
 - Shared evidence model types, product-photo scaffold/defaults, signal builders, summary/completeness helpers, compile probes, an exported-only analyzer builder, analyzer and routing-adapter probes, a shared result envelope/probe, a non-live product-photo shared-result boundary/probe, a dev-only recognition boundary, a dev-only routing adapter, a dev-only analyzer routing guard, an optional file-aware routing boundary, a dev-only analyzer-routing preservation/status probe, and a decision-only public analyzer routing wrapper exist.
@@ -38,6 +39,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - The optional file-aware routing boundary uses synthetic file-like context only, keeps runtime routing disabled by default, and is not called by the live UI or upload flow.
 - The analyzer-routing preservation probe strengthens confidence that receipt-like inputs preserve the receipt path conceptually, product-photo candidates return guarded unsupported-live-path status when runtime routing is disabled, unknown inputs remain inconclusive, and product-photo candidate output does not require `LocalAnalysisResult`.
 - `routeAnalyzerEvidenceInput` returns `PublicAnalyzerRoutingDecision` only, stays unwired from live UI/upload/report/scoring/parser paths, does not call `analyzeEvidenceFile`, does not call the product-photo routing adapter, and keeps product-photo candidates guarded/non-live even when runtime routing is requested.
+- The guarded internal analyzer-routing boundary remains decision-only, preserves the existing receipt analyzer path decision, keeps product-photo candidates as guarded unsupported live paths, and explicitly records that analyzer, adapter, product-photo result boundary, UI, upload, report, scoring, parser, and fixture paths were not invoked.
 - `analyzer-routing` remains unwired from live UI, upload, report, scoring, and parser paths.
 - Product-photo runtime analyzer behavior is still not live.
 - `analyzeEvidenceFile` remains the live receipt analyzer entrypoint and still protects the shipped receipt pipeline.
@@ -52,7 +54,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 
 ## Next Safe Tasks
 
-1. Plan any live analyzer integration in a separate planning prompt before implementation.
+1. Complete the docs-only product-photo report/UI mapping gate before any product-photo display work.
 2. Keep the decision-only public analyzer routing wrapper out of live UI/upload/report/scoring/parser paths until a separate live-routing plan is explicitly opened.
 3. Keep the dev-only routing adapter out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 4. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
@@ -167,6 +169,133 @@ Recommended next implementation prompt after this docs gate is committed and pus
 /claimguardagent implement the first guarded internal analyzer-routing slice only: keep analyzeEvidenceFile receipt-only and unchanged; preserve LocalAnalysisResult; update only analyzer-routing.ts and required routing probes so product-photo candidates can exercise a guarded internal route without UI, upload, report mapping, scoring, parser, fixtures, providers, storage, integrations, or case queues; run lint, build, report semantics, and diff check; commit only if safe; do not push
 ```
 
+## Phase 2.2 Product-Photo-Safe Report/UI Mapping Gate
+
+This is a docs-only planning gate. It defines what a future product-photo report/UI mapping slice must prove before product-photo output can appear in report or UI surfaces. It does not implement report mapping, UI display, upload routing, live analyzer routing, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues.
+
+Product-photo report/UI mapping means an isolated adapter or view-model layer that can translate `ProductPhotoEvidenceAnalysisResult` / `EvidenceAnalysisResult` into a display-safe review summary. The first future mapping slice should be mapping plus probes only; it should not make product-photo visible to users, should not run from upload or live analyzer paths, and should not call `analyzeEvidenceFile`.
+
+Product-photo report/UI mapping does not mean:
+
+- Wiring product-photo into `mapLocalAnalysisToReport`.
+- Forcing product-photo into `LocalAnalysisResult`.
+- Changing receipt report behavior.
+- Changing the current UI to display product-photo results.
+- Changing upload evidence routing.
+- Enabling live analyzer routing.
+- Adding product-photo scoring behavior, parser behavior, fixtures, providers, storage, integrations, or case queues.
+
+Required prerequisites before any future mapping implementation:
+
+- Start from a clean `main` synced with `origin/main`.
+- Keep `mapLocalAnalysisToReport(result: LocalAnalysisResult)` receipt-only unless a separate shared report migration is explicitly opened first.
+- Add a separate product-photo-safe mapping boundary for `ProductPhotoEvidenceAnalysisResult` or the shared `EvidenceAnalysisResult` envelope.
+- Keep `LocalAnalysisResult` unchanged and receipt-shaped.
+- Keep `analyzeEvidenceFile` unchanged as the live receipt analyzer entrypoint.
+- Keep `routeAnalyzerEvidenceInput` and the guarded internal analyzer-routing boundary decision-only and unwired from UI/upload/report/scoring/parser paths.
+- Keep product-photo runtime non-live.
+- Keep external verification not performed.
+- Extend safety/semantic coverage before any product-photo result can appear in a report or UI surface.
+
+Safe display allowlist for a future mapping slice:
+
+- Evidence type and evidence label.
+- Review readiness summary.
+- Local evidence quality summary.
+- Product context status and damage visibility status as review context only.
+- Image quality limits and image consistency review signals.
+- Requested additional views.
+- Purchase or receipt match needed.
+- Manual-review recommendation.
+- Evidence Reliability Score meaning, with score scope as local evidence quality and review readiness only.
+- Review priority and confidence as separate concepts.
+- External verification not performed.
+- Privacy-safe metadata status and buckets only.
+
+Display and export denylist:
+
+- Raw photo bytes or image buffers.
+- Raw EXIF, raw metadata, precise timestamps, GPS coordinates, device owner fields, file paths, original filenames, or copied metadata notes.
+- Raw serial/model/label values, barcode contents, or QR contents.
+- People, faces, addresses, customer identifiers, private backgrounds, or private evidence snippets.
+- Provider output, storage handles, integration IDs, case queue IDs, or retained image fingerprints.
+- Final evidence outcome, customer intent, claim outcome, automatic disposition, or policy disposition fields.
+
+Required safe language rules:
+
+- Use local evidence quality, review readiness, manual review recommended, review signal, findings inconclusive, additional context may be needed, and external verification not performed.
+- Explain that a high score means product-photo context may be more useful for local support review.
+- State that a high score does not prove the product photo or claim.
+- Keep score, review priority, and confidence separate:
+  - Score means evidence reliability and review readiness.
+  - Review priority means where support attention should go.
+  - Confidence means certainty and limitations of local analysis.
+- Recommended action may ask for a clearer photo, wider product context, label photo when policy needs it, proof-of-purchase match, or manual review.
+- Do not use proof language, final decision language, customer accusation language, automatic outcome language, or any wording implying external verification happened.
+
+Required result-shape constraints:
+
+- Product-photo mapping must consume the shared product-photo result shape, not receipt-only fields.
+- Product-photo report/UI payloads must not require OCR text, parsed receipt fields, receipt source classification, receipt score breakdown, receipt image heuristics, or internal receipt structure confidence.
+- Product-photo details must remain under product-photo module details or a product-photo-specific display model.
+- Receipt report/UI payloads must remain unchanged for the first mapping slice.
+- The future mapping output must keep external verification not performed and include a safety note that local analysis does not prove evidence truth.
+
+Required probes/checks before implementation:
+
+- Product-photo mapping probe proving product-photo maps to a separate report/UI-safe shape, not `LocalAnalysisResult`.
+- Result-shape probe forbidding receipt-only fields, final-decision fields, raw metadata fields, provider outputs, storage handles, integration handles, and case queue fields.
+- Public wrapper and guarded-routing probes proving mapping does not invoke upload routing, live analyzer routing, `analyzeEvidenceFile`, parser, scoring changes, fixtures, providers, storage, integrations, or case queues.
+- Privacy probe proving output omits raw EXIF, original filenames, raw labels, raw metadata, bytes/buffers, private evidence, and provider output.
+- Score semantics probe proving score, review priority, and confidence remain separate.
+- Safety wording probe or semantic checker expansion covering product-photo boundary, future mapping file, and future UI/report display surfaces.
+- Existing `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run check:report-semantics`, and `git diff --check` must pass.
+
+Allowed files for the future mapping implementation slice:
+
+- A new isolated product-photo report/UI mapping module under `src/lib/analysis/`, if explicitly opened.
+- A new or updated mapping probe under `src/lib/analysis/`, if explicitly opened.
+- `scripts/check-report-semantics.mjs`, only to expand safety coverage for product-photo mapping and display surfaces.
+- `NEXT_STEPS.md` and `AGENT_LOG.md` for status updates.
+
+Protected files for the future mapping implementation slice unless explicitly opened in a separate prompt:
+
+- `src/lib/analysis/analyzer.ts`.
+- `src/lib/analysis/analyzer-routing.ts`.
+- `src/lib/analysis/product-photo-analyzer.ts`.
+- `src/lib/analysis/types.ts`.
+- `src/lib/analysis/report-adapter.ts`, except for a separate receipt-preserving shared-report migration plan.
+- `src/components/ClaimReviewWorkflow.tsx` and other UI components.
+- Upload files.
+- Scoring files.
+- Parser files.
+- Fixtures.
+- Package scripts and dependencies.
+- Providers, storage, integrations, and case queues.
+
+Stop conditions for the future mapping implementation:
+
+- Product-photo mapping requires `LocalAnalysisResult`.
+- Receipt report/UI output changes unexpectedly.
+- `analyzeEvidenceFile` changes, is imported, or is called.
+- Product-photo output reaches live UI, upload, report display, scoring, parser, fixture, provider, storage, integration, or case queue paths before a separate display/live-routing slice is opened.
+- Mapping requires raw photo bytes, raw EXIF, raw metadata, original filenames, raw label values, private evidence, provider output, storage handles, integration handles, or case queue handles.
+- Any wording implies proof, external verification, customer wrongdoing, final outcome, or automatic disposition.
+- Any required check fails or cannot be interpreted safely.
+
+Why live routing remains separate:
+
+- Report/UI mapping only defines a safe display contract for product-photo result shapes.
+- Live upload/analyze routing decides when product-photo analysis runs, which remains blocked.
+- UI display decides when reviewers can see product-photo results, which remains blocked until mapping, wording, privacy, and QA gates are complete.
+- Keeping these separate protects the shipped receipt analyzer and prevents product-photo data from reaching support surfaces before the adapter and safety checks exist.
+
+Recommended next implementation prompt after this docs gate is committed and pushed:
+
+```text
+/claimguardagent implement the first product-photo-safe report/UI mapping probe slice only: add an isolated product-photo mapping boundary and required probes without changing report-adapter.ts, UI components, upload routing, analyzeEvidenceFile, LocalAnalysisResult, receipt behavior, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; expand safety checks only if needed; run lint, build, report semantics, and diff check; commit only if safe; do not push
+```
+
 ## Future Evidence Review UX Direction
 
 Robert wants the eventual result screen to feel like an evidence triage workspace, not a stack of competing result cards. This is product direction only; do not implement it during the current Phase 2.2 runtime-boundary work.
@@ -196,5 +325,5 @@ Robert wants the eventual result screen to feel like an evidence triage workspac
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent plan the next live analyzer-routing integration slice as docs-only: define guardrails, prerequisites, and checks for any future runtime wiring; do not implement live routing, UI/upload changes, report mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues
+/claimguardagent implement the first product-photo-safe report/UI mapping probe slice only: add an isolated product-photo mapping boundary and required probes without changing report-adapter.ts, UI components, upload routing, analyzeEvidenceFile, LocalAnalysisResult, receipt behavior, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; expand safety checks only if needed; run lint, build, report semantics, and diff check; commit only if safe; do not push
 ```
