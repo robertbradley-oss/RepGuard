@@ -51,7 +51,7 @@ Explicitly deferred from Phase 1:
 
 ## Phase 2: Photo Evidence
 
-Status: Not started.
+Status: Phase 2.0 implementation has officially started as scaffold-only, local-heuristics-only, provider-ready, and intentionally unwired.
 
 Meaning:
 
@@ -61,7 +61,13 @@ Meaning:
 - Provider-neutral image analysis contracts.
 - Manual-review language for photo findings.
 
-Deferred until Phase 2 is explicitly opened:
+Current implementation boundary:
+
+- Shared evidence and product-photo scaffold/type-boundary work is allowed.
+- No product-photo analyzer behavior is live yet.
+- No runtime analyzer, upload, UI, report, scoring, parser, fixture, storage, integration, or external provider behavior is live for Phase 2 yet.
+
+Deferred until Robert explicitly approves a later Phase 2 runtime slice:
 
 - Implementing product damage photo analysis.
 - Connecting AI vision providers.

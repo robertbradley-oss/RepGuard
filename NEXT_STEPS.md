@@ -8,23 +8,23 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 
 - Phase 1 Receipt Intelligence is closed, pushed, deployed, and production-smoked.
 - Post-Phase-1 evidence workspace polish is live from commit `19ef25e`.
-- Phase 2 has not started.
-- The immediate priority is agent-system and documentation discipline, not app behavior changes.
+- Phase 2.0 implementation has officially started.
+- Current Phase 2 status is scaffold-only, local-heuristics-only, provider-ready, and intentionally unwired.
+- No product-photo analyzer behavior is live yet.
+- No runtime analyzer, upload, UI, report, scoring, parser, or fixture behavior changed during the overnight Phase 2 scaffold.
 
 ## Next Safe Tasks
 
-1. Review Agent System Upgrade 1.0 documentation changes.
-2. Confirm `ROADMAP.md` and `NEXT_STEPS.md` are serving distinct purposes.
-3. Decide whether any additional release checklist docs are needed for future deploys.
-4. Plan, but do not implement, the first Phase 2 readiness artifact if Robert asks.
-5. Identify any stale Phase 1 language remaining in project guidance docs.
-6. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
-7. Preserve a clean operational queue after each completed agent task.
+1. Review the Phase 2.0 scaffold commits for module boundaries and safety wording.
+2. Confirm the scaffold remains unwired from runtime analyzer, upload, UI, report, scoring, parser, and fixture behavior.
+3. Decide whether the next Phase 2 daytime task should stay scaffold-only or move into local heuristic design.
+4. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
+5. Preserve a clean operational queue after each completed agent task.
 
 ## Do Not Touch Right Now
 
-- Do not start Phase 2.
-- Do not add product damage photo analysis.
+- Do not wire product-photo scaffold into runtime analyzer behavior.
+- Do not add live product damage photo analysis.
 - Do not modify app UI.
 - Do not modify upload/input/reset behavior.
 - Do not modify analyzer, parser, scoring, report, privacy, or fixture logic.
@@ -35,5 +35,5 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent review Agent System Upgrade 1.0 docs for routing clarity and stale Phase 1 language only; do not modify app code
+/claimguardagent review the Phase 2.0 scaffold commits for safety and module boundaries only; do not make runtime, UI, upload, analyzer, scoring, parser, report, or fixture changes
 ```

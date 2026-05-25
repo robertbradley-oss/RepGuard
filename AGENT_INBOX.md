@@ -39,12 +39,14 @@ Prepare a concise morning checkpoint that includes:
    - which slices were skipped or stopped
 
 3. Safety verification:
-   - confirm whether runtime behavior changed
+   - confirm whether overnight Phase 2 scaffold runtime behavior changed
+   - state: Overnight Phase 2 scaffold runtime behavior changed: No
    - confirm whether analyzer.ts changed
    - confirm whether upload behavior changed
    - confirm whether UI changed
    - confirm whether fixtures changed
    - confirm whether report mapping/scoring/parser behavior changed
+   - clarify that older pre-Phase-2 commits changed upload/UI behavior, but those were already reviewed and are not part of the overnight Phase 2 scaffold
 
 4. Checks:
    - npm.cmd run lint
@@ -56,6 +58,7 @@ Prepare a concise morning checkpoint that includes:
    - anything risky
    - anything intentionally left unwired
    - anything Robert should inspect before the next task
+   - state that no product-photo analyzer behavior is live yet
 
 6. Recommended next move:
    - one safest next Phase 2 task
