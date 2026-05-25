@@ -19,22 +19,28 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
   - `78ad7bb` added an exported-only product-photo analyzer builder.
   - `dca1177` captured future evidence review UX direction as docs-only product direction.
   - `bf46949` added a dev-only product-photo recognition boundary.
-- Shared evidence model types, product-photo scaffold/defaults, signal builders, summary/completeness helpers, compile probes, an exported-only analyzer builder, an analyzer probe, and a dev-only recognition boundary exist.
+- `2cbe002` added a dev-only product-photo routing adapter.
+- Shared evidence model types, product-photo scaffold/defaults, signal builders, summary/completeness helpers, compile probes, an exported-only analyzer builder, analyzer and routing-adapter probes, a dev-only recognition boundary, and a dev-only routing adapter exist.
 - The recognition boundary is isolated and dev-only. `recognizeProductPhotoEvidence` is not called by `analyzeEvidenceFile`.
+- The routing adapter composes the recognition boundary and product-photo analyzer builder only inside an isolated dev-only module.
+- The routing adapter returns its own adapter-specific result, not `LocalAnalysisResult`.
+- The routing adapter is imported only by `product-photo-routing-adapter.probe.ts`.
+- The routing adapter is not called by `analyzeEvidenceFile`.
 - Product-photo runtime analyzer behavior is still not live.
 - `analyzeEvidenceFile` still protects the shipped receipt pipeline, and `LocalAnalysisResult` remains receipt-path shaped.
 - No runtime analyzer routing, upload, UI, report, scoring, parser, metadata extraction, or fixture behavior changed during Phase 2.0, Phase 2.1, or Phase 2.2 helper/boundary work.
+- Runtime routing remains blocked until Robert explicitly opens that slice.
 - `product-photo` is canonical.
 - `damage-photo` remains only a compatibility alias to `product-photo` / `damage-close-up`.
 
 ## Next Safe Tasks
 
-1. Plan the first dev-only routing-adapter boundary before implementing it.
-2. Treat a dev-only routing adapter as the next risk step; do not start it without a separate planning prompt.
+1. Plan any live analyzer integration in a separate planning prompt before implementation.
+2. Keep the dev-only routing adapter out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 3. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 4. Keep `LocalAnalysisResult` receipt-path shaped until a separate shared-result migration slice is planned.
 5. Keep image-consistency uncertainty dormant until a future explicitly opened provider, validated local-metrics, and QA-evidence slice.
-6. Confirm the product-photo helpers, analyzer builder, probes, and recognition boundary remain unwired from runtime analyzer, upload, UI, report, scoring, parser, metadata extraction, and fixture behavior.
+6. Confirm the product-photo helpers, analyzer builder, probes, recognition boundary, and routing adapter remain unwired from runtime analyzer, upload, UI, report, scoring, parser, metadata extraction, and fixture behavior.
 7. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
 8. Preserve a clean operational queue after each completed agent task.
 
@@ -67,5 +73,5 @@ Robert wants the eventual result screen to feel like an evidence triage workspac
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent plan the first dev-only product-photo routing-adapter boundary; do not implement; do not call recognizeProductPhotoEvidence from analyzeEvidenceFile; do not change LocalAnalysisResult, upload, UI, scoring, report mapping, parser behavior, fixtures, providers, storage, integrations, or case queues
+/claimguardagent plan a live analyzer integration boundary for product-photo routing; do not implement; do not call the routing adapter or recognizeProductPhotoEvidence from analyzeEvidenceFile; do not change LocalAnalysisResult, upload, UI, scoring, report mapping, parser behavior, fixtures, providers, storage, integrations, or case queues
 ```
