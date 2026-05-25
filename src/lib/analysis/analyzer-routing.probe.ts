@@ -2,8 +2,10 @@ import {
   buildAnalyzerFileRoutingDecision,
   buildAnalyzerRoutingDecision,
   ENABLE_PRODUCT_PHOTO_RUNTIME_ROUTING,
+  routeAnalyzerEvidenceInput,
   type AnalyzerFileRoutingGuardInput,
   type AnalyzerRoutingGuardInput,
+  type PublicAnalyzerRoutingInput,
 } from "@/lib/analysis/analyzer-routing";
 
 const receiptLikeInput = {
@@ -31,6 +33,19 @@ const productPhotoRuntimeTrueInput = {
 } satisfies AnalyzerRoutingGuardInput;
 
 const unknownInput = {} satisfies AnalyzerRoutingGuardInput;
+
+const pdfLikeInput = {
+  file: {
+    name: "synthetic-order-details.pdf",
+    type: "application/pdf",
+    size: 240_000,
+  },
+} satisfies PublicAnalyzerRoutingInput;
+
+const screenshotLikeInput = {
+  fileName: "synthetic-order-screenshot.png",
+  mimeType: "image/png",
+} satisfies PublicAnalyzerRoutingInput;
 
 const receiptLikeFileInput = {
   file: {
@@ -69,6 +84,13 @@ const receiptLikeFileDecision = buildAnalyzerFileRoutingDecision(receiptLikeFile
 const productPhotoRuntimeOffFileDecision = buildAnalyzerFileRoutingDecision(productPhotoRuntimeOffFileInput);
 const productPhotoRuntimeTrueFileDecision = buildAnalyzerFileRoutingDecision(productPhotoRuntimeTrueFileInput);
 const unknownFileDecision = buildAnalyzerFileRoutingDecision(unknownFileInput);
+const publicReceiptLikeDecision = routeAnalyzerEvidenceInput(receiptLikeInput);
+const publicReceiptLikeFileDecision = routeAnalyzerEvidenceInput(receiptLikeFileInput);
+const publicProductPhotoRuntimeOffDecision = routeAnalyzerEvidenceInput(productPhotoRuntimeOffInput);
+const publicProductPhotoRuntimeTrueDecision = routeAnalyzerEvidenceInput(productPhotoRuntimeTrueInput);
+const publicUnknownDecision = routeAnalyzerEvidenceInput(unknownInput);
+const publicPdfLikeDecision = routeAnalyzerEvidenceInput(pdfLikeInput);
+const publicScreenshotLikeDecision = routeAnalyzerEvidenceInput(screenshotLikeInput);
 
 function allChecksPass(checks: Record<string, boolean>) {
   return Object.values(checks).every(Boolean);
@@ -129,6 +151,42 @@ const livePathIsolationChecks = {
   unknownFileDoesNotInvokeAdapter: unknownFileDecision.adapterInvoked === false,
 } as const;
 
+const publicWrapperChecks = {
+  receiptLikeObjectRoutesToExistingReceiptPath:
+    publicReceiptLikeDecision.route === "existing-receipt-path-candidate",
+  receiptLikeObjectCandidateReceiptLike: publicReceiptLikeDecision.evidenceCandidate === "receipt-like",
+  receiptLikeObjectAnalyzerNotInvoked: publicReceiptLikeDecision.analyzerInvoked === false,
+  receiptLikeFileRoutesToExistingReceiptPath:
+    publicReceiptLikeFileDecision.route === "existing-receipt-path-candidate",
+  receiptLikeFileCandidateReceiptLike: publicReceiptLikeFileDecision.evidenceCandidate === "receipt-like",
+  receiptLikeFileAnalyzerNotInvoked: publicReceiptLikeFileDecision.analyzerInvoked === false,
+  productPhotoCandidateGuarded:
+    publicProductPhotoRuntimeOffDecision.route === "product-photo-guarded-non-live",
+  productPhotoCandidateNonLive: publicProductPhotoRuntimeOffDecision.productPhotoRuntimeLive === false,
+  productPhotoRuntimeRequestStillGuarded:
+    publicProductPhotoRuntimeTrueDecision.route === "product-photo-guarded-non-live",
+  productPhotoRuntimeRequestStillDisabled:
+    publicProductPhotoRuntimeTrueDecision.runtimeRoutingEnabled === false,
+  productPhotoRuntimeRequestAnalyzerNotInvoked:
+    publicProductPhotoRuntimeTrueDecision.analyzerInvoked === false,
+  productPhotoWrapperDoesNotReturnDetails:
+    !("productPhotoDetails" in publicProductPhotoRuntimeOffDecision) &&
+    !("productPhotoAnalysisDetails" in publicProductPhotoRuntimeOffDecision),
+  unknownInputRouteInconclusive: publicUnknownDecision.route === "unknown-inconclusive",
+  unknownInputCandidateInconclusive: publicUnknownDecision.evidenceCandidate === "unknown-inconclusive",
+  pdfLikeRoutesToExistingReceiptPath: publicPdfLikeDecision.route === "existing-receipt-path-candidate",
+  pdfLikeCandidateDetected: publicPdfLikeDecision.evidenceCandidate === "pdf-like",
+  pdfLikeAnalyzerNotInvoked: publicPdfLikeDecision.analyzerInvoked === false,
+  screenshotLikeRoutesToExistingReceiptPath:
+    publicScreenshotLikeDecision.route === "existing-receipt-path-candidate",
+  screenshotLikeCandidateDetected: publicScreenshotLikeDecision.evidenceCandidate === "screenshot-like",
+  screenshotLikeAnalyzerNotInvoked: publicScreenshotLikeDecision.analyzerInvoked === false,
+  wrapperDoesNotNeedLocalAnalysisResult:
+    publicProductPhotoRuntimeOffDecision.localAnalysisResultShapeRequired === false,
+  wrapperDoesNotInvokeAdapter: publicProductPhotoRuntimeOffDecision.adapterInvoked === false,
+  wrapperDoesNotExerciseUiOrReport: publicProductPhotoRuntimeOffDecision.uiOrReportBehaviorExercised === false,
+} as const;
+
 export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
   guard: {
     defaultProductPhotoRuntimeRoutingEnabled: ENABLE_PRODUCT_PHOTO_RUNTIME_ROUTING,
@@ -142,6 +200,15 @@ export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
     productPhotoRuntimeOffFile: productPhotoRuntimeOffFileDecision,
     productPhotoRuntimeTrueFile: productPhotoRuntimeTrueFileDecision,
     unknownFile: unknownFileDecision,
+    publicWrapper: {
+      receiptLike: publicReceiptLikeDecision,
+      receiptLikeFile: publicReceiptLikeFileDecision,
+      productPhotoRuntimeOff: publicProductPhotoRuntimeOffDecision,
+      productPhotoRuntimeTrue: publicProductPhotoRuntimeTrueDecision,
+      unknown: publicUnknownDecision,
+      pdfLike: publicPdfLikeDecision,
+      screenshotLike: publicScreenshotLikeDecision,
+    },
   },
   expectations: {
     receiptLike: {
@@ -217,12 +284,66 @@ export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
       adapterInvoked: unknownFileDecision.adapterInvoked,
       uiOrReportBehaviorExercised: unknownFileDecision.uiOrReportBehaviorExercised,
     },
+    publicWrapper: {
+      receiptLike: {
+        boundary: publicReceiptLikeDecision.boundary,
+        route: publicReceiptLikeDecision.route,
+        evidenceCandidate: publicReceiptLikeDecision.evidenceCandidate,
+        analyzerInvoked: publicReceiptLikeDecision.analyzerInvoked,
+      },
+      receiptLikeFile: {
+        boundary: publicReceiptLikeFileDecision.boundary,
+        route: publicReceiptLikeFileDecision.route,
+        evidenceCandidate: publicReceiptLikeFileDecision.evidenceCandidate,
+        analyzerInvoked: publicReceiptLikeFileDecision.analyzerInvoked,
+      },
+      productPhotoRuntimeOff: {
+        boundary: publicProductPhotoRuntimeOffDecision.boundary,
+        route: publicProductPhotoRuntimeOffDecision.route,
+        evidenceCandidate: publicProductPhotoRuntimeOffDecision.evidenceCandidate,
+        runtimeRoutingEnabled: publicProductPhotoRuntimeOffDecision.runtimeRoutingEnabled,
+        productPhotoRuntimeLive: publicProductPhotoRuntimeOffDecision.productPhotoRuntimeLive,
+        analyzerInvoked: publicProductPhotoRuntimeOffDecision.analyzerInvoked,
+        adapterInvoked: publicProductPhotoRuntimeOffDecision.adapterInvoked,
+      },
+      productPhotoRuntimeTrue: {
+        boundary: publicProductPhotoRuntimeTrueDecision.boundary,
+        route: publicProductPhotoRuntimeTrueDecision.route,
+        evidenceCandidate: publicProductPhotoRuntimeTrueDecision.evidenceCandidate,
+        runtimeRoutingEnabled: publicProductPhotoRuntimeTrueDecision.runtimeRoutingEnabled,
+        productPhotoRuntimeLive: publicProductPhotoRuntimeTrueDecision.productPhotoRuntimeLive,
+        analyzerInvoked: publicProductPhotoRuntimeTrueDecision.analyzerInvoked,
+        adapterInvoked: publicProductPhotoRuntimeTrueDecision.adapterInvoked,
+      },
+      unknown: {
+        boundary: publicUnknownDecision.boundary,
+        route: publicUnknownDecision.route,
+        evidenceCandidate: publicUnknownDecision.evidenceCandidate,
+        recognitionState: publicUnknownDecision.recognitionState,
+        analyzerInvoked: publicUnknownDecision.analyzerInvoked,
+      },
+      pdfLike: {
+        boundary: publicPdfLikeDecision.boundary,
+        route: publicPdfLikeDecision.route,
+        evidenceCandidate: publicPdfLikeDecision.evidenceCandidate,
+        recognizedEvidenceType: publicPdfLikeDecision.recognizedEvidenceType,
+        analyzerInvoked: publicPdfLikeDecision.analyzerInvoked,
+      },
+      screenshotLike: {
+        boundary: publicScreenshotLikeDecision.boundary,
+        route: publicScreenshotLikeDecision.route,
+        evidenceCandidate: publicScreenshotLikeDecision.evidenceCandidate,
+        recognizedEvidenceType: publicScreenshotLikeDecision.recognizedEvidenceType,
+        analyzerInvoked: publicScreenshotLikeDecision.analyzerInvoked,
+      },
+    },
   },
   preservationStatus: {
     receiptPathPreserved: allChecksPass(receiptPathPreservationChecks),
     productPhotoCandidatesGuarded: allChecksPass(productPhotoGuardChecks),
     unknownInputsRemainInconclusive: allChecksPass(unknownPathChecks),
     livePathBehaviorNotExercised: allChecksPass(livePathIsolationChecks),
+    publicWrapperDecisionOnly: allChecksPass(publicWrapperChecks),
     localAnalysisResultShapeRequiredForProductPhoto: false,
     adapterInvokedForProductPhoto: false,
     checks: {
@@ -230,6 +351,7 @@ export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
       productPhotoGuard: productPhotoGuardChecks,
       unknownPath: unknownPathChecks,
       livePathIsolation: livePathIsolationChecks,
+      publicWrapper: publicWrapperChecks,
     },
   },
 } as const;

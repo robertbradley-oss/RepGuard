@@ -62,6 +62,42 @@ export type AnalyzerFileRoutingGuardDecision = Omit<AnalyzerRoutingGuardDecision
   limitations: string[];
 };
 
+export type PublicAnalyzerRoutingInput = AnalyzerFileRoutingGuardInput;
+
+export type PublicAnalyzerRoutingRoute =
+  | "existing-receipt-path-candidate"
+  | "product-photo-guarded-non-live"
+  | "unknown-inconclusive";
+
+export type PublicAnalyzerRoutingEvidenceCandidate =
+  | "receipt-like"
+  | "pdf-like"
+  | "screenshot-like"
+  | "product-photo-candidate"
+  | "unknown-inconclusive";
+
+export type PublicAnalyzerRoutingDecision = {
+  boundary: "analyzer-routing-public-wrapper";
+  decisionOnly: true;
+  runtimeRoutingEnabled: boolean;
+  route: PublicAnalyzerRoutingRoute;
+  evidenceCandidate: PublicAnalyzerRoutingEvidenceCandidate;
+  recognizedEvidenceType: ProductPhotoRecognitionResult["evidenceType"];
+  recognitionState: ProductPhotoRecognitionResult["recognitionState"];
+  existingReceiptPathCandidate: boolean;
+  receiptPathPreserved: boolean;
+  productPhotoCandidate: boolean;
+  productPhotoRuntimeLive: false;
+  status: AnalyzerRoutingGuardStatus;
+  fileContext: AnalyzerFileRoutingGuardDecision["fileContext"];
+  localAnalysisResultShapeRequired: false;
+  adapterInvoked: false;
+  analyzerInvoked: false;
+  uiOrReportBehaviorExercised: false;
+  reasons: string[];
+  limitations: string[];
+};
+
 const ANALYZER_ROUTING_LIMITATIONS = [
   "dev-only analyzer routing guard",
   "unsupported live path for product-photo candidates",
@@ -133,6 +169,40 @@ function recognitionInputForFileLike(input: AnalyzerFileRoutingGuardInput): Anal
     subjectType: input.subjectType,
     runtimeRoutingEnabled: input.runtimeRoutingEnabled,
   };
+}
+
+function publicEvidenceCandidateFor(
+  recognition: ProductPhotoRecognitionResult,
+): PublicAnalyzerRoutingEvidenceCandidate {
+  if (recognition.recognitionState === "product-photo-compatible") {
+    return "product-photo-candidate";
+  }
+
+  if (recognition.evidenceType === "pdf-receipt") {
+    return "pdf-like";
+  }
+
+  if (recognition.evidenceType === "order-screenshot") {
+    return "screenshot-like";
+  }
+
+  if (recognition.evidenceType === "receipt") {
+    return "receipt-like";
+  }
+
+  return "unknown-inconclusive";
+}
+
+function publicRouteFor(decision: AnalyzerFileRoutingGuardDecision): PublicAnalyzerRoutingRoute {
+  if (decision.productPhotoCandidate) {
+    return "product-photo-guarded-non-live";
+  }
+
+  if (decision.status === "receipt-path-preserved") {
+    return "existing-receipt-path-candidate";
+  }
+
+  return "unknown-inconclusive";
 }
 
 export function buildAnalyzerRoutingDecision(
@@ -228,3 +298,35 @@ export function buildAnalyzerFileRoutingDecision(
 }
 
 export const analyzeFileLikeEvidenceWithRoutingGuard = buildAnalyzerFileRoutingDecision;
+
+export function routeAnalyzerEvidenceInput(
+  input: PublicAnalyzerRoutingInput = {},
+): PublicAnalyzerRoutingDecision {
+  const decision = buildAnalyzerFileRoutingDecision(input);
+
+  return {
+    boundary: "analyzer-routing-public-wrapper",
+    decisionOnly: true,
+    runtimeRoutingEnabled: decision.runtimeRoutingEnabled,
+    route: publicRouteFor(decision),
+    evidenceCandidate: publicEvidenceCandidateFor(decision.recognition),
+    recognizedEvidenceType: decision.recognition.evidenceType,
+    recognitionState: decision.recognition.recognitionState,
+    existingReceiptPathCandidate: decision.status === "receipt-path-preserved",
+    receiptPathPreserved: decision.receiptPathPreserved,
+    productPhotoCandidate: decision.productPhotoCandidate,
+    productPhotoRuntimeLive: false,
+    status: decision.status,
+    fileContext: decision.fileContext,
+    localAnalysisResultShapeRequired: false,
+    adapterInvoked: false,
+    analyzerInvoked: false,
+    uiOrReportBehaviorExercised: false,
+    reasons: [...decision.reasons, "public wrapper returned a routing decision only"],
+    limitations: [
+      ...decision.limitations,
+      "analyzeEvidenceFile was not invoked",
+      "ProductPhotoAnalysisDetails were not returned",
+    ],
+  };
+}
