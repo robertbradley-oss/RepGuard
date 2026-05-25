@@ -1,12 +1,40 @@
 import {
   buildAnalyzerFileRoutingDecision,
+  buildGuardedInternalAnalyzerRouteDecision,
   buildAnalyzerRoutingDecision,
   ENABLE_PRODUCT_PHOTO_RUNTIME_ROUTING,
   routeAnalyzerEvidenceInput,
   type AnalyzerFileRoutingGuardInput,
   type AnalyzerRoutingGuardInput,
+  type PublicAnalyzerRoutingDecision,
   type PublicAnalyzerRoutingInput,
 } from "@/lib/analysis/analyzer-routing";
+
+type HasAnyKey<T, TKey extends PropertyKey> = Extract<keyof T, TKey> extends never ? false : true;
+
+type PublicWrapperForbiddenSharedResultPayloadKeys =
+  | "module"
+  | "evidenceType"
+  | "evidenceLabel"
+  | "sourceKind"
+  | "score"
+  | "scoreMeaning"
+  | "localSignalLevel"
+  | "reviewPriority"
+  | "confidenceLevel"
+  | "reviewLabel"
+  | "verificationStatus"
+  | "externalVerification"
+  | "signals"
+  | "findingGroups"
+  | "evidenceSummary"
+  | "recommendedSupportAction"
+  | "customerSafeWording"
+  | "privacySafeMetadataSummary"
+  | "moduleDetails";
+
+const publicWrapperDoesNotExposeSharedResultPayloadFields =
+  false satisfies HasAnyKey<PublicAnalyzerRoutingDecision, PublicWrapperForbiddenSharedResultPayloadKeys>;
 
 const receiptLikeInput = {
   evidenceType: "receipt",
@@ -54,6 +82,18 @@ const screenshotLikeInput = {
   mimeType: "image/png",
 } satisfies PublicAnalyzerRoutingInput;
 
+const productPhotoSyntheticMetadataInput = {
+  fileName: "synthetic-product-context-photo.jpg",
+  mimeType: "image/jpeg",
+  subjectType: "damage-close-up",
+  metadataSummary: {
+    fileTypeCategory: "image",
+    dimensionsPresent: true,
+    dimensionsBucket: "large",
+  },
+  runtimeRoutingEnabled: true,
+} satisfies PublicAnalyzerRoutingInput;
+
 const receiptLikeFileInput = {
   file: {
     name: "synthetic-receipt-photo.png",
@@ -92,6 +132,14 @@ const receiptLikeFileDecision = buildAnalyzerFileRoutingDecision(receiptLikeFile
 const productPhotoRuntimeOffFileDecision = buildAnalyzerFileRoutingDecision(productPhotoRuntimeOffFileInput);
 const productPhotoRuntimeTrueFileDecision = buildAnalyzerFileRoutingDecision(productPhotoRuntimeTrueFileInput);
 const unknownFileDecision = buildAnalyzerFileRoutingDecision(unknownFileInput);
+const internalReceiptLikeDecision = buildGuardedInternalAnalyzerRouteDecision(receiptLikeFileInput);
+const internalProductPhotoRuntimeOffDecision =
+  buildGuardedInternalAnalyzerRouteDecision(productPhotoRuntimeOffFileInput);
+const internalProductPhotoRuntimeTrueDecision =
+  buildGuardedInternalAnalyzerRouteDecision(productPhotoRuntimeTrueFileInput);
+const internalProductPhotoSyntheticMetadataDecision =
+  buildGuardedInternalAnalyzerRouteDecision(productPhotoSyntheticMetadataInput);
+const internalUnknownDecision = buildGuardedInternalAnalyzerRouteDecision(unknownFileInput);
 const publicReceiptLikeDecision = routeAnalyzerEvidenceInput(receiptLikeInput);
 const publicReceiptLikeFileDecision = routeAnalyzerEvidenceInput(receiptLikeFileInput);
 const publicProductPhotoRuntimeOffDecision = routeAnalyzerEvidenceInput(productPhotoRuntimeOffInput);
@@ -100,6 +148,8 @@ const publicDamagePhotoAliasDecision = routeAnalyzerEvidenceInput(damagePhotoAli
 const publicUnknownDecision = routeAnalyzerEvidenceInput(unknownInput);
 const publicPdfLikeDecision = routeAnalyzerEvidenceInput(pdfLikeInput);
 const publicScreenshotLikeDecision = routeAnalyzerEvidenceInput(screenshotLikeInput);
+const publicProductPhotoSyntheticMetadataDecision =
+  routeAnalyzerEvidenceInput(productPhotoSyntheticMetadataInput);
 
 function allChecksPass(checks: Record<string, boolean>) {
   return Object.values(checks).every(Boolean);
@@ -116,6 +166,22 @@ function lacksProductPhotoResultDetails(decision: object) {
 
 function lacksSharedResultBoundaryPayload(decision: object) {
   return (
+    !("module" in decision) &&
+    !("evidenceType" in decision) &&
+    !("evidenceLabel" in decision) &&
+    !("sourceKind" in decision) &&
+    !("score" in decision) &&
+    !("scoreMeaning" in decision) &&
+    !("localSignalLevel" in decision) &&
+    !("reviewPriority" in decision) &&
+    !("confidenceLevel" in decision) &&
+    !("reviewLabel" in decision) &&
+    !("externalVerification" in decision) &&
+    !("signals" in decision) &&
+    !("findingGroups" in decision) &&
+    !("evidenceSummary" in decision) &&
+    !("recommendedSupportAction" in decision) &&
+    !("customerSafeWording" in decision) &&
     !("moduleDetails" in decision) &&
     !("evidenceReliabilityScore" in decision) &&
     !("verificationStatus" in decision) &&
@@ -148,6 +214,15 @@ const publicWrapperDecisions = [
   publicUnknownDecision,
   publicPdfLikeDecision,
   publicScreenshotLikeDecision,
+  publicProductPhotoSyntheticMetadataDecision,
+] as const;
+
+const guardedInternalRouteDecisions = [
+  internalReceiptLikeDecision,
+  internalProductPhotoRuntimeOffDecision,
+  internalProductPhotoRuntimeTrueDecision,
+  internalProductPhotoSyntheticMetadataDecision,
+  internalUnknownDecision,
 ] as const;
 
 const receiptPathPreservationChecks = {
@@ -201,6 +276,52 @@ const unknownPathChecks = {
   unknownFileNotProductPhotoCandidate: !unknownFileDecision.productPhotoCandidate,
 } as const;
 
+const guardedInternalRouteChecks = {
+  internalDecisionsAreDecisionOnly: guardedInternalRouteDecisions.every((decision) => decision.decisionOnly),
+  internalReceiptRoutePreservesReceiptPath:
+    internalReceiptLikeDecision.route === "receipt-analyzer-path" &&
+    internalReceiptLikeDecision.status === "receipt-path-preserved",
+  internalReceiptRouteDoesNotInvokeAnalyzer: internalReceiptLikeDecision.analyzerInvoked === false,
+  internalProductPhotoRouteGuarded:
+    internalProductPhotoRuntimeOffDecision.route === "product-photo-guarded" &&
+    internalProductPhotoRuntimeOffDecision.status === "unsupported-live-path",
+  internalProductPhotoRuntimeRequestStillNonLive:
+    internalProductPhotoRuntimeTrueDecision.runtimeRoutingEnabled === false &&
+    internalProductPhotoRuntimeTrueDecision.productPhotoRuntimeLive === false,
+  internalSyntheticMetadataProductPhotoStillGuarded:
+    internalProductPhotoSyntheticMetadataDecision.route === "product-photo-guarded" &&
+    internalProductPhotoSyntheticMetadataDecision.status === "unsupported-live-path",
+  internalSyntheticMetadataDoesNotExposeSharedResultPayload:
+    lacksSharedResultBoundaryPayload(internalProductPhotoSyntheticMetadataDecision),
+  internalUnknownRouteInconclusive:
+    internalUnknownDecision.route === "unknown-inconclusive" &&
+    internalUnknownDecision.status === "unknown-inconclusive",
+  internalRoutesNeverInvokeAnalyzer:
+    guardedInternalRouteDecisions.every((decision) => decision.analyzerInvoked === false),
+  internalRoutesNeverInvokeAdapter:
+    guardedInternalRouteDecisions.every((decision) => decision.adapterInvoked === false),
+  internalRoutesNeverInvokeProductPhotoResultBoundary:
+    guardedInternalRouteDecisions.every((decision) => decision.productPhotoResultBoundaryInvoked === false),
+  internalRoutesNeverInvokeUiUploadReportScoringParserFixtures:
+    guardedInternalRouteDecisions.every(
+      (decision) => decision.uiUploadReportScoringParserFixturePathsInvoked === false,
+    ),
+  internalRoutesNeverNeedLocalAnalysisResult:
+    guardedInternalRouteDecisions.every((decision) => decision.localAnalysisResultShapeRequired === false),
+} as const;
+
+const analyzerRoutingImportBoundaryChecks = {
+  importsLiveAnalyzer: false,
+  importsProductPhotoAnalyzer: false,
+  importsProductPhotoRoutingAdapter: false,
+  importsUiUploadReportScoringParserFixtures: false,
+  importsProvidersStorageIntegrationsCaseQueues: false,
+  invokesAnalyzeEvidenceFile: false,
+  invokesProductPhotoResultBoundary: false,
+  invokesUiUploadReportScoringParserFixtures: false,
+  invokesProvidersStorageIntegrationsCaseQueues: false,
+} as const;
+
 const livePathIsolationChecks = {
   receiptObjectDoesNotExerciseUiOrReport: receiptLikeDecision.uiOrReportBehaviorExercised === false,
   productPhotoObjectDoesNotExerciseUiOrReport: productPhotoRuntimeOffDecision.uiOrReportBehaviorExercised === false,
@@ -221,6 +342,13 @@ const livePathIsolationChecks = {
   publicWrapperDoesNotExerciseUiOrReport: publicWrapperDecisions.every(
     (decision) => decision.uiOrReportBehaviorExercised === false,
   ),
+  internalRoutesDoNotInvokeAnalyzer:
+    guardedInternalRouteDecisions.every((decision) => decision.analyzerInvoked === false),
+  internalRoutesDoNotInvokeAdapter:
+    guardedInternalRouteDecisions.every((decision) => decision.adapterInvoked === false),
+  internalRoutesDoNotInvokeProductPhotoResultBoundary:
+    guardedInternalRouteDecisions.every((decision) => decision.productPhotoResultBoundaryInvoked === false),
+  analyzerRoutingImportBoundaryClean: allChecksPass(analyzerRoutingImportBoundaryChecks),
 } as const;
 
 const publicWrapperChecks = {
@@ -248,6 +376,8 @@ const publicWrapperChecks = {
   productPhotoCandidateGuarded:
     publicProductPhotoRuntimeOffDecision.route === "product-photo-guarded-non-live",
   productPhotoCandidateNonLive: publicProductPhotoRuntimeOffDecision.productPhotoRuntimeLive === false,
+  productPhotoCandidateNotExistingReceiptPath:
+    publicProductPhotoRuntimeOffDecision.existingReceiptPathCandidate === false,
   productPhotoCandidateDoesNotInvokeAnalyzer: publicProductPhotoRuntimeOffDecision.analyzerInvoked === false,
   productPhotoCandidateDoesNotInvokeAdapter: publicProductPhotoRuntimeOffDecision.adapterInvoked === false,
   productPhotoRuntimeRequestStillGuarded:
@@ -273,6 +403,7 @@ const publicWrapperChecks = {
     lacksProductPhotoResultDetails(publicDamagePhotoAliasDecision),
   publicWrapperDoesNotExposeSharedResultBoundary:
     publicWrapperDecisions.every(lacksSharedResultBoundaryPayload),
+  publicWrapperDoesNotExposeSharedResultPayloadFields,
   unknownInputRouteInconclusive: publicUnknownDecision.route === "unknown-inconclusive",
   unknownInputCandidateInconclusive: publicUnknownDecision.evidenceCandidate === "unknown-inconclusive",
   pdfLikeRoutesToExistingReceiptPath: publicPdfLikeDecision.route === "existing-receipt-path-candidate",
@@ -292,6 +423,20 @@ const publicWrapperChecks = {
   screenshotLikeAnalyzerNotInvoked: publicScreenshotLikeDecision.analyzerInvoked === false,
   screenshotLikeAdapterNotInvoked: publicScreenshotLikeDecision.adapterInvoked === false,
   screenshotLikeUiOrReportNotExercised: publicScreenshotLikeDecision.uiOrReportBehaviorExercised === false,
+  metadataBearingProductPhotoRoutesGuarded:
+    publicProductPhotoSyntheticMetadataDecision.route === "product-photo-guarded-non-live",
+  metadataBearingProductPhotoCandidateDetected:
+    publicProductPhotoSyntheticMetadataDecision.evidenceCandidate === "product-photo-candidate",
+  metadataBearingProductPhotoRuntimeNonLive:
+    publicProductPhotoSyntheticMetadataDecision.productPhotoRuntimeLive === false,
+  metadataBearingProductPhotoNotExistingReceiptPath:
+    publicProductPhotoSyntheticMetadataDecision.existingReceiptPathCandidate === false,
+  metadataBearingProductPhotoDoesNotExposeSharedResultPayload:
+    lacksSharedResultBoundaryPayload(publicProductPhotoSyntheticMetadataDecision),
+  metadataBearingProductPhotoAnalyzerNotInvoked:
+    publicProductPhotoSyntheticMetadataDecision.analyzerInvoked === false,
+  metadataBearingProductPhotoAdapterNotInvoked:
+    publicProductPhotoSyntheticMetadataDecision.adapterInvoked === false,
   wrapperDoesNotNeedLocalAnalysisResult:
     publicProductPhotoRuntimeOffDecision.localAnalysisResultShapeRequired === false,
   wrapperDoesNotInvokeAdapter: publicProductPhotoRuntimeOffDecision.adapterInvoked === false,
@@ -321,6 +466,14 @@ const resultShapeIsolationChecks = {
     lacksProductPhotoResultDetails(publicProductPhotoRuntimeTrueDecision),
   publicDamagePhotoAliasDoesNotExposeResultDetails:
     lacksProductPhotoResultDetails(publicDamagePhotoAliasDecision),
+  internalProductPhotoDoesNotExposeResultDetails:
+    lacksProductPhotoResultDetails(internalProductPhotoRuntimeOffDecision),
+  internalProductPhotoRuntimeRequestDoesNotExposeResultDetails:
+    lacksProductPhotoResultDetails(internalProductPhotoRuntimeTrueDecision),
+  internalProductPhotoSyntheticMetadataDoesNotExposeResultDetails:
+    lacksProductPhotoResultDetails(internalProductPhotoSyntheticMetadataDecision),
+  guardedInternalRoutesDoNotExposeSharedResultPayload:
+    guardedInternalRouteDecisions.every(lacksSharedResultBoundaryPayload),
 } as const;
 
 const safetyWordingChecks = {
@@ -331,11 +484,29 @@ const safetyWordingChecks = {
   publicProductPhotoRuntimeRequestManualReviewOnly:
     hasManualReviewOnlySafetyWording(publicProductPhotoRuntimeTrueDecision),
   publicDamagePhotoAliasManualReviewOnly: hasManualReviewOnlySafetyWording(publicDamagePhotoAliasDecision),
+  publicSyntheticMetadataProductPhotoManualReviewOnly:
+    hasManualReviewOnlySafetyWording(publicProductPhotoSyntheticMetadataDecision),
+  internalProductPhotoManualReviewOnly:
+    hasManualReviewOnlySafetyWording(internalProductPhotoRuntimeOffDecision),
   allPublicWrapperDecisionsAvoidUnsafeWording: publicWrapperDecisions.every(hasNoUnsafeSafetyWording),
+  allGuardedInternalRouteDecisionsAvoidUnsafeWording:
+    guardedInternalRouteDecisions.every(hasNoUnsafeSafetyWording),
   productPhotoGuardAvoidsUnsafeWording: hasNoUnsafeSafetyWording(productPhotoRuntimeOffDecision),
   productPhotoRuntimeRequestAvoidsUnsafeWording: hasNoUnsafeSafetyWording(productPhotoRuntimeTrueDecision),
   damagePhotoAliasAvoidsUnsafeWording: hasNoUnsafeSafetyWording(damagePhotoAliasDecision),
 } as const;
+
+function assertProbeChecksPass(label: string, checks: Record<string, boolean>) {
+  if (!allChecksPass(checks)) {
+    throw new Error(`Analyzer routing probe failed: ${label}`);
+  }
+}
+
+assertProbeChecksPass("guarded internal route", guardedInternalRouteChecks);
+assertProbeChecksPass("live path isolation", livePathIsolationChecks);
+assertProbeChecksPass("public wrapper", publicWrapperChecks);
+assertProbeChecksPass("result shape isolation", resultShapeIsolationChecks);
+assertProbeChecksPass("safety wording", safetyWordingChecks);
 
 export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
   guard: {
@@ -351,6 +522,13 @@ export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
     productPhotoRuntimeOffFile: productPhotoRuntimeOffFileDecision,
     productPhotoRuntimeTrueFile: productPhotoRuntimeTrueFileDecision,
     unknownFile: unknownFileDecision,
+    guardedInternalRoute: {
+      receiptLike: internalReceiptLikeDecision,
+      productPhotoRuntimeOff: internalProductPhotoRuntimeOffDecision,
+      productPhotoRuntimeTrue: internalProductPhotoRuntimeTrueDecision,
+      productPhotoSyntheticMetadata: internalProductPhotoSyntheticMetadataDecision,
+      unknown: internalUnknownDecision,
+    },
     publicWrapper: {
       receiptLike: publicReceiptLikeDecision,
       receiptLikeFile: publicReceiptLikeFileDecision,
@@ -360,6 +538,7 @@ export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
       unknown: publicUnknownDecision,
       pdfLike: publicPdfLikeDecision,
       screenshotLike: publicScreenshotLikeDecision,
+      productPhotoSyntheticMetadata: publicProductPhotoSyntheticMetadataDecision,
     },
   },
   expectations: {
@@ -448,6 +627,64 @@ export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
       adapterInvoked: unknownFileDecision.adapterInvoked,
       uiOrReportBehaviorExercised: unknownFileDecision.uiOrReportBehaviorExercised,
     },
+    guardedInternalRoute: {
+      receiptLike: {
+        boundary: internalReceiptLikeDecision.boundary,
+        route: internalReceiptLikeDecision.route,
+        status: internalReceiptLikeDecision.status,
+        existingReceiptAnalyzerPathCandidate:
+          internalReceiptLikeDecision.existingReceiptAnalyzerPathCandidate,
+        analyzerInvoked: internalReceiptLikeDecision.analyzerInvoked,
+        adapterInvoked: internalReceiptLikeDecision.adapterInvoked,
+        productPhotoResultBoundaryInvoked:
+          internalReceiptLikeDecision.productPhotoResultBoundaryInvoked,
+      },
+      productPhotoRuntimeOff: {
+        boundary: internalProductPhotoRuntimeOffDecision.boundary,
+        route: internalProductPhotoRuntimeOffDecision.route,
+        status: internalProductPhotoRuntimeOffDecision.status,
+        runtimeRoutingEnabled: internalProductPhotoRuntimeOffDecision.runtimeRoutingEnabled,
+        productPhotoRuntimeLive: internalProductPhotoRuntimeOffDecision.productPhotoRuntimeLive,
+        localAnalysisResultShapeRequired:
+          internalProductPhotoRuntimeOffDecision.localAnalysisResultShapeRequired,
+        analyzerInvoked: internalProductPhotoRuntimeOffDecision.analyzerInvoked,
+        adapterInvoked: internalProductPhotoRuntimeOffDecision.adapterInvoked,
+        productPhotoResultBoundaryInvoked:
+          internalProductPhotoRuntimeOffDecision.productPhotoResultBoundaryInvoked,
+      },
+      productPhotoRuntimeTrue: {
+        boundary: internalProductPhotoRuntimeTrueDecision.boundary,
+        route: internalProductPhotoRuntimeTrueDecision.route,
+        status: internalProductPhotoRuntimeTrueDecision.status,
+        runtimeRoutingEnabled: internalProductPhotoRuntimeTrueDecision.runtimeRoutingEnabled,
+        productPhotoRuntimeLive: internalProductPhotoRuntimeTrueDecision.productPhotoRuntimeLive,
+        analyzerInvoked: internalProductPhotoRuntimeTrueDecision.analyzerInvoked,
+        adapterInvoked: internalProductPhotoRuntimeTrueDecision.adapterInvoked,
+        productPhotoResultBoundaryInvoked:
+          internalProductPhotoRuntimeTrueDecision.productPhotoResultBoundaryInvoked,
+      },
+      productPhotoSyntheticMetadata: {
+        boundary: internalProductPhotoSyntheticMetadataDecision.boundary,
+        route: internalProductPhotoSyntheticMetadataDecision.route,
+        status: internalProductPhotoSyntheticMetadataDecision.status,
+        recognizedEvidenceType:
+          internalProductPhotoSyntheticMetadataDecision.recognizedEvidenceType,
+        recognitionState: internalProductPhotoSyntheticMetadataDecision.recognitionState,
+        productPhotoRuntimeLive:
+          internalProductPhotoSyntheticMetadataDecision.productPhotoRuntimeLive,
+        analyzerInvoked: internalProductPhotoSyntheticMetadataDecision.analyzerInvoked,
+        adapterInvoked: internalProductPhotoSyntheticMetadataDecision.adapterInvoked,
+        productPhotoResultBoundaryInvoked:
+          internalProductPhotoSyntheticMetadataDecision.productPhotoResultBoundaryInvoked,
+      },
+      unknown: {
+        boundary: internalUnknownDecision.boundary,
+        route: internalUnknownDecision.route,
+        status: internalUnknownDecision.status,
+        analyzerInvoked: internalUnknownDecision.analyzerInvoked,
+        adapterInvoked: internalUnknownDecision.adapterInvoked,
+      },
+    },
     publicWrapper: {
       receiptLike: {
         boundary: publicReceiptLikeDecision.boundary,
@@ -510,10 +747,21 @@ export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
         recognizedEvidenceType: publicScreenshotLikeDecision.recognizedEvidenceType,
         analyzerInvoked: publicScreenshotLikeDecision.analyzerInvoked,
       },
+      productPhotoSyntheticMetadata: {
+        boundary: publicProductPhotoSyntheticMetadataDecision.boundary,
+        route: publicProductPhotoSyntheticMetadataDecision.route,
+        evidenceCandidate: publicProductPhotoSyntheticMetadataDecision.evidenceCandidate,
+        runtimeRoutingEnabled: publicProductPhotoSyntheticMetadataDecision.runtimeRoutingEnabled,
+        productPhotoRuntimeLive: publicProductPhotoSyntheticMetadataDecision.productPhotoRuntimeLive,
+        analyzerInvoked: publicProductPhotoSyntheticMetadataDecision.analyzerInvoked,
+        adapterInvoked: publicProductPhotoSyntheticMetadataDecision.adapterInvoked,
+      },
     },
+    analyzerRoutingImportBoundary: analyzerRoutingImportBoundaryChecks,
   },
   preservationStatus: {
     receiptPathPreserved: allChecksPass(receiptPathPreservationChecks),
+    guardedInternalRouteDecisionOnly: allChecksPass(guardedInternalRouteChecks),
     productPhotoCandidatesGuarded: allChecksPass(productPhotoGuardChecks),
     unknownInputsRemainInconclusive: allChecksPass(unknownPathChecks),
     livePathBehaviorNotExercised: allChecksPass(livePathIsolationChecks),
@@ -526,6 +774,8 @@ export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
     productPhotoRuntimeLive: false,
     checks: {
       receiptPathPreservation: receiptPathPreservationChecks,
+      guardedInternalRoute: guardedInternalRouteChecks,
+      analyzerRoutingImportBoundary: analyzerRoutingImportBoundaryChecks,
       productPhotoGuard: productPhotoGuardChecks,
       unknownPath: unknownPathChecks,
       livePathIsolation: livePathIsolationChecks,

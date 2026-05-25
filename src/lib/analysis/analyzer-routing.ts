@@ -98,6 +98,28 @@ export type PublicAnalyzerRoutingDecision = {
   limitations: string[];
 };
 
+export type GuardedInternalAnalyzerRouteDecision = {
+  boundary: "guarded-internal-analyzer-route";
+  decisionOnly: true;
+  runtimeRoutingEnabled: boolean;
+  route: AnalyzerRoutingGuardRoute;
+  status: AnalyzerRoutingGuardStatus;
+  recognizedEvidenceType: ProductPhotoRecognitionResult["evidenceType"];
+  recognitionState: ProductPhotoRecognitionResult["recognitionState"];
+  fileContext: AnalyzerFileRoutingGuardDecision["fileContext"];
+  receiptPathPreserved: boolean;
+  existingReceiptAnalyzerPathCandidate: boolean;
+  productPhotoCandidate: boolean;
+  productPhotoRuntimeLive: false;
+  localAnalysisResultShapeRequired: false;
+  analyzerInvoked: false;
+  adapterInvoked: false;
+  productPhotoResultBoundaryInvoked: false;
+  uiUploadReportScoringParserFixturePathsInvoked: false;
+  reasons: string[];
+  limitations: string[];
+};
+
 const ANALYZER_ROUTING_LIMITATIONS = [
   "dev-only analyzer routing guard",
   "unsupported live path for product-photo candidates",
@@ -172,7 +194,7 @@ function recognitionInputForFileLike(input: AnalyzerFileRoutingGuardInput): Anal
 }
 
 function publicEvidenceCandidateFor(
-  recognition: ProductPhotoRecognitionResult,
+  recognition: Pick<ProductPhotoRecognitionResult, "evidenceType" | "recognitionState">,
 ): PublicAnalyzerRoutingEvidenceCandidate {
   if (recognition.recognitionState === "product-photo-compatible") {
     return "product-photo-candidate";
@@ -193,7 +215,9 @@ function publicEvidenceCandidateFor(
   return "unknown-inconclusive";
 }
 
-function publicRouteFor(decision: AnalyzerFileRoutingGuardDecision): PublicAnalyzerRoutingRoute {
+function publicRouteForInternalDecision(
+  decision: GuardedInternalAnalyzerRouteDecision,
+): PublicAnalyzerRoutingRoute {
   if (decision.productPhotoCandidate) {
     return "product-photo-guarded-non-live";
   }
@@ -299,20 +323,58 @@ export function buildAnalyzerFileRoutingDecision(
 
 export const analyzeFileLikeEvidenceWithRoutingGuard = buildAnalyzerFileRoutingDecision;
 
+export function buildGuardedInternalAnalyzerRouteDecision(
+  input: AnalyzerFileRoutingGuardInput = {},
+): GuardedInternalAnalyzerRouteDecision {
+  const decision = buildAnalyzerFileRoutingDecision(input);
+
+  return {
+    boundary: "guarded-internal-analyzer-route",
+    decisionOnly: true,
+    runtimeRoutingEnabled: decision.runtimeRoutingEnabled,
+    route: decision.route,
+    status: decision.status,
+    recognizedEvidenceType: decision.recognition.evidenceType,
+    recognitionState: decision.recognition.recognitionState,
+    fileContext: decision.fileContext,
+    receiptPathPreserved: decision.receiptPathPreserved,
+    existingReceiptAnalyzerPathCandidate: decision.status === "receipt-path-preserved",
+    productPhotoCandidate: decision.productPhotoCandidate,
+    productPhotoRuntimeLive: false,
+    localAnalysisResultShapeRequired: false,
+    analyzerInvoked: false,
+    adapterInvoked: false,
+    productPhotoResultBoundaryInvoked: false,
+    uiUploadReportScoringParserFixturePathsInvoked: false,
+    reasons: [
+      ...decision.reasons,
+      "guarded internal route decision prepared without invoking analyzer paths",
+    ],
+    limitations: [
+      ...decision.limitations,
+      "product-photo result boundary was not invoked",
+      "analyzer, UI, upload, report, scoring, parser, and fixture paths were not invoked",
+    ],
+  };
+}
+
 export function routeAnalyzerEvidenceInput(
   input: PublicAnalyzerRoutingInput = {},
 ): PublicAnalyzerRoutingDecision {
-  const decision = buildAnalyzerFileRoutingDecision(input);
+  const decision = buildGuardedInternalAnalyzerRouteDecision(input);
 
   return {
     boundary: "analyzer-routing-public-wrapper",
     decisionOnly: true,
     runtimeRoutingEnabled: decision.runtimeRoutingEnabled,
-    route: publicRouteFor(decision),
-    evidenceCandidate: publicEvidenceCandidateFor(decision.recognition),
-    recognizedEvidenceType: decision.recognition.evidenceType,
-    recognitionState: decision.recognition.recognitionState,
-    existingReceiptPathCandidate: decision.status === "receipt-path-preserved",
+    route: publicRouteForInternalDecision(decision),
+    evidenceCandidate: publicEvidenceCandidateFor({
+      evidenceType: decision.recognizedEvidenceType,
+      recognitionState: decision.recognitionState,
+    }),
+    recognizedEvidenceType: decision.recognizedEvidenceType,
+    recognitionState: decision.recognitionState,
+    existingReceiptPathCandidate: decision.existingReceiptAnalyzerPathCandidate,
     receiptPathPreserved: decision.receiptPathPreserved,
     productPhotoCandidate: decision.productPhotoCandidate,
     productPhotoRuntimeLive: false,
