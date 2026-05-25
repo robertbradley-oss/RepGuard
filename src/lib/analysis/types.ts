@@ -465,6 +465,66 @@ export type EvidenceModuleDetails =
       };
     };
 
+export type SharedEvidenceFindingStatus =
+  | "Clear"
+  | "Inconclusive"
+  | "Review recommended"
+  | "Manual review recommended";
+
+export type SharedEvidenceFindingGroup = {
+  category: SharedEvidenceSignalCategory;
+  status: SharedEvidenceFindingStatus;
+  summary: string;
+  details: {
+    label: string;
+    value: string;
+    status: SharedEvidenceFindingStatus;
+  }[];
+  relatedSignalIds: string[];
+};
+
+export type EvidenceAnalysisModule = EvidenceModuleDetails["module"];
+
+export type EvidenceAnalysisResultBase<TModuleDetails extends EvidenceModuleDetails> = {
+  module: TModuleDetails["module"];
+  evidenceType: SharedEvidenceType;
+  evidenceLabel: string;
+  sourceKind: EvidenceSourceKind;
+  scoreLabel: "Evidence Reliability Score";
+  evidenceReliabilityScore: SharedEvidenceReliabilityScore;
+  score: number;
+  scoreMeaning: ScoreMeaning;
+  localSignalLevel: LocalSignalLevel;
+  reviewPriority: ReviewPriority;
+  confidenceLevel: EvidenceConfidence;
+  reviewLabel: EvidenceReviewStatus;
+  verificationStatus: SharedExternalVerificationStatus;
+  externalVerification: "Not performed";
+  signals: SharedEvidenceSignal[];
+  findingGroups: SharedEvidenceFindingGroup[];
+  evidenceSummary: string;
+  recommendedSupportAction: string;
+  customerSafeWording: string;
+  privacySafeMetadataSummary: EvidenceMetadataSummary;
+  moduleDetails: TModuleDetails;
+};
+
+export type ReceiptEvidenceAnalysisResult = EvidenceAnalysisResultBase<
+  Extract<EvidenceModuleDetails, { module: "receipt" }>
+> & {
+  module: "receipt";
+  evidenceType: "receipt" | "pdf-receipt" | "order-screenshot";
+};
+
+export type ProductPhotoEvidenceAnalysisResult = EvidenceAnalysisResultBase<
+  Extract<EvidenceModuleDetails, { module: "productPhoto" }>
+> & {
+  module: "productPhoto";
+  evidenceType: "product-photo";
+};
+
+export type EvidenceAnalysisResult = ReceiptEvidenceAnalysisResult | ProductPhotoEvidenceAnalysisResult;
+
 export type VerificationStatus = {
   status: "Not externally verified" | "Locally analyzed only" | "External verification unavailable";
   externalVerification: "Not performed";

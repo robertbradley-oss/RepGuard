@@ -24,7 +24,9 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - `e8636e4` added an optional file-aware analyzer routing boundary.
 - `7459a15` added a dev-only analyzer-routing preservation/status probe.
 - `2071374` added a decision-only public analyzer routing wrapper.
-- Shared evidence model types, product-photo scaffold/defaults, signal builders, summary/completeness helpers, compile probes, an exported-only analyzer builder, analyzer and routing-adapter probes, a dev-only recognition boundary, a dev-only routing adapter, a dev-only analyzer routing guard, an optional file-aware routing boundary, a dev-only analyzer-routing preservation/status probe, and a decision-only public analyzer routing wrapper exist.
+- A type-only shared `EvidenceAnalysisResult` envelope and compile-only shared-result probe now exist for future analyzer routing.
+- Shared evidence model types, product-photo scaffold/defaults, signal builders, summary/completeness helpers, compile probes, an exported-only analyzer builder, analyzer and routing-adapter probes, a shared result envelope/probe, a dev-only recognition boundary, a dev-only routing adapter, a dev-only analyzer routing guard, an optional file-aware routing boundary, a dev-only analyzer-routing preservation/status probe, and a decision-only public analyzer routing wrapper exist.
+- The shared result envelope represents receipt and product-photo as separate module variants and does not force product-photo into `LocalAnalysisResult`.
 - The recognition boundary is isolated and dev-only. `recognizeProductPhotoEvidence` is not called by `analyzeEvidenceFile`.
 - The routing adapter composes the recognition boundary and product-photo analyzer builder only inside an isolated dev-only module.
 - The routing adapter returns its own adapter-specific result, not `LocalAnalysisResult`.
@@ -38,6 +40,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - Product-photo runtime analyzer behavior is still not live.
 - `analyzeEvidenceFile` remains the live receipt analyzer entrypoint and still protects the shipped receipt pipeline.
 - `LocalAnalysisResult` remains unchanged and receipt-path shaped.
+- The shared-result probe confirms product-photo shared results do not require receipt-only OCR/parser/result fields and keep external verification as not performed / not externally verified.
 - No runtime analyzer routing, upload, UI, report, scoring, parser, metadata extraction, or fixture behavior changed during Phase 2.0, Phase 2.1, or Phase 2.2 helper/boundary work.
 - Runtime routing remains blocked until Robert explicitly opens that slice.
 - `product-photo` is canonical.
@@ -50,7 +53,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 3. Keep the dev-only routing adapter out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 4. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 5. Keep the analyzer routing guard and optional file-aware boundary out of the live UI/upload flow until a separate live-routing plan is explicitly opened.
-6. Keep `LocalAnalysisResult` receipt-path shaped until a separate shared-result migration slice is planned.
+6. Keep `LocalAnalysisResult` receipt-path shaped until a separate shared-result migration slice is explicitly opened.
 7. Keep image-consistency uncertainty dormant until a future explicitly opened provider, validated local-metrics, and QA-evidence slice.
 8. Confirm the product-photo helpers, analyzer builder, probes, recognition boundary, routing adapter, analyzer routing guard, optional file-aware boundary, preservation probe, and public wrapper remain unwired from runtime analyzer, upload, UI, report, scoring, parser, metadata extraction, and fixture behavior.
 9. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
@@ -65,7 +68,7 @@ Staged order:
 1. Complete this docs-only live-routing integration plan and keep `routeAnalyzerEvidenceInput` decision-only and unwired.
 2. Expand probe coverage for the planned contract before any runtime wiring is attempted.
 3. Refine type-only/shared-result boundaries only if the staged plan requires a result model that can safely represent receipts and product photos without forcing one into the other's shape.
-4. Add a non-live product-photo adapter/result boundary that returns a future-safe result shape and remains separate from `LocalAnalysisResult`.
+4. Add a non-live product-photo adapter/result boundary that returns the shared result shape and remains separate from `LocalAnalysisResult`.
 5. Add a guarded internal route-to-adapter path that is still not callable by UI/upload/report/scoring/parser paths.
 6. Seek separate approval for live analyzer/UI/upload integration only after the result shape, report mapping, probes, and safety wording are ready.
 
@@ -87,6 +90,7 @@ Required probes before live integration:
 - Product-photo runtime flag remains non-live unless Robert explicitly opens it.
 - `damage-photo` compatibility alias maps only to the canonical `product-photo` planning path.
 - No product-photo details leak into `LocalAnalysisResult`.
+- Product-photo shared result variants do not require receipt-only OCR/parser/result fields.
 - Decision-only wrapper does not invoke adapter/analyzer/UI/report paths.
 - Safety-wording scan remains clean.
 
@@ -119,5 +123,5 @@ Robert wants the eventual result screen to feel like an evidence triage workspac
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent plan any future live analyzer routing integration separately; do not implement; keep routeAnalyzerEvidenceInput decision-only and unwired; do not touch analyzeEvidenceFile; do not call the routing adapter or recognizeProductPhotoEvidence from analyzeEvidenceFile; do not change LocalAnalysisResult, upload, UI, scoring, report mapping, parser behavior, fixtures, providers, storage, integrations, or case queues
+/claimguardagent implement the next non-live product-photo adapter/result boundary using the shared EvidenceAnalysisResult envelope; keep it dev-only/probe-only and unwired; do not touch analyzeEvidenceFile, LocalAnalysisResult, UI, upload, report mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues
 ```
