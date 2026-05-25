@@ -1,53 +1,39 @@
 # ClaimGuard Next Steps
 
-This roadmap keeps ClaimGuard focused on a polished mock-first MVP before any real integrations are added.
+This file is the near-term operational queue. Keep it short, current, and actionable.
 
-## 1. Polish MVP Dashboard
+Use `ROADMAP.md` for durable product roadmap, future modules, and phase definitions.
 
-- Tighten desktop and mobile spacing.
-- Improve empty, loading, and selected-case states.
-- Make the risk score, red flags, and support action hierarchy easier to scan.
-- Add stronger visual distinction between low, medium, and high risk.
+## Current Checkpoint
 
-## 2. Improve Upload-To-Analysis Workflow Using Mock Data
+- Phase 1 Receipt Intelligence is closed, pushed, deployed, and production-smoked.
+- Post-Phase-1 evidence workspace polish is live from commit `19ef25e`.
+- Phase 2 has not started.
+- The immediate priority is agent-system and documentation discipline, not app behavior changes.
 
-- Add mock upload states: idle, file selected, analyzing, complete, and needs review.
-- Let the selected mock file type influence the displayed report.
-- Add a clear "Run mock analysis" action.
-- Keep all uploaded files local to the browser for now.
+## Next Safe Tasks
 
-## 3. Add Mock Receipt Analysis Engine
+1. Review Agent System Upgrade 1.0 documentation changes.
+2. Confirm `ROADMAP.md` and `NEXT_STEPS.md` are serving distinct purposes.
+3. Decide whether any additional release checklist docs are needed for future deploys.
+4. Plan, but do not implement, the first Phase 2 readiness artifact if Robert asks.
+5. Identify any stale Phase 1 language remaining in project guidance docs.
+6. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
+7. Preserve a clean operational queue after each completed agent task.
 
-- Create deterministic mock analysis functions for receipt-like inputs.
-- Return an Evidence Reliability Score, risk level, risk signals, evidence summary, and recommended action.
-- Include receipt-specific signals such as date clarity, total consistency, merchant visibility, and proof-of-purchase verification needs.
-- Do not connect real OCR or AI yet.
+## Do Not Touch Right Now
 
-## 4. Add Mock Product-Photo Analysis Engine
+- Do not start Phase 2.
+- Do not add product damage photo analysis.
+- Do not modify app UI.
+- Do not modify upload/input/reset behavior.
+- Do not modify analyzer, parser, scoring, report, privacy, or fixture logic.
+- Do not connect real AI, OCR, ticket, email, drive, database, auth, Vercel, or payment systems.
+- Do not change package dependencies.
+- Do not deploy unless Robert explicitly asks.
 
-- Create deterministic mock analysis functions for product damage photos.
-- Return photo-specific risk signals such as lighting mismatch, damage visibility, metadata availability, and image clarity.
-- Use careful wording like "risk signal" and "manual review recommended."
-- Do not connect real computer vision or AI yet.
+## Current Recommended Next Prompt
 
-## 5. Add Case History
-
-- Add a case detail view or selectable recent-case workflow.
-- Track mock review status, evidence type, score, risk level, and recommended support action.
-- Add filters for risk level, channel, status, and submission date.
-- Keep case data mocked until the data model is planned.
-
-## 6. Plan Database Schema
-
-- Draft tables or collections for cases, customers, evidence files, analysis reports, risk signals, and review actions.
-- Identify which fields are required for auditability and support workflows.
-- Plan retention and privacy expectations before implementation.
-- Do not add a database until the user approves the architecture.
-
-## 7. Plan Real OCR And AI Vision Integration Later
-
-- Define provider-neutral interfaces for OCR and image analysis.
-- Decide what evidence should be sent to external services and what should stay local.
-- Add safety checks so AI output cannot accuse customers or state that fraud is confirmed.
-- Plan human review and confidence thresholds before connecting real models.
-- Do not connect real AI, OCR, Gmail, Vercel APIs, databases, or payment systems yet.
+```text
+/claimguardagent review Agent System Upgrade 1.0 docs for routing clarity and stale Phase 1 language only; do not modify app code
+```

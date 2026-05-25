@@ -4,14 +4,77 @@ Use `C:\Users\robby\Projects\ClaimGuard` as the active ClaimGuard source-of-trut
 
 Do not make ClaimGuard code, fixture, package, or documentation edits in `C:\Users\robby\OneDrive\Documents\GitHub\claimguard`. That OneDrive checkout is an outdated duplicate and should be treated as read-only reference material unless Robert explicitly says otherwise.
 
-## Pre-Commit Review Checklist
+The OneDrive Documents path may exist as a shell starting point, but it is not the active Git working tree.
 
-Before preparing Phase 1 work for commit:
+## Branch And Release Discipline
 
-- Confirm `git status --short --branch` is running from `C:\Users\robby\Projects\ClaimGuard`.
-- Group changes by review area: analyzer engine, `/test-evidence` harness, source classification and fixtures, reliability-score semantics, docs/routing, package/script changes, and brand assets.
-- Manually review risky files before staging, especially analyzer/scoring modules, `src/components/ClaimReviewWorkflow.tsx`, dependency changes, and fixture data.
-- Confirm committed fixtures are synthetic or privacy-safe only. Do not stage real customer receipts, raw OCR from customer evidence, copied private JSON, `.env*`, `.vercel/`, `.next/`, or `node_modules/`.
-- Run `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run check:report-semantics`.
-- Browser-check `/test-evidence` when practical, using synthetic fixtures or anonymized browser-local evidence only.
-- Preserve Phase 1 semantics: Evidence Reliability Score measures local evidence quality and internal consistency, not externally confirmed receipt truth.
+- Check `git status --short --branch` before and after work.
+- Preserve unrelated user changes.
+- Do not commit, push, deploy, rewrite history, or change repo visibility unless Robert explicitly asks.
+- Do not stage `.env*`, `.vercel/`, `.next/`, `node_modules/`, real customer evidence, raw OCR from private evidence, private JSON exports, screenshots containing private details, or credentials.
+- Keep release notes clear about whether work was docs/config-only, app behavior, analyzer logic, UI, QA, or deployment.
+
+## Phase-Aware Workflow
+
+- Phase 1 Receipt Intelligence is closed, deployed, and production-smoked.
+- Phase 2 has not started.
+- Future-phase planning is allowed when requested.
+- Future-phase implementation requires explicit approval from Robert.
+- Use `ROADMAP.md` for durable phase definitions.
+- Use `NEXT_STEPS.md` for the immediate working queue.
+- Use `AGENTS.md` and `ROUTING.md` to select the correct agent role before work.
+
+## Pre-Change Review Checklist
+
+Before editing:
+
+- Confirm you are in `C:\Users\robby\Projects\ClaimGuard`.
+- Confirm the selected agent and phase boundary.
+- Identify whether the task touches docs/config, UI, analyzer/parser/scoring/report/privacy logic, fixtures, dependencies, or release/deploy workflow.
+- Confirm private evidence is not being introduced.
+
+## Stop And Report Conditions
+
+Stop and report before continuing when:
+
+- The active path is not `C:\Users\robby\Projects\ClaimGuard`.
+- Work appears to be in a OneDrive duplicate or outdated checkout.
+- Dirty mixed work makes the current task scope unclear.
+- Unexpected app-code, analyzer, parser, scoring, report, privacy, fixture, package, script, or upload-mechanics diffs appear.
+- Real customer evidence, private customer data, raw OCR, copied private JSON, or credentials appear in files or logs.
+- Unsafe wrongdoing-confirming language, customer-accusation language, or automatic-denial language appears.
+- Phase 2 implementation appears before Robert explicitly opens Phase 2.
+- A required check fails or cannot run.
+
+## Check Guidance
+
+Docs/config-only:
+
+- `git diff --check`
+- `npm.cmd run check:report-semantics` when safety wording might matter
+
+Analyzer/parser/scoring/report/privacy/fixture changes:
+
+- `npm.cmd run lint`
+- `npm.cmd run build`
+- `npm.cmd run check:report-semantics`
+- Targeted synthetic fixture or manual QA checks
+
+UI changes:
+
+- `npm.cmd run lint`
+- `npm.cmd run build`
+- Browser check affected routes when practical
+
+Release/deploy work:
+
+- `git status --short --branch` before and after
+- Confirm exact branch and commit
+- Run relevant checks for changed areas
+- Perform or document production smoke only when deploy is explicitly requested
+
+## Source Safety
+
+Committed fixtures must be synthetic or structurally redacted. Real customer receipts, photos, ticket content, order details, customer messages, and copied private JSON must not be committed.
+
+Preserve ClaimGuard semantics: evidence scores measure local evidence quality and internal consistency, not externally confirmed truth.

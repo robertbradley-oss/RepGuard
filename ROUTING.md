@@ -1,99 +1,120 @@
 # ClaimGuard Routing Guide
 
-Use this quick guide before starting any ClaimGuard task.
+Use this compact guide before starting any ClaimGuard task. `AGENTS.md` is the full role source of truth, `ROADMAP.md` defines durable phases, and `NEXT_STEPS.md` defines the immediate operating queue.
 
-ClaimGuard is in Phase 1: Receipt Authenticity Analyzer. If a request is ambiguous, choose the most conservative Phase 1 agent and do not expand scope.
+Routing means supervised delegation. The Main ClaimGuard Agent classifies the task, chooses the best specialized agent, defines scope, delegates the work, reviews the result critically, and owns the final handoff.
 
 ## Required Routing Pattern
 
 Before doing work, Codex must:
 
 1. Read Robert's request.
-2. Select the best primary agent.
-3. Mention the selected agent and why.
-4. Note any secondary agents whose concerns matter.
-5. Stay within the selected agent's scope.
-6. Complete the task.
-7. End with the expanded CLAIMGUARD HANDOFF from `AGENTS.md`.
+2. Confirm the current phase and whether the task is planning, docs/config, implementation, QA, or release work.
+3. Select exactly one primary agent.
+4. Mention the selected agent and why.
+5. Note secondary agent concerns.
+6. Define what is in scope and out of scope.
+7. Delegate the work to the selected specialized agent role.
+8. Challenge shallow work, unsafe wording, generic UI choices, phase drift, weak assumptions, or incomplete checks.
+9. Require another pass when quality is not strong enough.
+10. Run checks that match the changed files.
+11. End with the expanded CLAIMGUARD HANDOFF from `AGENTS.md`.
 
-If a task touches multiple areas, choose one primary agent, mention secondary considerations, and avoid trying to do everything at once.
+If a request is ambiguous, preserve the shipped receipt module, avoid starting a new phase, and choose planning before implementation.
 
-## Agent Roles
+## Orchestrator Quality Bar
 
-- Phase 1 Implementation Agent: Builds the receipt analyzer and test harness into a reliable working engine. Handles OCR/PDF work, analyzer pipeline improvements, parsing, score breakdowns, fake fixtures, `/test-evidence`, and small high-value Phase 1 improvements.
-- Scoring & Safety Reviewer Agent: Makes sure ClaimGuard never overclaims and that scores mean internal consistency/evidence reliability, not verified truth. Handles risk semantics, verification wording, manual-review language, report interpretation, and accusation prevention.
-- Real Receipt QA & Tuning Agent: Turns anonymized real receipt observations into better analyzer behavior. Handles tuning exports, false positives/false negatives, threshold recommendations, OCR-vs-signal interpretation, and privacy-safe QA workflows.
-- Source Classification Agent: Makes ClaimGuard correctly identify receipt source/type before scoring. Handles Amazon app screenshots, Amazon PDFs/order details, Amazon invoice/detail pages, iSpring direct invoices, Lowe's email/order screenshots, generic receipts, unknown classification, and source-specific parsed-field summaries.
-- Privacy & Evidence Safety Agent: Prevents private customer data from leaking into code, exports, prompts, logs, or committed files. Handles redaction, safe JSON exports, tuning observation exports, raw OCR safety, privacy checklists, and fixture contamination prevention.
-- Architecture & Maintainability Agent: Keeps ClaimGuard modular and future-ready without overbuilding. Handles analyzer boundaries, TypeScript cleanup, future OpenAI Vision/AWS Textract/Google Vision readiness, server-side OCR route planning, and technical debt reduction.
-- UI/Product Workflow Agent: Improves usability and support-rep workflow without drifting into visual redesign. Handles upload flow clarity, report readability, `/test-evidence` usability, evidence-review workflow, support-safe decision flow, and cognitive-load reduction. Use only when Robert explicitly asks for UI/product flow work.
-- Product Strategy / Roadmap Agent: Keeps ClaimGuard on the right phase and prevents scope creep. Handles roadmap discipline, phase placement, prioritization, plugin/tool timing, moat protection, and deferral decisions.
+The Main ClaimGuard Agent must ensure each specialist operates at a senior/expert level:
 
-## Which Agent Handles Which Task
+- Product Strategy protects the broader fraud intelligence vision.
+- UI/Product Workflow protects evidence-first workflows and avoids generic SaaS patterns.
+- Architecture & Maintainability prevents hacky one-offs.
+- Scoring & Safety prevents overclaiming and unsafe wrongdoing language.
+- Privacy & Evidence Safety prevents evidence leakage.
+- Receipt Intelligence maintains receipt quality without making receipts the whole product.
+- Photo Evidence and Case Workflow remain planning-only until their phases are explicitly opened.
+- QA Harness requires meaningful verification.
+- Deployment & Release enforces clean commits, checks, deployment discipline, and smoke testing.
 
-- "Fix the score overclaiming authenticity" -> Scoring & Safety Reviewer Agent
-- "Improve Amazon order parsing" -> Source Classification Agent
-- "Make copied JSON safer" -> Privacy & Evidence Safety Agent
-- "Clean up analyzer module structure" -> Architecture & Maintainability Agent
-- "Improve /test-evidence upload usability" -> UI/Product Workflow Agent
-- "Analyze real receipt tuning observations" -> Real Receipt QA & Tuning Agent
-- "What phase does AI image detection belong in?" -> Product Strategy / Roadmap Agent
-- "Add OCR confidence labels" -> Phase 1 Implementation Agent
-- "Add iSpring receipt source summary" -> Source Classification Agent
-- "Recommend next ClaimGuard task" -> Product Strategy / Roadmap Agent
-- "Create fake PDF fixtures for Lowe's testing" -> Phase 1 Implementation Agent
-- "Review whether clean synthetic receipts should score 94" -> Scoring & Safety Reviewer Agent
-- "Prevent full order IDs from copied output" -> Privacy & Evidence Safety Agent
-- "Prepare analyzer for future Textract" -> Architecture & Maintainability Agent
-- "Make the report easier for support reps to scan" -> UI/Product Workflow Agent
+Before accepting delegated work, the Main ClaimGuard Agent must ask: what could go wrong, what phase boundary could this cross, what safety/privacy/product risk exists, and what would a stricter reviewer object to?
 
-## Phase Boundaries
+## Secondary Review Triggers
 
-- Phase 1: Receipt upload, OCR extraction, PDF handling, receipt parsing, source classification, Amazon/iSpring/Lowe's validation, metadata/image-quality heuristics, Evidence Reliability Score, score breakdown, `/test-evidence`, Real Receipt QA, privacy-safe tuning observations, and customer-safe report wording.
-- Phase 2: Product damage photo analysis and AI-generated/altered image detection.
-- Phase 3: Case review workflow.
-- Phase 4: Stronger AI/OCR integrations.
-- Phase 5: Ticket and email integrations.
-- Phase 6: SaaS platform.
-- Phase 7: Enterprise fraud intelligence.
+- UI changes: consider UI/Product Workflow, Architecture & Maintainability, and Scoring & Safety if wording changes.
+- Analyzer/scoring changes: consider Receipt Intelligence, Scoring & Safety, Privacy & Evidence Safety, and QA Harness.
+- Export/log/fixture changes: consider Privacy & Evidence Safety and QA Harness.
+- Deploy/push/release tasks: consider Deployment & Release.
+- Phase transition tasks: consider Product Strategy, Privacy & Evidence Safety, Scoring & Safety, QA Harness, and Deployment & Release.
 
-Phase 1 is not about auth, billing, enterprise dashboards, marketing pages, ticket integrations, Gmail/Zendesk/Freshdesk, full product-damage AI image detection, or server-side OCR unless Robert explicitly approves that scope.
+## Stop Conditions
 
-## Safe Language Rules
+Stop and report instead of forcing progress when the repo path is wrong, a OneDrive duplicate is active, mixed dirty work makes scope unclear, unexpected app-code or analyzer/parser/scoring/report/privacy diffs appear, upload mechanics are touched out of scope, real customer evidence or raw OCR appears, unsafe wrongdoing-confirming language appears, Phase 2 implementation appears before approval, or required checks cannot be completed.
 
-Prefer:
+## Definition Of Done Summary
 
-- "Evidence Reliability Score"
-- "Receipt Reliability Score"
-- "Internal consistency"
-- "Verification Status: Not externally verified"
-- "External Verification: Not performed"
-- "Potential alteration indicators"
-- "Manual review recommended"
-- "Receipt details could not be fully verified"
-- "Findings are inconclusive"
-- "Additional proof of purchase may be needed"
+- UI polish: preserve evidence-first workflow, upload mechanics, customer-safe wording, and run UI checks when code changes.
+- Analyzer/receipt work: separate parser/source/scoring/report/privacy impacts and verify with lint, build, report-semantics, and targeted QA.
+- Docs/config work: change only approved docs/config files, run `git diff --check`, and run report-semantics when safety wording might matter.
+- Deploy/release work: require Robert approval, clean status awareness, relevant checks, and smoke/rollback notes.
+- QA/test-evidence work: use synthetic or redacted fixtures, preserve privacy, and distinguish fixture coverage from real verification.
 
-Avoid:
+## Handoff Quality Gate
 
-- Claims that a receipt is proven genuine
-- Definitive real/not-real labels
-- Confirmed wrongdoing language
-- Customer-accusation language
-- Automatic denial language
+The Main ClaimGuard Agent should request another pass when a handoff is vague, misses changed files, ignores forbidden scope, omits checks, overclaims safety, fails to state analyzer or phase impact, or does not recommend the next safest task.
+
+## Agent Selection Table
+
+| Request type | Primary agent |
+| --- | --- |
+| Product vision, phase placement, prioritization, roadmap discipline | Product Strategy Agent |
+| Upload workflow clarity, report scanability, evidence workspace usability | UI/Product Workflow Agent |
+| Module boundaries, TypeScript structure, provider-neutral planning, technical debt | Architecture & Maintainability Agent |
+| Score meaning, verification wording, manual-review language, overclaim prevention | Scoring & Safety Reviewer Agent |
+| Redaction, exports, evidence handling, fixture contamination, privacy review | Privacy & Evidence Safety Agent |
+| Receipt OCR/PDF, parsing, source classification, receipt fixtures, receipt module maintenance | Receipt Intelligence Agent |
+| Product photo evidence requirements, image-risk planning, Phase 2 readiness | Photo Evidence / Phase 2 Readiness Agent |
+| Case queue/detail planning, review status lifecycle, audit history, Phase 3 readiness | Case Workflow / Phase 3 Readiness Agent |
+| `/test-evidence`, synthetic fixtures, check scripts, manual QA workflow | QA Harness Agent |
+| Branch, commit, deploy, production smoke, release checklist | Deployment & Release Agent |
+| OCR/AI, ticket, email, drive, database, auth, Vercel integration planning | Integration Readiness Agent |
+| Cross-case intelligence, enterprise signal taxonomy, long-term fraud-risk platform planning | Enterprise Fraud Intelligence Agent |
+
+## Quick Examples
+
+- "Where does photo damage analysis belong?" -> Product Strategy Agent, with Photo Evidence secondary.
+- "Plan Phase 2 image evidence requirements" -> Photo Evidence / Phase 2 Readiness Agent.
+- "Improve Amazon receipt parsing" -> Receipt Intelligence Agent.
+- "Make copied JSON safer" -> Privacy & Evidence Safety Agent.
+- "Fix score wording that sounds too certain" -> Scoring & Safety Reviewer Agent.
+- "Clean up analyzer module boundaries" -> Architecture & Maintainability Agent.
+- "Make the evidence workspace easier to scan" -> UI/Product Workflow Agent.
+- "Add manual QA coverage for a synthetic fixture" -> QA Harness Agent.
+- "Prepare a deployment checklist" -> Deployment & Release Agent.
+- "Plan Zendesk or Gmail data flow" -> Integration Readiness Agent.
+- "Think through cross-case merchant-risk signals" -> Enterprise Fraud Intelligence Agent.
+
+## Phase Gates
+
+- Phase 1 receipt intelligence is closed, deployed, and production-smoked.
+- Phase 2 has not started. Photo evidence work is planning-only unless Robert explicitly opens implementation.
+- Phase 3 case workflow is planning-only unless Robert explicitly opens implementation.
+- Phase 4 and Phase 5 integrations are planning-only unless Robert explicitly approves real services.
+- Phase 6 SaaS platform and Phase 7 enterprise intelligence are strategy/planning only.
 
 ## Global Guardrails
 
-- Never claim fraud is confirmed.
+- Never claim wrongdoing is confirmed.
 - Never accuse customers.
-- Never imply local Phase 1 analysis proves a receipt is real.
-- Do not store or commit real customer receipts.
-- Keep real receipt work browser-local and privacy-safe.
-- Use fake data only for committed fixtures.
-- Do not add new product areas unless explicitly requested.
-- Do not redesign the main app unless explicitly asked.
-- Keep OCR, parsing, source classification, scoring, reporting, and UI modular.
+- Never imply local analysis proves evidence truth.
+- Never recommend automatic denial.
+- Do not store or commit real customer evidence.
+- Keep real evidence browser-local unless Robert explicitly approves a different workflow.
+- Use synthetic data only for committed fixtures.
+- Do not connect real AI, OCR, Gmail, Drive, ticket systems, databases, auth, Vercel APIs, or payment systems unless explicitly approved.
+- Do not modify analyzer/parser/scoring/report/privacy/upload/UI areas unless the selected task explicitly authorizes that scope.
 
-## Handoff Requirement
+## Command Guidance
 
-Every completed task must end with the expanded CLAIMGUARD HANDOFF from `AGENTS.md`, including selected agent, secondary concerns, files changed, checks run, privacy/safety notes, risks, unfinished work, recommended next task, suggested next prompt, and files the next agent should inspect first.
+Direct `/claimguardagent` tasks are executed immediately in the current thread and are not added to `AGENT_INBOX.md`.
+
+Queued future requests can go in `AGENT_INBOX.md`, but each request should be small enough for one focused agent pass.
