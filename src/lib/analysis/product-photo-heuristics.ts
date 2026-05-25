@@ -1,5 +1,7 @@
 import type {
   DamageVisibilityStatus,
+  EvidenceMetadataSummary,
+  PhotoReviewCompleteness,
   ProductContextStatus,
   ProductPhotoSubjectType,
   RequestedPhotoView,
@@ -68,10 +70,73 @@ export type ProductPhotoSignalInput = {
   evidenceSource?: string;
 };
 
+export type ProductPhotoFileSummaryInput = {
+  metadataSummary?: EvidenceMetadataSummary;
+  fileTypeCategory?: EvidenceMetadataSummary["fileTypeCategory"];
+  fileSizeBucket?: EvidenceMetadataSummary["fileSizeBucket"];
+  dimensionsPresent?: boolean;
+  dimensionsBucket?: EvidenceMetadataSummary["dimensionsBucket"];
+  metadataContext?: EvidenceMetadataSummary["metadataContext"];
+  qualityLimits?: string[];
+};
+
+export type ProductPhotoFileSummary = {
+  fileTypeCategory: EvidenceMetadataSummary["fileTypeCategory"];
+  fileSizeBucket: EvidenceMetadataSummary["fileSizeBucket"];
+  dimensionsPresent: boolean;
+  dimensionsBucket: NonNullable<EvidenceMetadataSummary["dimensionsBucket"]>;
+  metadataContext: EvidenceMetadataSummary["metadataContext"];
+  qualityLimits: string[];
+  summary: ProductPhotoSafeReviewLabel;
+};
+
+export type ProductPhotoReviewCompletenessInput = {
+  subjectType?: ProductPhotoSubjectType;
+  requestedAdditionalViews?: RequestedPhotoView[];
+  missingContext?: RequestedPhotoView[];
+  productContext?: ProductContextStatus;
+  purchaseOrReceiptMatchNeeded?: boolean;
+};
+
+export type ProductPhotoLocalReviewSignalInput = {
+  fileSummary?: ProductPhotoFileSummary | ProductPhotoFileSummaryInput;
+  reviewCompleteness?: PhotoReviewCompleteness | ProductPhotoReviewCompletenessInput;
+  includeManualReviewRecommendation?: boolean;
+};
+
 const PRODUCT_PHOTO_LOCAL_EVIDENCE_SOURCE = "Local-only product-photo review signal";
 
 function normalizeProductPhotoSignalConfidence(confidence: number) {
   return Math.max(0, Math.min(100, Math.round(confidence)));
+}
+
+function uniqueRequestedPhotoViews(views: RequestedPhotoView[]) {
+  return Array.from(new Set(views));
+}
+
+function hasPhotoReviewCompletenessShape(
+  input: PhotoReviewCompleteness | ProductPhotoReviewCompletenessInput,
+): input is PhotoReviewCompleteness {
+  return "status" in input && "missingContext" in input && "summary" in input;
+}
+
+function hasProductPhotoFileSummaryShape(
+  input: ProductPhotoFileSummary | ProductPhotoFileSummaryInput,
+): input is ProductPhotoFileSummary {
+  return "summary" in input && "qualityLimits" in input && "metadataContext" in input;
+}
+
+function uniqueProductPhotoSignals(signals: SharedEvidenceSignal[]) {
+  const seen = new Set<string>();
+
+  return signals.filter((signal) => {
+    if (seen.has(signal.id)) {
+      return false;
+    }
+
+    seen.add(signal.id);
+    return true;
+  });
 }
 
 export function buildProductPhotoSignal(input: ProductPhotoSignalInput): SharedEvidenceSignal {
@@ -229,4 +294,136 @@ export function buildManualReviewRecommendedSignal(
       input.recommendation ??
       "Have a reviewer inspect the photo evidence and decide the next support step.",
   });
+}
+
+export function buildProductPhotoFileSummary(
+  input: ProductPhotoFileSummaryInput = {},
+): ProductPhotoFileSummary {
+  const metadataSummary = input.metadataSummary;
+  const fileTypeCategory = input.fileTypeCategory ?? metadataSummary?.fileTypeCategory ?? "unknown";
+  const fileSizeBucket = input.fileSizeBucket ?? metadataSummary?.fileSizeBucket ?? "unknown";
+  const dimensionsPresent = input.dimensionsPresent ?? metadataSummary?.dimensionsPresent ?? false;
+  const dimensionsBucket = input.dimensionsBucket ?? metadataSummary?.dimensionsBucket ?? "unknown";
+  const metadataContext = input.metadataContext ?? metadataSummary?.metadataContext ?? "Unavailable";
+  const qualityLimits = input.qualityLimits ? [...input.qualityLimits] : [];
+
+  if (!dimensionsPresent) {
+    qualityLimits.push("photo dimensions unavailable");
+  }
+
+  if (dimensionsBucket === "small") {
+    qualityLimits.push("photo dimensions may limit review");
+  }
+
+  if (fileSizeBucket === "tiny" || fileSizeBucket === "small") {
+    qualityLimits.push("file size may limit review");
+  }
+
+  if (fileTypeCategory !== "image" && fileTypeCategory !== "screenshot") {
+    qualityLimits.push("file context needs manual review");
+  }
+
+  const summary: ProductPhotoSafeReviewLabel =
+    qualityLimits.length > 0
+      ? "photo quality limits review"
+      : metadataContext === "Available"
+        ? "local-only review signal"
+        : "metadata context limited";
+
+  return {
+    fileTypeCategory,
+    fileSizeBucket,
+    dimensionsPresent,
+    dimensionsBucket,
+    metadataContext,
+    qualityLimits: Array.from(new Set(qualityLimits)),
+    summary,
+  };
+}
+
+export function buildProductPhotoFileSummarySignals(
+  input: ProductPhotoFileSummary | ProductPhotoFileSummaryInput = {},
+): SharedEvidenceSignal[] {
+  const fileSummary = hasProductPhotoFileSummaryShape(input) ? input : buildProductPhotoFileSummary(input);
+  const signals: SharedEvidenceSignal[] = [];
+
+  if (fileSummary.qualityLimits.length > 0) {
+    signals.push(
+      buildPhotoQualityLimitsReviewSignal({
+        explanation:
+          "File summary suggests photo quality limits review. This local-only review signal supports manual review only.",
+        recommendation:
+          "Request a clearer product photo if the current file summary does not provide enough review-ready context.",
+      }),
+    );
+  }
+
+  if (fileSummary.metadataContext !== "Available") {
+    signals.push(buildMetadataContextLimitedSignal());
+  }
+
+  return uniqueProductPhotoSignals(signals);
+}
+
+export function buildProductPhotoReviewCompleteness(
+  input: ProductPhotoReviewCompletenessInput = {},
+): PhotoReviewCompleteness {
+  const requestedAdditionalViews =
+    input.requestedAdditionalViews ?? PRODUCT_PHOTO_COMPLETENESS_DEFAULTS.requestedAdditionalViews;
+  const defaultMissingContext =
+    input.productContext === "complete" && !input.purchaseOrReceiptMatchNeeded
+      ? []
+      : requestedAdditionalViews;
+  const missingContext = uniqueRequestedPhotoViews(input.missingContext ?? defaultMissingContext);
+  const status: PhotoReviewCompleteness["status"] =
+    missingContext.length === 0 ? "complete" : missingContext.length === 1 ? "partial" : "inconclusive";
+  const summary: ProductPhotoSafeReviewLabel =
+    status === "complete"
+      ? "local-only review signal"
+      : missingContext.includes("wider-product-photo")
+        ? "product context incomplete"
+        : "requested view incomplete";
+
+  return {
+    status,
+    missingContext,
+    summary,
+  };
+}
+
+export function buildProductPhotoReviewCompletenessSignals(
+  input: PhotoReviewCompleteness | ProductPhotoReviewCompletenessInput = {},
+): SharedEvidenceSignal[] {
+  const reviewCompleteness = hasPhotoReviewCompletenessShape(input)
+    ? input
+    : buildProductPhotoReviewCompleteness(input);
+  const signals = reviewCompleteness.missingContext.map((requestedView) =>
+    buildRequestedViewIncompleteSignal(requestedView),
+  );
+
+  if (reviewCompleteness.missingContext.includes("wider-product-photo")) {
+    signals.push(buildProductContextIncompleteSignal());
+  }
+
+  if (reviewCompleteness.status === "inconclusive") {
+    signals.push(buildFindingsInconclusiveSignal());
+  }
+
+  return uniqueProductPhotoSignals(signals);
+}
+
+export function buildProductPhotoLocalReviewSignals(
+  input: ProductPhotoLocalReviewSignalInput = {},
+): SharedEvidenceSignal[] {
+  const signals = [
+    ...buildProductPhotoFileSummarySignals(input.fileSummary),
+    ...buildProductPhotoReviewCompletenessSignals(input.reviewCompleteness),
+  ];
+  const shouldRecommendManualReview = input.includeManualReviewRecommendation ?? signals.length > 0;
+
+  if (shouldRecommendManualReview) {
+    signals.push(buildManualReviewRecommendedSignal());
+  }
+
+  return uniqueProductPhotoSignals(signals);
 }
