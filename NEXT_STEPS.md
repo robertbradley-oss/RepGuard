@@ -8,20 +8,20 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 
 - Phase 1 Receipt Intelligence is closed, pushed, deployed, and production-smoked.
 - Post-Phase-1 evidence workspace polish is live from commit `19ef25e`.
-- Phase 2.0 implementation has officially started.
-- Current Phase 2.0 state is scaffold-only, local-heuristics-only, provider-ready, and intentionally unwired.
+- Phase 2.0 scaffold work is closed.
+- Phase 2.1 has officially started as Product Photo Local Heuristic Design.
+- Current Phase 2.1 state is documentation/planning-only, local-only, manual-review-safe, provider-ready, and intentionally unwired.
 - Shared evidence model types and product-photo scaffold/defaults exist.
 - No product-photo analyzer behavior is live yet.
-- No runtime analyzer, upload, UI, report, scoring, parser, or fixture behavior changed during the overnight Phase 2 scaffold.
+- No runtime analyzer, upload, UI, report, scoring, parser, or fixture behavior changed during Phase 2.0 or Phase 2.1 planning.
 - `product-photo` is canonical.
 - `damage-photo` remains only a compatibility alias to `product-photo` / `damage-close-up`.
-- Do not start Phase 2.1 until Robert/ChatGPT explicitly confirms the scaffold review is complete.
 
 ## Next Safe Tasks
 
-1. Review the Phase 2.0 scaffold commits for module boundaries and safety wording.
-2. Confirm the scaffold remains unwired from runtime analyzer, upload, UI, report, scoring, parser, and fixture behavior.
-3. Decide whether the next Phase 2 daytime task should stay scaffold-only or move into local heuristic design.
+1. Complete the Phase 2.1 first-pass product-photo heuristic signal design in `PHASE_2_PHOTO_EVIDENCE_PLAN.md`.
+2. Review the proposed Phase 2.2 implementation order before any runtime or routing work begins.
+3. Confirm the product-photo scaffold remains unwired from runtime analyzer, upload, UI, report, scoring, parser, and fixture behavior.
 4. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
 5. Preserve a clean operational queue after each completed agent task.
 
@@ -39,5 +39,5 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent review the Phase 2.0 scaffold commits for safety and module boundaries only; do not make runtime, UI, upload, analyzer, scoring, parser, report, or fixture changes
+/claimguardagent review the Phase 2.1 product-photo local heuristic design for safety, privacy, and Phase 2.2 implementation order only; do not make runtime, UI, upload, analyzer, scoring, parser, report, or fixture changes
 ```

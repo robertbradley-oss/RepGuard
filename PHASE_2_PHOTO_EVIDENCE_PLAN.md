@@ -1,8 +1,8 @@
 # Phase 2 Photo Evidence Plan
 
-This document defines Phase 2 before implementation. It is planning guidance only.
+This document defines Phase 2 before runtime implementation. It is planning guidance only.
 
-Phase 1 Receipt Intelligence is closed, pushed, deployed, and production-smoked. Phase 2 has not started. Robert must explicitly open Phase 2 implementation before app code, analyzer logic, fixtures, upload behavior, provider integrations, or UI behavior changes are made.
+Phase 1 Receipt Intelligence is closed, pushed, deployed, and production-smoked. Phase 2.0 scaffold work is closed. Phase 2.1 has officially started as Product Photo Local Heuristic Design, limited to local-only, manual-review-safe signal design. Phase 2.1 does not change app code, analyzer logic, fixtures, upload behavior, provider integrations, scoring, report mapping, or UI behavior.
 
 ClaimGuard is a fraud-risk screening and evidence intelligence platform for support and warranty teams. Receipt analysis is one evidence module inside that broader system. Phase 2 should add photo evidence readiness without turning ClaimGuard into a toy image checker, a generic AI chatbot, a generic SaaS dashboard, or an automatic decision system.
 
@@ -22,7 +22,7 @@ Phase 2 should help answer:
 - Are there local image-quality, context, metadata, or consistency signals that should guide the next review step?
 - What additional photo or proof-of-purchase detail should support request when the current evidence is inconclusive?
 
-Phase 2 must not claim that a customer caused damage, altered an image, submitted invalid evidence, or should receive an automatic outcome.
+Phase 2 must not claim customer intent, decide whether evidence is true, or create an automatic outcome.
 
 Initial Phase 2 emphasis:
 
@@ -41,13 +41,13 @@ Phase 2 is:
 - A photo evidence planning and implementation phase after Robert explicitly opens implementation.
 - A product-damage photo evidence module.
 - A local evidence-quality and context review layer.
-- A way to categorize review-support signals for damage visibility, product context, image quality, and image consistency.
+- A way to categorize review-support signals for damage visibility, product context, image quality, and image consistency uncertainty.
 - A step toward a shared evidence model that can support receipts, screenshots, PDFs, photos, and future evidence types.
 - A manual-review support tool with safe customer language.
 
 Phase 2 is not:
 
-- A real AI vision integration unless Robert separately approves that work.
+- A real AI vision integration unless Robert separately opens that work.
 - A third-party evidence upload workflow.
 - A final authenticity or wrongdoing determination.
 - A replacement for support policy or human review.
@@ -72,7 +72,7 @@ Evidence subject:
 Priority notes:
 
 - Start with damage close-up review because it is the core warranty/support damage evidence path.
-- Require full product context as the grounding companion because a close-up alone can be misleading or incomplete.
+- Require full product context as the grounding companion because a close-up alone can be incomplete.
 - Add serial/model labels after the core close-up/context path because label review is closer to verification and OCR.
 - Add packaging damage after serial/model labels because it is more of a shipping or carrier evidence path.
 - Add installation context later because it can require product knowledge, plumbing context, support troubleshooting rules, or policy-specific interpretation.
@@ -118,7 +118,7 @@ Preferred signal labels:
 - Wider product photo recommended.
 - Serial or model context needed.
 - Packaging context may be useful.
-- Image consistency needs manual review.
+- Image consistency uncertainty needs manual review.
 - Metadata context is limited.
 - Findings are inconclusive from current photo.
 - Manual review recommended.
@@ -140,23 +140,17 @@ Avoid wording that accuses the customer, treats local signals as proof, or impli
 
 Do not say:
 
-- The customer altered the photo.
 - The image proves the damage is real.
 - The image proves the damage is not real.
-- The claim should be rejected.
-- The customer submitted misleading evidence.
 - The evidence is definitively valid or invalid.
-- AI detected manipulation.
-- The photo is externally verified.
+- The photo received a final external evidence determination.
 - The customer caused the damage.
-- The claim is approved or rejected based on photo analysis.
+- The claim outcome is decided based on photo analysis.
 
 Avoid strong labels unless they are carefully framed:
 
-- Do not use "manipulated image" as a final label.
-- Do not use "AI-generated image" as a final label.
-- Do not use "tampered photo" as a final label.
-- Use "image consistency signal," "potential editing indicator," or "manual review recommended" when the evidence only supports further review.
+- Do not use final evidence-origin labels from local signals.
+- Use "image consistency uncertainty," "additional context needed," or "manual review recommended" when the evidence only supports further review.
 
 ## 6. Customer-Safe Support Language Rules
 
@@ -208,9 +202,9 @@ GPS handling:
 
 - GPS presence can be noted for privacy review.
 - Raw coordinates must be omitted from copied summaries and fixtures.
-- If GPS is ever needed for a future approved workflow, it requires a separate privacy and retention decision.
+- If GPS is ever needed for a future explicitly opened workflow, it requires a separate privacy and retention decision.
 
-## 8. Image-Quality And Manipulation-Signal Categories
+## 8. Image-Quality And Consistency-Uncertainty Categories
 
 Phase 2 should separate quality limits from image consistency signals. Poor quality is often just poor quality; it must not be treated as evidence of wrongdoing.
 
@@ -245,33 +239,33 @@ Image consistency categories:
 - Edge inconsistency needing review.
 - Compression mismatch needing review.
 - Local texture inconsistency needing review.
-- Duplicate or reused-looking photo needing future review.
+- Duplicate or reuse context needing future review.
 - Screenshot-of-photo context needing review.
 - Metadata and visual context mismatch needing review.
 
 Important distinction:
 
 - Quality limits support clearer-photo requests.
-- Consistency signals support manual review.
-- Neither category proves the image was edited or that the claim outcome is determined.
+- Consistency-uncertainty signals support manual review.
+- Neither category proves evidence truth or determines the claim outcome.
 
-## 9. AI-Generated-Image Uncertainty Rules
+## 9. Provider-Dependent Image-Origin Uncertainty Rules
 
-Phase 2 may plan for AI-generated-image uncertainty, but implementation must wait until Robert explicitly opens it and approves any provider or local model.
+Phase 2 may plan for image-origin uncertainty, but implementation must wait until Robert explicitly opens provider or local-model support.
 
 Rules:
 
-- Do not claim an image is AI-generated from local heuristics alone.
-- Do not expose an "AI-generated" verdict to support reps unless the underlying evidence and policy are approved.
-- Use "image-generation uncertainty signal" only as internal review-support wording.
-- Require multiple supporting signals before surfacing any AI-image concern.
+- Do not make image-origin determinations from local heuristics alone.
+- Do not expose categorical image-origin conclusions to support reps unless the underlying evidence and policy are explicitly opened.
+- Use "image-origin uncertainty signal" only as internal review-support wording.
+- Require multiple supporting signals before surfacing any image-origin concern.
 - Prefer "manual review recommended" over categorical labels.
 - Keep customer-facing language neutral and focused on requesting clearer or additional product context.
-- Treat AI-image signals as low-confidence unless validated by approved tooling and QA evidence.
+- Treat image-origin signals as low-confidence unless validated by explicitly opened tooling and QA evidence.
 
 Safe internal wording:
 
-- "Image-generation uncertainty signal."
+- "Image-origin uncertainty signal."
 - "Visual consistency needs manual review."
 - "Photo context is insufficient to assess from current image."
 - "Additional photo evidence may be needed."
@@ -284,7 +278,7 @@ Future possibilities:
 
 - Compare submitted image against other evidence in the same case.
 - Compare near-duplicates across uploads within a browser-local session.
-- Track perceptual hash summaries if a privacy model is approved.
+- Track perceptual hash summaries if a privacy model is explicitly opened.
 - Detect repeated product photos across claims only after platform, retention, privacy, and legal review.
 
 Do not build yet:
@@ -331,7 +325,7 @@ Evidence-specific modules should populate module sections:
 Shared model rules:
 
 - The top-level score remains evidence reliability and review readiness, not proof.
-- `External Verification: Not performed` remains the default until an approved integration changes it.
+- `External Verification: Not performed` remains the default until an explicitly opened integration changes it.
 - Receipt-specific fields must not be required for photo evidence.
 - Photo-specific fields must not change receipt scoring by accident.
 - Shared signal categories should be broad enough for future case review without forcing Phase 3 implementation.
@@ -436,7 +430,7 @@ Preferred observation shape:
     "meaning": "Score reflects photo review readiness and local evidence quality only."
   },
   "verification": {
-    "status": "Not externally verified",
+    "status": "Local analysis only",
     "externalVerification": "Not performed"
   }
 }
@@ -474,43 +468,58 @@ Recommendation output should include:
 - What single additional evidence item would help most.
 - Whether proof-of-purchase matching is still needed.
 - Whether metadata is only context.
-- Whether the result is local-only and not externally verified.
+- Whether the result is local-only and external verification was not performed.
 
-## 16. Phase 2 Implementation Prerequisites
+## 16. Phase 2 Runtime Implementation Prerequisites
 
-Before Robert opens Phase 2 implementation, the project should have:
+Before Robert opens Phase 2 runtime implementation, the project should have:
 
-- Robert approval to begin Phase 2 implementation.
-- A reviewed shared evidence model plan.
 - Clear separation between receipt analysis and photo evidence analysis.
 - A product-photo signal taxonomy.
 - A photo privacy and EXIF handling policy.
 - A privacy-safe photo observation format.
-- Synthetic fixture categories approved.
+- Synthetic fixture categories explicitly opened.
 - Manual QA expectations for photo evidence.
 - Customer-safe support copy patterns.
-- A decision on whether Phase 2 is local-heuristics-only or provider-readiness-only.
-- Explicit confirmation that no AI/vision provider will be connected unless separately approved.
+- A decision on whether the next slice is local-heuristics-only or provider-readiness-only.
+- Explicit confirmation that no AI/vision provider will be connected unless separately opened.
 - A rollback-safe implementation order.
 
-## 17. First Implementation Tasks After Robert Explicitly Opens Phase 2
+## 17. Phase 2.1 First-Pass Local Heuristic Signals
 
-When Robert explicitly opens Phase 2 implementation, the first safe implementation tasks should be:
+Phase 2.1 starts with a small signal catalog only. These signals are manual-review support language and future implementation guidance; they do not run in `analyzeEvidenceFile`, do not change `LocalAnalysisResult`, do not affect scoring, and do not change upload, UI, report mapping, fixtures, receipt parsing, metadata extraction behavior, routing, storage, integrations, or case queues.
 
-1. Add shared evidence model types without changing receipt behavior.
-2. Add product-photo planning-only types for damage close-up and full product context without running provider analysis.
-3. Extract shared UI/result concepts from receipt-specific fields where needed.
-4. Add synthetic photo fixture scaffolding for damage close-ups and full product context companion photos.
-5. Add privacy-safe photo observation export shape.
-6. Add manual QA documentation for photo fixtures.
-7. Add local image-quality-only photo signals for damage close-ups if approved.
-8. Add photo customer-safe response patterns that request a wider product context image when needed.
-9. Add serial/model label planning after the close-up/context path is stable.
-10. Run lint, build, report-semantics, and manual route checks for affected surfaces.
+| Signal category | What it can safely mean | What it must not claim | Suggested safe wording | Later implementation readiness |
+| --- | --- | --- | --- | --- |
+| Photo quality limits review | File-level or visual-quality context may make manual inspection harder. | It must not decide evidence truth, customer intent, policy disposition, or claim outcome. | "Photo quality limits review. A clearer image may be needed before support can complete the case." | Local later: dimensions, file size bucket, format support, compression summary, contrast/lighting heuristics if validated. |
+| Product context incomplete | The current image may not show enough surrounding product context to place the close-up. | It must not conclude the submitted image is unreliable or that the customer withheld context. | "Product context is incomplete. Request a wider product photo showing the damaged area and surrounding product." | Local later: subject type, requested companion view state, crop/aspect heuristics, manual reviewer-selected category. |
+| Requested view missing or incomplete | The current evidence set is missing a view needed for review, such as wider product, clearer close-up, label, packaging, installation context, or proof-of-purchase match. | It must not create a pass/fail outcome or imply the current photo alone decides the case. | "Additional view may be needed. Request the single next photo or proof detail that would help review most." | Local later: requested view defaults and completeness aggregation from declared evidence type; multi-file set logic should wait until evidence grouping exists. |
+| Damage visibility unclear | The current photo does not provide enough review-ready detail about the relevant area. | It must not state whether damage exists, whether damage is absent, or who caused it. | "Damage visibility is unclear from the current photo. A clearer close-up may be needed." | Local later only as an inconclusive/default review state or reviewer-selected note; actual visual assessment should wait for future provider or validated local vision support. |
+| Product label/context missing | Model, serial, SKU, or label context may be needed for warranty or product matching. | It must not expose raw label values by default or treat missing label context as a customer-risk conclusion. | "Serial or model context may be needed. Request a label photo if policy requires it." | Local later: requested view state and privacy-safe label presence flags; label readability/OCR should wait for future OCR/provider support. |
+| Metadata context unavailable or limited | Metadata is absent, limited, or summarized only as privacy-safe context. | It must not treat missing metadata as a standalone concern or reveal private metadata values. | "Metadata context is limited and should be used as context only." | Local later: existing privacy-safe metadata summary fields, dimensions presence, timestamp presence, GPS presence flag without raw values. |
+| Image consistency uncertainty signal | A future signal family may route unusual image-context patterns to manual review. | It must not name a categorical image-origin conclusion, accuse a customer, or determine an outcome. | "Image consistency uncertainty needs manual review." | Wait: keep as a documented category until future provider support, validated local metrics, and QA evidence are explicitly opened. |
+| Findings inconclusive | The available photo information is not enough for a confident manual-review path. | It must not sound like a negative decision or final evidence result. | "Findings are inconclusive from the current photo. Additional evidence may be needed." | Local later: aggregate low-context, low-quality, missing-view, and metadata-limited states. |
+| Manual review recommended | A reviewer should inspect the evidence and decide the next support step. | It must not automate claim disposition, escalation, or customer messaging. | "Manual review recommended. This signal supports review priority only." | Local later: default recommendation when any Phase 2 photo signal is present or incomplete. |
+
+Initial implementation boundary:
+
+- Local-later signals should be deterministic, privacy-safe, and explainable from file summaries, declared subject type, requested views, metadata summary, or review completeness state.
+- Provider-dependent signals should remain dormant planning categories until provider/local-model support, privacy review, QA evidence, and explicit runtime scope are opened.
+- Customer-facing wording should ask for the minimum useful additional evidence in neutral terms.
+
+## 18. Proposed Phase 2.2 Implementation Order
+
+1. Add a product-photo signal catalog and type-safe builders in the product-photo module without wiring `analyzeEvidenceFile`.
+2. Add local file-summary signal helpers for dimensions, file size bucket, format support, and metadata-context status without changing metadata extraction behavior.
+3. Add review-completeness helpers for subject type and requested additional views without changing upload or evidence grouping.
+4. Add safe aggregation for "findings inconclusive" and "manual review recommended" inside the unwired product-photo module.
+5. Add developer-only tests or probes for the signal helpers using synthetic metadata objects, not photo fixtures.
+6. Keep image consistency uncertainty as a dormant category until a future explicitly opened provider/metadata slice defines evidence requirements and QA gates.
+7. Review safety wording with `check:report-semantics` before any report, UI, scoring, or runtime mapping work is considered.
 
 Implementation should move in small commits so receipt behavior can be audited separately from photo behavior.
 
-## 18. Explicit Do-Not-Build-Yet List
+## 19. Explicit Do-Not-Build-Yet List
 
 Do not build yet:
 
@@ -528,7 +537,7 @@ Do not build yet:
 - Case queue or audit history UI.
 - Receipt scoring changes that are only meant to make photo work easier.
 - Fixture changes using real customer photos.
-- Any workflow that stores or shares raw customer photo metadata without explicit approval.
+- Any workflow that stores or shares raw customer photo metadata without explicit runtime scope.
 
 ## Challenge-Mode Notes
 
@@ -537,7 +546,7 @@ What could go wrong:
 - Phase 2 could accidentally inherit receipt-specific fields and make photos look like failed receipts.
 - Image-quality limits could be mistaken for customer-risk signals.
 - Metadata absence could be overinterpreted.
-- AI-image language could overclaim uncertainty.
+- Image-origin language could overclaim uncertainty.
 - Real photo fixtures could leak private backgrounds, labels, serials, addresses, or GPS metadata.
 
 Required discipline:
