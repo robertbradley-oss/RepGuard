@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Local object URL evidence previews cannot be optimized through next/image. */
 
-import { useEffect, useMemo, useRef, useState, type DragEvent, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type DragEvent, type ReactNode } from "react";
 import Image from "next/image";
 import {
   AlertTriangle,
@@ -254,8 +254,58 @@ function SignalItem({ signal, tone = "dark" }: { signal: RedFlag; tone?: "dark" 
   );
 }
 
+function EvidenceFileButton({
+  isAnalyzing,
+  onFileSelect,
+  className,
+  stopPropagation = false,
+  children,
+}: {
+  isAnalyzing: boolean;
+  onFileSelect: (file: File | null) => void;
+  className: string;
+  stopPropagation?: boolean;
+  children: ReactNode;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function openFilePicker() {
+    if (isAnalyzing) {
+      return;
+    }
+
+    fileInputRef.current?.click();
+  }
+
+  return (
+    <>
+      <input
+        ref={fileInputRef}
+        className="sr-only"
+        type="file"
+        accept={evidenceInputAccept}
+        disabled={isAnalyzing}
+        aria-label="Upload receipt, screenshot, or PDF receipt"
+        onChange={(event) => onFileSelect(event.currentTarget.files?.[0] ?? null)}
+      />
+      <button
+        className={className}
+        disabled={isAnalyzing}
+        onClick={(event) => {
+          if (stopPropagation) {
+            event.stopPropagation();
+          }
+          openFilePicker();
+        }}
+        type="button"
+      >
+        {children}
+      </button>
+    </>
+  );
+}
+
 export function ClaimReviewWorkflow() {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [status, setStatus] = useState<AnalysisStatus>("idle");
   const [activeAnalysisStep, setActiveAnalysisStep] = useState(0);
@@ -364,17 +414,6 @@ export function ClaimReviewWorkflow() {
     setCopyNotice(null);
   }
 
-  function triggerFilePicker() {
-    inputRef.current?.click();
-  }
-
-  function handleUploadKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      triggerFilePicker();
-    }
-  }
-
   function handleDragEnter(event: DragEvent<HTMLElement>) {
     event.preventDefault();
     event.stopPropagation();
@@ -425,9 +464,6 @@ export function ClaimReviewWorkflow() {
     setStatus("idle");
     setActiveAnalysisStep(0);
     setCopyNotice(null);
-    if (inputRef.current) {
-      inputRef.current.value = "";
-    }
   }
 
   async function handleRunAnalysis() {
@@ -502,17 +538,6 @@ export function ClaimReviewWorkflow() {
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
-          <input
-            ref={inputRef}
-            className="sr-only"
-            type="file"
-            accept={evidenceInputAccept}
-            aria-label="Upload receipt, screenshot, or PDF receipt"
-            onChange={(event) => {
-              handleFileSelect(event.currentTarget.files?.item(0) ?? null);
-              event.currentTarget.value = "";
-            }}
-          />
           {selectedFile ? (
             <div className="cg-module-header mb-3 flex flex-col gap-3 rounded-lg px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -526,11 +551,7 @@ export function ClaimReviewWorkflow() {
           ) : null}
           {!selectedFile ? (
             <div
-              className="relative grid min-h-[510px] flex-1 cursor-pointer place-items-center p-6 text-center sm:min-h-[530px] xl:min-h-0"
-              onClick={triggerFilePicker}
-              onKeyDown={handleUploadKeyDown}
-              role="button"
-              tabIndex={0}
+              className="relative grid min-h-[510px] flex-1 place-items-center p-6 text-center sm:min-h-[530px] xl:min-h-0"
             >
               <div className="cg-scan-corners" aria-hidden="true" />
               <div className="mx-auto max-w-[620px]">
@@ -552,17 +573,15 @@ export function ClaimReviewWorkflow() {
                 </div>
 
                 <div className="mt-5">
-                  <button
+                  <EvidenceFileButton
                     className="cg-primary-button inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-medium transition"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      triggerFilePicker();
-                    }}
-                    type="button"
+                    isAnalyzing={isAnalyzing}
+                    onFileSelect={handleFileSelect}
+                    stopPropagation
                   >
                     <FileUp className="size-4" aria-hidden="true" />
                     Choose evidence file
-                  </button>
+                  </EvidenceFileButton>
                 </div>
 
                 <div className="mx-auto my-6 h-px max-w-[520px] bg-[rgba(125,103,64,0.16)]" />
@@ -613,13 +632,13 @@ export function ClaimReviewWorkflow() {
                       {isAnalyzing ? "Analyzing Evidence" : "Run Local Analysis"}
                     </button>
                   )}
-                  <button
+                  <EvidenceFileButton
                     className="whitespace-nowrap rounded-md border border-[var(--cg-border)] bg-[rgba(255,253,247,0.72)] px-2.5 py-1.5 text-xs font-medium text-[var(--cg-text)] transition hover:border-[var(--cg-border-strong)]"
-                    onClick={triggerFilePicker}
-                    type="button"
+                    isAnalyzing={isAnalyzing}
+                    onFileSelect={handleFileSelect}
                   >
                     Replace file
-                  </button>
+                  </EvidenceFileButton>
                   <button
                     className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-[var(--cg-border)] bg-[rgba(255,253,247,0.72)] px-2.5 py-1.5 text-xs font-medium text-[var(--cg-text)] transition hover:border-[var(--cg-border-strong)]"
                     onClick={handleReset}
