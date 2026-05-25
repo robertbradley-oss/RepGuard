@@ -30,13 +30,36 @@
   --cg-shadow-panel: 0 22px 56px rgba(77, 62, 36, 0.1);
   --cg-shadow-blue: 0 0 0 1px rgba(184, 133, 24, 0.22), 0 18px 44px rgba(77, 62, 36, 0.12);
   --cg-shadow-green: 0 0 0 1px rgba(95, 143, 100, 0.22), 0 18px 44px rgba(95, 143, 100, 0.1);
+  --cg-font-sans: "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+  --cg-font-size-12: 12px;
+  --cg-font-size-13: 13px;
+  --cg-font-size-14: 14px;
+  --cg-font-size-16: 16px;
+  --cg-font-size-18: 18px;
+  --cg-font-size-24: 24px;
+  --cg-font-weight-regular: 400;
+  --cg-font-weight-medium: 500;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--cg-font-sans);
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --text-xs: var(--cg-font-size-12);
+  --text-xs--line-height: 1.35;
+  --text-sm: var(--cg-font-size-13);
+  --text-sm--line-height: 1.45;
+  --text-base: var(--cg-font-size-14);
+  --text-base--line-height: 1.45;
+  --text-lg: var(--cg-font-size-16);
+  --text-lg--line-height: 1.35;
+  --text-xl: var(--cg-font-size-18);
+  --text-xl--line-height: 1.3;
+  --text-2xl: var(--cg-font-size-24);
+  --text-2xl--line-height: 1.2;
+  --font-weight-normal: var(--cg-font-weight-regular);
+  --font-weight-medium: var(--cg-font-weight-medium);
 }
 
 * {
@@ -53,6 +76,10 @@ body {
   margin: 0;
   background: var(--cg-bg);
   color: var(--cg-text);
+  font-family: var(--cg-font-sans);
+  font-size: var(--cg-font-size-13);
+  font-weight: var(--cg-font-weight-regular);
+  line-height: 1.45;
 }
 
 body::before,

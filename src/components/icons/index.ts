@@ -1,0 +1,1 @@
+export { NucleoCameraIcon } from "./NucleoCameraIcon";

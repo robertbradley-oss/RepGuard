@@ -29,11 +29,11 @@ export function AuthenticityResultCard({ report, status }: AuthenticityResultCar
       {isComplete ? <div className="absolute inset-x-0 top-0 h-1 cg-brand-gradient" /> : null}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Authenticity result</p>
-          <h2 className="mt-1 text-xl font-semibold text-[#061426]">Evidence review</h2>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Authenticity result</p>
+          <h2 className="mt-1 text-xl font-medium text-[#061426]">Evidence review</h2>
         </div>
         <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
+          className={`rounded-full px-3 py-1 text-xs font-medium ring-1 ${
             isComplete ? riskStyles[report.riskLevel] : "bg-[#F8FCFF] text-slate-500 ring-[#E4F0F7]"
           }`}
         >
@@ -64,7 +64,7 @@ export function AuthenticityResultCard({ report, status }: AuthenticityResultCar
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={`${isComplete ? "text-5xl" : "text-3xl"} font-semibold text-[#061426]`}>
+            <span className="text-xl font-medium text-[#061426]">
               {isComplete ? report.score : "--"}
             </span>
             <span className="text-xs font-medium text-slate-500">/ 100</span>
@@ -72,7 +72,7 @@ export function AuthenticityResultCard({ report, status }: AuthenticityResultCar
         </div>
 
         <div className="min-w-0">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#008F91]">
+          <div className="flex items-center gap-2 text-sm font-medium text-[#008F91]">
             {isAnalyzing ? (
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
             ) : (
@@ -91,7 +91,7 @@ export function AuthenticityResultCard({ report, status }: AuthenticityResultCar
       </div>
 
       <div className="mt-6 border-t border-[#E4F0F7] pt-5">
-        <h3 className="text-sm font-semibold text-[#061426]">Key risk signals</h3>
+        <h3 className="text-sm font-medium text-[#061426]">Key risk signals</h3>
         <div className="mt-3 space-y-2.5">
           {!isComplete ? (
             <div className="rounded-2xl border border-dashed border-[#D5E8F3] bg-gradient-to-br from-white to-[#F6FCFF] p-5 text-sm leading-6 text-slate-600">
@@ -100,7 +100,7 @@ export function AuthenticityResultCard({ report, status }: AuthenticityResultCar
                   <FileSearch className="size-5" aria-hidden="true" />
                 </span>
                 <div>
-                  <p className="font-semibold text-slate-900">Ready for evidence</p>
+                  <p className="font-medium text-slate-900">Ready for evidence</p>
                   <p className="mt-1">
                     Once you upload a file and run analysis, this card will show the score, risk level,
                     and the most important review signals.
@@ -127,9 +127,9 @@ export function AuthenticityResultCard({ report, status }: AuthenticityResultCar
                       <AlertCircle className="size-4" aria-hidden="true" />
                     </span>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">{flag.label}</p>
+                      <p className="text-sm font-medium text-slate-900">{flag.label}</p>
                       <p className="mt-1 text-sm leading-5 text-slate-600">{flag.detail}</p>
-                      <p className="mt-2 text-xs font-semibold text-slate-500">{flag.confidence}</p>
+                      <p className="mt-2 text-xs font-medium text-slate-500">{flag.confidence}</p>
                     </div>
                   </div>
                 </article>
@@ -139,13 +139,13 @@ export function AuthenticityResultCard({ report, status }: AuthenticityResultCar
       </div>
 
       <div className="mt-5 rounded-2xl border border-[#E4F0F7] bg-[#F8FCFF] p-4 text-sm leading-6 text-slate-600">
-        <span className="font-semibold text-slate-900">Manual review note:</span> This mock review does
+        <span className="font-medium text-slate-900">Manual review note:</span> This mock review does
         not confirm authenticity or determine customer intent. Manual policy verification is still
         recommended.
       </div>
 
       <details className="mt-3 rounded-2xl border border-[#E4F0F7] bg-white px-4 py-3">
-        <summary className="cursor-pointer text-sm font-semibold text-[#061426]">Review guidance</summary>
+        <summary className="cursor-pointer text-sm font-medium text-[#061426]">Review guidance</summary>
         <div className="mt-3 space-y-2 text-sm leading-6 text-slate-600">
           <p>Use risk signals only as prompts for manual verification.</p>
           <p>Use &quot;manual review recommended&quot; when evidence is mixed.</p>

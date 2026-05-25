@@ -45,13 +45,13 @@ export function RiskScoreCard({
     <section className="cg-forensic-panel rounded-[1.35rem] p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--cg-cyan)]">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--cg-cyan)]">
             Risk intelligence
           </p>
-          <h2 className="mt-1 text-xl font-semibold text-white">Scoring module</h2>
+          <h2 className="mt-1 text-xl font-medium text-white">Scoring module</h2>
         </div>
         <span
-          className={`shrink-0 rounded-lg border px-3 py-1 text-xs font-bold ${
+          className={`shrink-0 rounded-lg border px-3 py-1 text-xs font-medium ${
             isPending ? "cg-security-badge" : riskClass[riskLevel]
           }`}
         >
@@ -62,11 +62,11 @@ export function RiskScoreCard({
       <div className="mt-6 rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/62 p-4">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
               Evidence Reliability Score
             </p>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-mono text-6xl font-semibold leading-none tabular-nums text-white">
+              <span className="font-mono text-6xl font-medium leading-none tabular-nums text-white">
                 {isPending ? "--" : score}
               </span>
               <span className="font-mono text-sm text-[var(--cg-text-muted)]">/100</span>
@@ -87,7 +87,7 @@ export function RiskScoreCard({
           />
         </div>
         <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.025] p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
             External Verification: Not performed
           </p>
           <p className="mt-1 text-sm leading-5 text-[var(--cg-text-soft)]">
@@ -103,17 +103,17 @@ export function RiskScoreCard({
           { label: "Review state", value: isPending ? "Evidence needed" : reviewLabel, icon: ShieldAlert },
         ].map((item) => (
           <div className="rounded-xl border border-white/10 bg-white/[0.025] p-3" key={item.label}>
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-[var(--cg-text-muted)]">
               <item.icon className="size-3.5 text-[var(--cg-cyan)]" aria-hidden="true" />
               {item.label}
             </div>
-            <p className="mt-2 text-sm font-semibold text-white">{item.value}</p>
+            <p className="mt-2 text-sm font-medium text-white">{item.value}</p>
           </div>
         ))}
       </div>
 
       <div className="mt-4 rounded-xl border border-[var(--cg-border)] bg-[#06101f]/62 p-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
+        <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--cg-text-muted)]">
           Severity distribution
         </p>
         <div className="mt-3 space-y-2">
@@ -123,7 +123,7 @@ export function RiskScoreCard({
             { label: "Manual review", value: distribution.high, color: "bg-[var(--cg-red)]" },
           ].map((item) => (
             <div className="grid grid-cols-[112px_1fr_34px] items-center gap-2 text-xs" key={item.label}>
-              <span className="font-semibold text-[var(--cg-text-muted)]">{item.label}</span>
+              <span className="font-medium text-[var(--cg-text-muted)]">{item.label}</span>
               <span className="h-2 overflow-hidden rounded-full bg-[#13243a]">
                 <span className={`block h-full rounded-full ${item.color}`} style={{ width: isPending ? "0%" : `${item.value}%` }} />
               </span>
@@ -137,14 +137,14 @@ export function RiskScoreCard({
         <div className="flex items-start gap-2">
           <ArrowRight className="mt-0.5 size-4 shrink-0 text-[var(--cg-green)]" aria-hidden="true" />
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--cg-green)]">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--cg-green)]">
               Recommended support action
             </p>
             <p className="mt-1 text-sm leading-5 text-[var(--cg-text-soft)]">
               {isPending ? "Attach evidence and run mock analysis to receive support-safe guidance." : suggestedAction}
             </p>
             <button
-              className="mt-3 rounded-lg bg-[var(--cg-blue)] px-4 py-2 text-sm font-bold text-[#02111f] transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cg-cyan)]"
+              className="mt-3 rounded-lg bg-[var(--cg-blue)] px-4 py-2 text-sm font-medium text-[#02111f] transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cg-cyan)]"
               type="button"
             >
               Mark as Reviewed

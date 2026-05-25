@@ -35,13 +35,13 @@ export function RedFlagsList({
     <section className="cg-command-panel rounded-[1.15rem] p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--cg-cyan)]">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--cg-cyan)]">
             Signal monitor
           </p>
-          <h2 className="mt-1 text-xl font-semibold text-white">Detected signals</h2>
+          <h2 className="mt-1 text-xl font-medium text-white">Detected signals</h2>
           <p className="mt-1 text-xs text-[var(--cg-text-muted)]">Signals guide manual review, not conclusions.</p>
         </div>
-        <span className="cg-security-badge rounded-lg px-3 py-1 text-xs font-semibold">
+        <span className="cg-security-badge rounded-lg px-3 py-1 text-xs font-medium">
           {isPending ? "Pending" : `${flags.length} signals`}
         </span>
       </div>
@@ -72,8 +72,8 @@ export function RedFlagsList({
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-sm font-semibold text-white">{title}</p>
-                      <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[10px] font-bold text-[var(--cg-text-muted)]">
+                    <p className="text-sm font-medium text-white">{title}</p>
+                      <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-xs font-medium text-[var(--cg-text-muted)]">
                         SIG-{String(index + 1).padStart(2, "0")}
                       </span>
                     </div>
@@ -86,10 +86,10 @@ export function RedFlagsList({
                         { label: "Evidence source", value: evidenceLabel },
                       ].map((item) => (
                         <div className="rounded-lg border border-white/10 bg-white/[0.025] px-2.5 py-2" key={item.label}>
-                          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]">
+                          <dt className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-muted)]">
                             {item.label}
                           </dt>
-                          <dd className="mt-1 text-xs font-semibold text-[var(--cg-text-soft)]">{item.value}</dd>
+                          <dd className="mt-1 text-xs font-medium text-[var(--cg-text-soft)]">{item.value}</dd>
                         </div>
                       ))}
                     </dl>

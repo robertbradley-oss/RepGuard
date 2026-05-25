@@ -32,7 +32,7 @@ export function TicketPreview({ selectedFile, status, report, caseRecord }: Tick
   return (
     <section className="grid gap-4 md:grid-cols-2">
       <article className="cg-command-panel rounded-[1.15rem] p-4">
-        <h2 className="text-base font-semibold uppercase tracking-wide text-white">Case context</h2>
+        <h2 className="text-base font-medium uppercase tracking-wide text-white">Case context</h2>
         <dl className="mt-4 space-y-3 text-sm">
           {[
             { label: "Customer", value: customer, icon: UserRound },
@@ -55,7 +55,7 @@ export function TicketPreview({ selectedFile, status, report, caseRecord }: Tick
 
       <article className="cg-command-panel rounded-[1.15rem] p-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold uppercase tracking-wide text-white">Customer message</h2>
+          <h2 className="text-base font-medium uppercase tracking-wide text-white">Customer message</h2>
           <MessageCircle className="size-5 text-[var(--cg-cyan)]" aria-hidden="true" />
         </div>
         <div className="mt-4 rounded-xl border border-white/10 bg-[#06101f]/58 p-4">

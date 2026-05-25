@@ -49,10 +49,10 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
     <section className="cg-command-panel rounded-[1.35rem] p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--cg-cyan)]">Mock report</p>
-          <h2 className="mt-1 text-2xl font-semibold text-white">Evidence analysis report</h2>
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--cg-cyan)]">Mock report</p>
+          <h2 className="mt-1 text-xl font-medium text-white">Evidence analysis report</h2>
         </div>
-        <span className="cg-security-badge rounded-lg px-3 py-1 text-xs font-semibold">
+        <span className="cg-security-badge rounded-lg px-3 py-1 text-xs font-medium">
           {isComplete ? report.reviewLabel : isAnalyzing ? "Analyzing" : "Awaiting evidence"}
         </span>
       </div>
@@ -71,7 +71,7 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
               <ShieldQuestion className="mt-0.5 size-5 shrink-0 text-[var(--cg-cyan)]" aria-hidden="true" />
             )}
             <div>
-              <p className="text-sm font-semibold text-white">
+              <p className="text-sm font-medium text-white">
                 {isAnalyzing ? "Building mock authenticity report" : "No completed report yet"}
               </p>
               <p className="mt-1 text-sm leading-6 text-[var(--cg-text-muted)]">
@@ -87,8 +87,8 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
       {isComplete ? (
         <div className="mt-5 space-y-5">
           <div className="cg-ticket-paper rounded-2xl p-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#526175]">Primary finding</p>
-            <p className="mt-1 text-base font-bold text-[var(--cg-text-paper)]">{report.primaryFinding}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[#526175]">Primary finding</p>
+            <p className="mt-1 text-base font-medium text-[var(--cg-text-paper)]">{report.primaryFinding}</p>
             <p className="mt-2 text-sm leading-6 text-[#344155]">
               This is a mock report for support prioritization. It is not a final decision about the
               customer or claim.
@@ -97,32 +97,32 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
 
           <div className="grid gap-3 md:grid-cols-[1.1fr_0.9fr_0.9fr]">
             <article className="rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/62 p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
                 <Gauge className="size-4 text-[var(--cg-cyan)]" aria-hidden="true" />
                 Evidence Reliability Score
               </div>
-              <p className="mt-3 font-mono text-4xl font-semibold text-white">{report.score}</p>
+              <p className="mt-3 font-mono text-xl font-medium text-white">{report.score}</p>
               <p className="text-xs font-medium text-[var(--cg-text-muted)]">out of 100</p>
               <p className="mt-3 text-sm leading-5 text-[var(--cg-text-muted)]">{report.scoreExplanation}</p>
             </article>
 
             <article className="rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/62 p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
                 <ShieldQuestion className="size-4 text-[var(--cg-green)]" aria-hidden="true" />
                 Confidence level
               </div>
-              <p className="mt-3 text-lg font-semibold text-white">{report.confidenceLevel}</p>
+              <p className="mt-3 text-lg font-medium text-white">{report.confidenceLevel}</p>
               <p className="mt-3 text-sm leading-5 text-[var(--cg-text-muted)]">
                 Confidence reflects how complete the submitted evidence is for manual support review.
               </p>
             </article>
 
             <article className="rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/62 p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
                 <AlertTriangle className="size-4 text-[var(--cg-amber)]" aria-hidden="true" />
                 Risk level
               </div>
-              <p className="mt-3 text-lg font-semibold text-white">{report.riskLevel} risk</p>
+              <p className="mt-3 text-lg font-medium text-white">{report.riskLevel} risk</p>
               <p className="mt-3 text-sm leading-5 text-[var(--cg-text-muted)]">
                 Use the level to prioritize review effort, not to accuse or automatically resolve the claim.
               </p>
@@ -133,7 +133,7 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
             <div className="flex items-start gap-3">
               <Info className="mt-0.5 size-5 shrink-0 text-[var(--cg-green)]" aria-hidden="true" />
               <div>
-                <p className="text-sm font-semibold text-white">Risk signal, not proof</p>
+                <p className="text-sm font-medium text-white">Risk signal, not proof</p>
                 <p className="mt-1 text-sm leading-6 text-[var(--cg-text-muted)]">{report.signalVsProof}</p>
               </div>
             </div>
@@ -144,7 +144,7 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
         <article className="rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/62 p-4">
           <ShieldQuestion className="size-5 text-[var(--cg-cyan)]" aria-hidden="true" />
-          <h3 className="mt-3 text-sm font-semibold text-white">Evidence summary</h3>
+          <h3 className="mt-3 text-sm font-medium text-white">Evidence summary</h3>
           <p className="mt-2 text-sm leading-6 text-[var(--cg-text-muted)]">
             {isComplete
               ? report.summary
@@ -154,7 +154,7 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
 
         <article className="rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/62 p-4">
           <CheckCircle2 className="size-5 text-[var(--cg-green)]" aria-hidden="true" />
-          <h3 className="mt-3 text-sm font-semibold text-white">Suggested support action</h3>
+          <h3 className="mt-3 text-sm font-medium text-white">Suggested support action</h3>
           <p className="mt-2 text-sm leading-6 text-[var(--cg-text-muted)]">
             {isComplete
               ? report.suggestedAction
@@ -164,7 +164,7 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
 
         <article className="rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/62 p-4">
           <MessageSquareText className="size-5 text-[var(--cg-cyan)]" aria-hidden="true" />
-          <h3 className="mt-3 text-sm font-semibold text-white">Customer-safe wording</h3>
+          <h3 className="mt-3 text-sm font-medium text-white">Customer-safe wording</h3>
           <p className="mt-2 text-sm leading-6 text-[var(--cg-text-muted)]">
             {isComplete
               ? report.customerSafeWording
@@ -177,7 +177,7 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
         <div className="mt-5 space-y-5">
           <section className="rounded-2xl border border-[var(--cg-border)] bg-[#06101f]/52">
             <div className="border-b border-white/10 px-4 py-3">
-              <h3 className="text-sm font-semibold text-white">Risk signals by category</h3>
+              <h3 className="text-sm font-medium text-white">Risk signals by category</h3>
               <p className="mt-1 text-xs text-[var(--cg-text-muted)]">
                 Each category is a prompt for manual review, not a final claim determination.
               </p>
@@ -193,7 +193,7 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
                         <CategoryIcon className="size-4" aria-hidden="true" />
                       </span>
                       <div className="min-w-0">
-                        <h4 className="text-sm font-semibold text-white">{group.category}</h4>
+                        <h4 className="text-sm font-medium text-white">{group.category}</h4>
                         <p className="mt-1 text-sm leading-5 text-[var(--cg-text-muted)]">{group.summary}</p>
                       </div>
                     </div>
@@ -202,9 +202,9 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
                       {group.signals.map((signal) => (
                         <div className="rounded-xl border border-white/10 bg-[#06101f]/72 p-3" key={signal.label}>
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                            <p className="text-sm font-semibold text-white">{signal.label}</p>
+                            <p className="text-sm font-medium text-white">{signal.label}</p>
                             <span
-                              className={`w-fit shrink-0 rounded-lg border px-2.5 py-1 text-xs font-semibold ${
+                              className={`w-fit shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium ${
                                 signalStyles[signal.confidence]
                               }`}
                             >
@@ -225,7 +225,7 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
             <div className="border-b border-white/10 px-4 py-3">
               <div className="flex items-center gap-2">
                 <ListChecks className="size-4 text-[var(--cg-green)]" aria-hidden="true" />
-                <h3 className="text-sm font-semibold text-white">What to verify next</h3>
+                <h3 className="text-sm font-medium text-white">What to verify next</h3>
               </div>
             </div>
             <div className="grid gap-3 p-4 md:grid-cols-3">
@@ -242,15 +242,15 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
             <div className="border-b border-white/10 px-4 py-3">
               <div className="flex items-center gap-2">
                 <TicketCheck className="size-4 text-[var(--cg-cyan)]" aria-hidden="true" />
-                <h3 className="text-sm font-semibold text-white">Verification checks</h3>
+                <h3 className="text-sm font-medium text-white">Verification checks</h3>
               </div>
             </div>
             <div className="divide-y divide-white/10">
               {report.verificationChecks.map((check) => (
                 <div className="grid gap-3 px-4 py-3 sm:grid-cols-[180px_120px_1fr]" key={check.label}>
-                  <p className="text-sm font-semibold text-white">{check.label}</p>
+                  <p className="text-sm font-medium text-white">{check.label}</p>
                   <span
-                    className={`w-fit rounded-lg border px-2.5 py-1 text-xs font-semibold ${checkStyles[check.result]}`}
+                    className={`w-fit rounded-lg border px-2.5 py-1 text-xs font-medium ${checkStyles[check.result]}`}
                   >
                     {check.result}
                   </span>
@@ -261,7 +261,7 @@ export function AnalysisReport({ report, status }: AnalysisReportProps) {
           </section>
 
           <div className="rounded-2xl border border-[rgba(74,222,128,0.26)] bg-[rgba(74,222,128,0.08)] p-4 text-sm leading-6 text-[var(--cg-text-muted)]">
-            <span className="font-semibold text-white">Manual review support only:</span> This mock
+            <span className="font-medium text-white">Manual review support only:</span> This mock
             analysis is designed to help support reps prioritize verification steps. This mock result
             does not confirm authenticity, determine customer intent, or replace policy-based human review.
             Manual policy verification is still recommended.
