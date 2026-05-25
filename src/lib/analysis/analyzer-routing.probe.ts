@@ -70,6 +70,65 @@ const productPhotoRuntimeOffFileDecision = buildAnalyzerFileRoutingDecision(prod
 const productPhotoRuntimeTrueFileDecision = buildAnalyzerFileRoutingDecision(productPhotoRuntimeTrueFileInput);
 const unknownFileDecision = buildAnalyzerFileRoutingDecision(unknownFileInput);
 
+function allChecksPass(checks: Record<string, boolean>) {
+  return Object.values(checks).every(Boolean);
+}
+
+const receiptPathPreservationChecks = {
+  receiptLikeObjectUsesReceiptPath: receiptLikeDecision.route === "receipt-analyzer-path",
+  receiptLikeObjectStatusPreserved: receiptLikeDecision.status === "receipt-path-preserved",
+  receiptLikeObjectPreservesReceiptPath: receiptLikeDecision.receiptPathPreserved,
+  receiptLikeObjectIsNotProductPhotoCandidate: !receiptLikeDecision.productPhotoCandidate,
+  receiptLikeFileUsesReceiptPath: receiptLikeFileDecision.route === "receipt-analyzer-path",
+  receiptLikeFileStatusPreserved: receiptLikeFileDecision.status === "receipt-path-preserved",
+  receiptLikeFilePreservesReceiptPath: receiptLikeFileDecision.receiptPathPreserved,
+  receiptLikeFileIsNotProductPhotoCandidate: !receiptLikeFileDecision.productPhotoCandidate,
+} as const;
+
+const productPhotoGuardChecks = {
+  runtimeRoutingDisabledByDefault: ENABLE_PRODUCT_PHOTO_RUNTIME_ROUTING === false,
+  productPhotoObjectUsesGuardedRoute: productPhotoRuntimeOffDecision.route === "product-photo-guarded",
+  productPhotoObjectStatusUnsupported: productPhotoRuntimeOffDecision.status === "unsupported-live-path",
+  productPhotoObjectCandidateGuarded: productPhotoRuntimeOffDecision.productPhotoCandidate,
+  productPhotoObjectDoesNotNeedLocalAnalysisResult:
+    productPhotoRuntimeOffDecision.localAnalysisResultShapeRequired === false,
+  productPhotoObjectDoesNotInvokeAdapter: productPhotoRuntimeOffDecision.adapterInvoked === false,
+  productPhotoRuntimeRequestStillDisabled: productPhotoRuntimeTrueDecision.runtimeRoutingEnabled === false,
+  productPhotoRuntimeRequestStillUnsupported: productPhotoRuntimeTrueDecision.status === "unsupported-live-path",
+  productPhotoFileUsesGuardedRoute: productPhotoRuntimeOffFileDecision.route === "product-photo-guarded",
+  productPhotoFileStatusUnsupported: productPhotoRuntimeOffFileDecision.status === "unsupported-live-path",
+  productPhotoFileCandidateGuarded: productPhotoRuntimeOffFileDecision.productPhotoCandidate,
+  productPhotoFileDoesNotNeedLocalAnalysisResult:
+    productPhotoRuntimeOffFileDecision.localAnalysisResultShapeRequired === false,
+  productPhotoFileDoesNotInvokeAdapter: productPhotoRuntimeOffFileDecision.adapterInvoked === false,
+  productPhotoFileRuntimeRequestStillDisabled: productPhotoRuntimeTrueFileDecision.runtimeRoutingEnabled === false,
+  productPhotoFileRuntimeRequestStillUnsupported: productPhotoRuntimeTrueFileDecision.status === "unsupported-live-path",
+} as const;
+
+const unknownPathChecks = {
+  unknownObjectRouteInconclusive: unknownDecision.route === "unknown-inconclusive",
+  unknownObjectStatusInconclusive: unknownDecision.status === "unknown-inconclusive",
+  unknownObjectNotProductPhotoCandidate: !unknownDecision.productPhotoCandidate,
+  unknownFileRouteInconclusive: unknownFileDecision.route === "unknown-inconclusive",
+  unknownFileStatusInconclusive: unknownFileDecision.status === "unknown-inconclusive",
+  unknownFileNotProductPhotoCandidate: !unknownFileDecision.productPhotoCandidate,
+} as const;
+
+const livePathIsolationChecks = {
+  receiptObjectDoesNotExerciseUiOrReport: receiptLikeDecision.uiOrReportBehaviorExercised === false,
+  productPhotoObjectDoesNotExerciseUiOrReport: productPhotoRuntimeOffDecision.uiOrReportBehaviorExercised === false,
+  unknownObjectDoesNotExerciseUiOrReport: unknownDecision.uiOrReportBehaviorExercised === false,
+  receiptFileDoesNotExerciseUiOrReport: receiptLikeFileDecision.uiOrReportBehaviorExercised === false,
+  productPhotoFileDoesNotExerciseUiOrReport: productPhotoRuntimeOffFileDecision.uiOrReportBehaviorExercised === false,
+  unknownFileDoesNotExerciseUiOrReport: unknownFileDecision.uiOrReportBehaviorExercised === false,
+  receiptObjectDoesNotInvokeAdapter: receiptLikeDecision.adapterInvoked === false,
+  productPhotoObjectDoesNotInvokeAdapter: productPhotoRuntimeOffDecision.adapterInvoked === false,
+  unknownObjectDoesNotInvokeAdapter: unknownDecision.adapterInvoked === false,
+  receiptFileDoesNotInvokeAdapter: receiptLikeFileDecision.adapterInvoked === false,
+  productPhotoFileDoesNotInvokeAdapter: productPhotoRuntimeOffFileDecision.adapterInvoked === false,
+  unknownFileDoesNotInvokeAdapter: unknownFileDecision.adapterInvoked === false,
+} as const;
+
 export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
   guard: {
     defaultProductPhotoRuntimeRoutingEnabled: ENABLE_PRODUCT_PHOTO_RUNTIME_ROUTING,
@@ -157,6 +216,20 @@ export const ANALYZER_ROUTING_GUARD_DEVELOPER_PROBE = {
       recognitionState: unknownFileDecision.recognition.recognitionState,
       adapterInvoked: unknownFileDecision.adapterInvoked,
       uiOrReportBehaviorExercised: unknownFileDecision.uiOrReportBehaviorExercised,
+    },
+  },
+  preservationStatus: {
+    receiptPathPreserved: allChecksPass(receiptPathPreservationChecks),
+    productPhotoCandidatesGuarded: allChecksPass(productPhotoGuardChecks),
+    unknownInputsRemainInconclusive: allChecksPass(unknownPathChecks),
+    livePathBehaviorNotExercised: allChecksPass(livePathIsolationChecks),
+    localAnalysisResultShapeRequiredForProductPhoto: false,
+    adapterInvokedForProductPhoto: false,
+    checks: {
+      receiptPathPreservation: receiptPathPreservationChecks,
+      productPhotoGuard: productPhotoGuardChecks,
+      unknownPath: unknownPathChecks,
+      livePathIsolation: livePathIsolationChecks,
     },
   },
 } as const;
