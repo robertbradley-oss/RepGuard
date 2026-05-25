@@ -2,6 +2,165 @@ import type { AnalysisConfidence, EvidenceType, RiskLevel } from "@/lib/claim-da
 
 export type SignalSeverity = "Low" | "Medium" | "High";
 
+export type SharedEvidenceType =
+  | "receipt"
+  | "order-screenshot"
+  | "pdf-receipt"
+  | "product-photo"
+  | "mixed-evidence"
+  | "unknown-evidence";
+
+export type EvidenceTypeCompatibilityAlias = {
+  alias: "damage-photo";
+  canonicalEvidenceType: "product-photo";
+  subjectType: "damage-close-up";
+};
+
+export type EvidenceSourceKind =
+  | "local-browser-analysis"
+  | "synthetic-fixture"
+  | "manual-review-context"
+  | "future-provider-signal";
+
+export type EvidenceReviewStatus = "Clear" | "Inconclusive" | "Review recommended" | "Manual review recommended";
+
+export type LocalSignalLevel = "None" | "Low" | "Medium" | "High";
+
+export type ReviewPriority = "Standard" | "Review" | "Manual review" | "Senior review";
+
+export type EvidenceConfidence = "High confidence" | "Medium confidence" | "Low confidence";
+
+export type SharedEvidenceReliabilityScore = {
+  label: "Evidence Reliability Score";
+  value: number;
+  meaning: string;
+  scoreScope: "Local evidence quality and review readiness only";
+};
+
+export type SharedExternalVerificationStatus = {
+  status: "Not externally verified" | "Locally analyzed only" | "External verification unavailable";
+  externalVerification: "Not performed";
+  method: "Local evidence analysis only" | "Future approved provider";
+  summary: string;
+};
+
+export type SharedEvidenceSignalCategory =
+  | "Evidence Quality"
+  | "Receipt Structure"
+  | "Photo Context"
+  | "Image Quality"
+  | "Image Consistency"
+  | "Metadata Context"
+  | "Purchase Match"
+  | "Recommendation";
+
+export type SharedEvidenceSignal = {
+  id: string;
+  title: string;
+  category: SharedEvidenceSignalCategory;
+  severity: SignalSeverity;
+  confidence: number;
+  evidenceSource: string;
+  explanation: string;
+  recommendation: string;
+};
+
+export type FileTypeCategory = "image" | "pdf" | "screenshot" | "document" | "unknown";
+
+export type FileSizeBucket = "tiny" | "small" | "medium" | "large" | "very-large" | "unknown";
+
+export type DimensionBucket = "small" | "medium" | "large" | "very-large" | "unknown";
+
+export type EvidenceMetadataSummary = {
+  fileTypeCategory: FileTypeCategory;
+  fileSizeBucket: FileSizeBucket;
+  dimensionsPresent: boolean;
+  dimensionsBucket?: DimensionBucket;
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+  metadataContext: "Available" | "Limited" | "Unavailable";
+  captureTimestampPresent: boolean | "unknown";
+  gpsContext: "present" | "stripped" | "unknown" | "not-applicable";
+  editingSoftwareSignal: "present" | "not-present" | "unknown";
+  rawExifOmitted: true;
+  originalFilenameOmitted: true;
+  notes: string[];
+};
+
+export type ProductPhotoSubjectType =
+  | "damage-close-up"
+  | "full-product-context"
+  | "serial-model-label"
+  | "packaging-damage"
+  | "installation-context"
+  | "mixed-evidence-image"
+  | "inconclusive-photo";
+
+export type DamageVisibilityStatus =
+  | "clearly-visible"
+  | "partially-visible"
+  | "claimed-but-not-visible"
+  | "damage-area-visible-context-missing"
+  | "product-visible-damage-area-missing"
+  | "inconclusive";
+
+export type ProductContextStatus = "complete" | "partial" | "missing" | "not-applicable" | "inconclusive";
+
+export type ProductLabelContext = {
+  serialOrModelContextPresent: boolean;
+  labelReadable: boolean | "unknown";
+  rawValueOmitted: true;
+  notes: string[];
+};
+
+export type ProductPhotoQualitySummary = {
+  qualityLevel: "Clear" | "Usable" | "Limited" | "Poor" | "Inconclusive";
+  qualityLimits: string[];
+  summary: string;
+};
+
+export type ProductPhotoConsistencySummary = {
+  status: "No material signal" | "Needs manual review" | "Inconclusive";
+  signals: SharedEvidenceSignal[];
+  summary: string;
+};
+
+export type PhotoMetadataContextSummary = {
+  metadataSummary: EvidenceMetadataSummary;
+  contextOnly: true;
+  summary: string;
+};
+
+export type PhotoReviewCompleteness = {
+  status: "complete" | "partial" | "inconclusive";
+  missingContext: RequestedPhotoView[];
+  summary: string;
+};
+
+export type RequestedPhotoView =
+  | "wider-product-photo"
+  | "clearer-damage-close-up"
+  | "serial-or-model-label"
+  | "packaging-context"
+  | "installation-context"
+  | "proof-of-purchase-match";
+
+export type ProductPhotoAnalysisDetails = {
+  subjectType: ProductPhotoSubjectType;
+  damageVisibility: DamageVisibilityStatus;
+  fullProductContext: ProductContextStatus;
+  productLabelContext: ProductLabelContext;
+  imageQuality: ProductPhotoQualitySummary;
+  imageConsistency: ProductPhotoConsistencySummary;
+  metadataContext: PhotoMetadataContextSummary;
+  reviewCompleteness: PhotoReviewCompleteness;
+  purchaseOrReceiptMatchNeeded: boolean;
+  requestedAdditionalViews: RequestedPhotoView[];
+  manualReviewRecommendation: string;
+};
+
 export type OcrRegion = {
   text: string;
   confidence: number;
@@ -266,6 +425,45 @@ export type ScoreBreakdown = {
     penalty: number;
   }[];
 };
+
+export type ReceiptAnalysisDetails = {
+  ocr: OcrExtraction;
+  parsedReceipt: ExtractedReceiptInfo;
+  sourceClassification: ReceiptSourceClassification;
+  sourceStructure?: ReceiptSourceStructureSummary;
+  imageQuality: ImageHeuristics;
+  receiptScoreBreakdown: ScoreBreakdown;
+  proofOfPurchaseMatchNeeded: boolean;
+  receiptPrivacySummary: EvidenceMetadataSummary;
+};
+
+export type EvidenceModuleDetails =
+  | { module: "receipt"; receipt: ReceiptAnalysisDetails }
+  | { module: "productPhoto"; productPhoto: ProductPhotoAnalysisDetails }
+  | {
+      module: "screenshot";
+      screenshot: {
+        sourceContext: "order-screenshot" | "screenshot-of-photo" | "unknown";
+        reviewStatus: EvidenceReviewStatus;
+        notes: string[];
+      };
+    }
+  | {
+      module: "pdf";
+      pdf: {
+        pageCount?: number;
+        textLayerAvailable: boolean | "unknown";
+        reviewStatus: EvidenceReviewStatus;
+        notes: string[];
+      };
+    }
+  | {
+      module: "unknown";
+      unknown: {
+        reviewStatus: EvidenceReviewStatus;
+        notes: string[];
+      };
+    };
 
 export type VerificationStatus = {
   status: "Not externally verified" | "Locally analyzed only" | "External verification unavailable";
