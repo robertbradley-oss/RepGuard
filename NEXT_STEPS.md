@@ -50,6 +50,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - Probe-only isolation assertions now explicitly record that the product-photo shared-result boundary does not invoke `analyzeEvidenceFile`, analyzer routing, UI, upload, report mapping, scoring, parser, fixtures, providers, storage, integrations, or case queues.
 - The first isolated product-photo UI display contract probe now strengthens the existing product-photo report view-model probe without adding a UI component or live workflow wiring. It proves future display surfaces can consume `ProductPhotoReportViewModel` only, covers missing-context and complete-context display cases, low/medium/high score semantics, missing metadata summaries, label-context raw value omission, overconfident review-label clamping, recursive private-key denial, sentinel private-value omission, and receipt/report-adapter preservation.
 - A docs-only standalone product-photo display component plan now defines the future component as an isolated `ProductPhotoReviewPanel`-style evidence-review panel with exactly one prop, `viewModel: ProductPhotoReportViewModel`. The planned component remains unwired from `ClaimReviewWorkflow`, owns no image preview or object URL, adds no upload/analyzer/report/scoring/parser/fixture behavior, and must receive semantic/privacy coverage before implementation.
+- The first isolated `ProductPhotoReviewPanel` component now exists as a standalone, unwired display surface that accepts exactly `viewModel: ProductPhotoReportViewModel`, renders derived product-photo review summaries only, keeps status, priority, confidence, evidence quality, score, recommended action, limitations, review signals, and privacy posture separate, and is covered by a dedicated component probe plus semantic/import/privacy guards. It is not inserted into `ClaimReviewWorkflow` or any live route.
 - Probe sample data is synthetic and records no file bytes, image buffers, raw EXIF objects, provider handles, storage handles, integration handles, or case queue handles.
 - No runtime analyzer routing, upload, UI, report, scoring, parser, metadata extraction, or fixture behavior changed during Phase 2.0, Phase 2.1, or Phase 2.2 helper/boundary work.
 - Runtime routing remains blocked until Robert explicitly opens that slice.
@@ -58,7 +59,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 
 ## Next Safe Tasks
 
-1. Implement the first standalone product-photo display component only after an explicit implementation prompt: keep it `ProductPhotoReportViewModel`-only, unwired from the live workflow, covered by semantic/privacy checks, and out of `ClaimReviewWorkflow`.
+1. Plan the next isolated product-photo UI verification slice only after an explicit prompt: either add a non-live synthetic render host for `ProductPhotoReviewPanel` browser checks, or keep planning for later live insertion gates. Continue keeping it out of `ClaimReviewWorkflow`, upload routing, analyzer routing, report mapping, scoring, parser behavior, fixtures, providers, storage, integrations, and case queues.
 2. Keep the decision-only public analyzer routing wrapper out of live UI/upload/report/scoring/parser paths until a separate live-routing plan is explicitly opened.
 3. Keep the dev-only routing adapter out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 4. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
@@ -561,7 +562,7 @@ Why later slices remain separate:
 Recommended next implementation prompt after this docs plan is committed and pushed:
 
 ```text
-/claimguardagent implement the first standalone product-photo display component slice only: create an isolated ProductPhotoReviewPanel-style component that accepts exactly viewModel: ProductPhotoReportViewModel; do not wire it into ClaimReviewWorkflow or any live route; do not add upload routing, analyzer routing, report-adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; add/extend only the required component probe and semantic checker coverage for the new display file; run lint, build, report semantics, diff check, and a browser/render check only if a renderable isolated host is added; commit only if safe; do not push
+/claimguardagent plan the next isolated product-photo UI verification slice only: decide whether to add a non-live synthetic render host for ProductPhotoReviewPanel browser checks or keep the next step docs-only; do not wire ProductPhotoReviewPanel into ClaimReviewWorkflow or any live route; do not add upload routing, analyzer routing, report-adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; preserve ProductPhotoReportViewModel-only display; run the relevant checks; do not push
 ```
 
 ## Future Evidence Review UX Direction
@@ -593,5 +594,5 @@ Robert wants the eventual result screen to feel like an evidence triage workspac
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent implement the first standalone product-photo display component slice only: create an isolated ProductPhotoReviewPanel-style component that accepts exactly viewModel: ProductPhotoReportViewModel; do not wire it into ClaimReviewWorkflow or any live route; do not add upload routing, analyzer routing, report-adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; add/extend only the required component probe and semantic checker coverage for the new display file; run lint, build, report semantics, diff check, and a browser/render check only if a renderable isolated host is added; commit only if safe; do not push
+/claimguardagent plan the next isolated product-photo UI verification slice only: decide whether to add a non-live synthetic render host for ProductPhotoReviewPanel browser checks or keep the next step docs-only; do not wire ProductPhotoReviewPanel into ClaimReviewWorkflow or any live route; do not add upload routing, analyzer routing, report-adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; preserve ProductPhotoReportViewModel-only display; run the relevant checks; do not push
 ```

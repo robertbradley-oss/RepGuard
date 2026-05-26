@@ -14,6 +14,8 @@ const filesToCheck = [
   "src/lib/analysis/shared-result.probe.ts",
   "src/lib/analysis/product-photo-report-view-model.ts",
   "src/lib/analysis/product-photo-report-view-model.probe.ts",
+  "src/components/ProductPhotoReviewPanel.tsx",
+  "src/components/ProductPhotoReviewPanel.probe.tsx",
   "src/components/AnalysisReport.tsx",
   "src/components/AuthenticityResultCard.tsx",
   "src/components/ClaimReviewWorkflow.tsx",
@@ -42,7 +44,12 @@ const sourceCorpus = [...fileContents]
   .map(([, contents]) => contents)
   .join("\n");
 const productPhotoCorpus = [...fileContents]
-  .filter(([filePath]) => filePath.includes("product-photo") || filePath.includes("shared-result.probe"))
+  .filter(
+    ([filePath]) =>
+      filePath.includes("product-photo") ||
+      filePath.includes("ProductPhotoReviewPanel") ||
+      filePath.includes("shared-result.probe"),
+  )
   .map(([, contents]) => contents)
   .join("\n");
 
@@ -230,6 +237,9 @@ const productPhotoReportViewModel =
   fileContents.get("src/lib/analysis/product-photo-report-view-model.ts") ?? "";
 const productPhotoReportViewModelProbe =
   fileContents.get("src/lib/analysis/product-photo-report-view-model.probe.ts") ?? "";
+const productPhotoReviewPanel = fileContents.get("src/components/ProductPhotoReviewPanel.tsx") ?? "";
+const productPhotoReviewPanelProbe = fileContents.get("src/components/ProductPhotoReviewPanel.probe.tsx") ?? "";
+const claimReviewWorkflow = fileContents.get("src/components/ClaimReviewWorkflow.tsx") ?? "";
 const reportAdapter = fileContents.get("src/lib/analysis/report-adapter.ts") ?? "";
 const forbiddenProductPhotoMapperImports = [
   "@/lib/analysis/analyzer",
@@ -313,8 +323,198 @@ const productPhotoDisplayBannedPatterns = [
   /\b(?:altered|tampered)\s+(?:photo|image|claim|evidence)\b/i,
   phrasePattern("misleading", "evidence"),
   phrasePattern("customer", "caused", "the", "damage"),
+  phrasePattern("customer", "intent"),
+  phrasePattern("customer", "wrongdoing"),
+  phrasePattern("claim", "outcome"),
+  phrasePattern("policy", "disposition"),
+  phrasePattern("support", "policy", "decision"),
+  phrasePattern("automatic", "decision"),
   phrasePattern("ai", "detected", "manipulation"),
   /\b(?:image|photo|evidence)\s+proves?\b/i,
+];
+const requiredProductPhotoReviewPanelSignals = [
+  {
+    label: "component type-only view-model import",
+    patterns: [
+      /import type \{ ProductPhotoReportViewModel \} from "@\/lib\/analysis\/product-photo-report-view-model";/,
+    ],
+  },
+  {
+    label: "component exact prop contract",
+    patterns: [/type ProductPhotoReviewPanelProps = \{\s*viewModel: ProductPhotoReportViewModel;\s*\};/s],
+  },
+  {
+    label: "component review snapshot section",
+    patterns: [/Review snapshot/],
+  },
+  {
+    label: "component separate priority",
+    patterns: [/Review priority/],
+  },
+  {
+    label: "component separate confidence",
+    patterns: [/Confidence/],
+  },
+  {
+    label: "component separate evidence quality",
+    patterns: [/Evidence quality/],
+  },
+  {
+    label: "component score local-only scope",
+    patterns: [/viewModel\.score\.scope/],
+  },
+  {
+    label: "component product/photo context section",
+    patterns: [/Product\/photo context/],
+  },
+  {
+    label: "component recommended action section",
+    patterns: [/Recommended support action/],
+  },
+  {
+    label: "component limitations section",
+    patterns: [/Limitations/],
+  },
+  {
+    label: "component review signals section",
+    patterns: [/Review signals/],
+  },
+  {
+    label: "component privacy posture section",
+    patterns: [/Privacy posture/],
+  },
+  {
+    label: "component external verification not performed",
+    patterns: [/External Verification: \{viewModel\.externalVerification\.externalVerification\}/],
+  },
+];
+const requiredProductPhotoReviewPanelProbeSignals = [
+  {
+    label: "panel probe exact props",
+    patterns: [/propsExactlyViewModelOnly/],
+  },
+  {
+    label: "panel probe forbidden props",
+    patterns: [/propsDoNotAcceptClassNameCallbacksFilesBlobsUrlsOrRawResults/],
+  },
+  {
+    label: "panel probe import boundary",
+    patterns: [/componentImportsOnlyReactAndProductPhotoViewModel/],
+  },
+  {
+    label: "panel probe live path import denial",
+    patterns: [/componentDoesNotImportClaimReviewWorkflowUploadAnalyzerRoutingReportAdapterScoringParserFixtures/],
+  },
+  {
+    label: "panel probe result type denial",
+    patterns: [/componentDoesNotImportLocalAnalysisResultEvidenceAnalysisResultProductPhotoEvidenceAnalysisResultMockAnalysisReport/],
+  },
+  {
+    label: "panel probe raw source denial",
+    patterns: [/componentSourceDoesNotReferenceObjectUrlImageUrlDataUrlFileBlobRawExifRawMetadataOriginalFilenameRawLabelValue/],
+  },
+  {
+    label: "panel probe required sections",
+    patterns: [/missingContextCaseRendersRequiredSections/],
+  },
+  {
+    label: "panel probe complete context case",
+    patterns: [/completeContextCaseDoesNotRequestAdditionalViews/],
+  },
+  {
+    label: "panel probe no requested views",
+    patterns: [/noRequestedViewsCaseRendersEmptyOrNeutralAdditionalViewsState/],
+  },
+  {
+    label: "panel probe multiple requested views",
+    patterns: [/multipleRequestedViewsCaseRendersAllDerivedLabels/],
+  },
+  {
+    label: "panel probe score-band cases",
+    patterns: [/lowMediumHighScoreCasesKeepScoreLocalOnlyAndNotProof/],
+  },
+  {
+    label: "panel probe separated concepts",
+    patterns: [/priorityConfidenceEvidenceQualityRemainSeparateFromScore/],
+  },
+  {
+    label: "panel probe external verification",
+    patterns: [/externalVerificationAlwaysNotPerformed/],
+  },
+  {
+    label: "panel probe manual review action",
+    patterns: [/manualReviewOnlyRecommendedAction/],
+  },
+  {
+    label: "panel probe limitations",
+    patterns: [/limitationsIncludeLocalOnlyExternalVerificationNotPerformedHighScoreNotProofMetadataContextOnly/],
+  },
+  {
+    label: "panel probe signal rows",
+    patterns: [/reviewSignalsRenderLabelCategorySeverityConfidenceReviewNoteAndRecommendedStep/],
+  },
+  {
+    label: "panel probe privacy posture",
+    patterns: [/privacyPostureShowsDerivedSummaryOnlyAndExcludedRawFields/],
+  },
+  {
+    label: "panel probe sentinel private values",
+    patterns: [/sentinelPrivateValuesAbsent/],
+  },
+  {
+    label: "panel probe recursive private keys",
+    patterns: [/forbiddenPrivateKeyPathsAbsent/],
+  },
+  {
+    label: "panel probe customer-safe wording internals",
+    patterns: [/customerSafeWordingDoesNotExposeScoreConfidencePriorityOrVerificationInternals/],
+  },
+  {
+    label: "panel probe unsafe copy denial",
+    patterns: [/renderableCopyAvoidsUnsafeOutcomeProofVerificationAccusationLanguage/],
+  },
+  {
+    label: "panel probe receipt adapter preservation",
+    patterns: [/receiptReportAdapterSignatureStillReceiptOnly/],
+  },
+  {
+    label: "panel probe ClaimReviewWorkflow unwired",
+    patterns: [/claimReviewWorkflowSourceDoesNotImportProductPhotoReviewPanel/],
+  },
+];
+const forbiddenProductPhotoReviewPanelImports = [
+  "@/components/ClaimReviewWorkflow",
+  "@/components/AnalysisReport",
+  "@/components/AuthenticityResultCard",
+  "@/components/RiskScoreCard",
+  "@/components/UploadPanel",
+  "@/lib/analysis/analyzer",
+  "@/lib/analysis/analyzer-routing",
+  "@/lib/analysis/report-adapter",
+  "@/lib/analysis/scoring",
+  "@/lib/analysis/receipt-parser",
+  "@/lib/test-evidence",
+  "@/lib/claim-data",
+];
+const forbiddenProductPhotoReviewPanelPatterns = [
+  /LocalAnalysisResult/,
+  /EvidenceAnalysisResult/,
+  /ProductPhotoEvidenceAnalysisResult/,
+  /MockAnalysisReport/,
+  /ProductPhotoEvidenceAnalysisResultInput/,
+  /createObjectURL/,
+  /\bobjectUrl\b/,
+  /\bimageUrl\b/,
+  /\bdataUrl\b/,
+  /\bFile\b/,
+  /\bBlob\b/,
+  /rawExif/,
+  /rawMetadata/,
+  /originalFilename/,
+  /rawLabelValue/,
+  /moduleDetails/,
+  /privacySafeMetadataSummary/,
+  /\.\.\.\s*(?:viewModel|result|details|metadataSummary)/,
 ];
 
 if (redactedProductTableNote !== safeProductTableNote) {
@@ -377,6 +577,34 @@ for (const pattern of productPhotoDisplayBannedPatterns) {
   if (pattern.test(productPhotoCorpus)) {
     failures.push(`Unsafe product-photo display wording found: ${pattern}`);
   }
+}
+
+for (const signal of requiredProductPhotoReviewPanelSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(productPhotoReviewPanel))) {
+    failures.push(`Product-photo review panel check failed: missing ${signal.label}`);
+  }
+}
+
+for (const signal of requiredProductPhotoReviewPanelProbeSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(productPhotoReviewPanelProbe))) {
+    failures.push(`Product-photo review panel probe check failed: missing ${signal.label}`);
+  }
+}
+
+for (const importPath of forbiddenProductPhotoReviewPanelImports) {
+  if (productPhotoReviewPanel.includes(importPath)) {
+    failures.push(`Product-photo review panel boundary check failed: component imports forbidden path ${importPath}`);
+  }
+}
+
+for (const pattern of forbiddenProductPhotoReviewPanelPatterns) {
+  if (pattern.test(productPhotoReviewPanel)) {
+    failures.push(`Product-photo review panel boundary check failed: component uses forbidden pattern ${pattern}`);
+  }
+}
+
+if (claimReviewWorkflow.includes("ProductPhotoReviewPanel")) {
+  failures.push("Product-photo review panel boundary check failed: ClaimReviewWorkflow imports or references the isolated panel.");
 }
 
 if (reportAdapter.includes("product-photo-report-view-model") || reportAdapter.includes("mapProductPhotoAnalysisToReportViewModel")) {
