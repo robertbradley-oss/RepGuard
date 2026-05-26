@@ -512,6 +512,33 @@ Required checks before product-photo mapping can be displayed:
 
 Stop if implementation requires receipt-only result fields, changes receipt report output, exposes private photo or metadata content, implies evidence truth or customer wrongdoing, or needs live routing before a separate runtime slice is opened.
 
+## 16B. Product-Photo Report/UI Display Gate
+
+Product-photo UI display must remain blocked until a separate implementation slice proves that product-photo review output can be presented without changing the receipt workflow, upload routing, analyzer routing, live report-adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues.
+
+The first display slice should consume only `ProductPhotoReportViewModel` or a similarly narrow product-photo display model. It should not consume `ProductPhotoEvidenceAnalysisResult` directly, should not spread product-photo module details or metadata summaries, should not reuse receipt-only report models, and should not make product-photo runtime behavior live.
+
+Safe display content:
+
+- Review readiness, local evidence quality, score meaning and scope, review priority, confidence, limitations, product context status, damage visibility review context, requested additional views, manual-review recommendation, customer-safe wording, and external verification not performed.
+- Privacy posture fields showing raw/private-bearing content is omitted.
+- Review signals framed only as manual-review support.
+
+Display and export must omit:
+
+- Raw photo bytes, image buffers, raw EXIF, raw metadata, original filenames, precise timestamps, GPS coordinates, raw serial/model/label values, barcode or QR contents, people, faces, addresses, customer identifiers, private backgrounds, private evidence snippets, provider output, storage handles, integration IDs, case queue IDs, retained image fingerprints, and final outcome fields.
+
+Before implementation, require:
+
+- A product-photo display-shape probe proving the UI consumes a product-photo-specific view model, not `LocalAnalysisResult` or receipt report types.
+- A UI isolation probe proving no upload routing, live analyzer routing, `analyzeEvidenceFile`, parser, receipt scoring, fixtures, providers, storage, integrations, or case queues are invoked.
+- Receipt preservation checks proving the receipt UI/report path remains unchanged.
+- Privacy display/export checks proving forbidden fields cannot render or copy.
+- Safe-wording coverage for every new display/export file.
+- Passing lint, build, report semantic checks, and diff check.
+
+Stop if product-photo display requires receipt-only fields, appears inside receipt-specific OCR/parser/extracted-data UI, changes receipt behavior, exposes raw/private-bearing evidence, implies proof or a completed support outcome, or depends on live routing/provider/case-workflow behavior before those slices are explicitly opened.
+
 ## 17. Phase 2.1 First-Pass Local Heuristic Signals
 
 Phase 2.1 starts with a small signal catalog only. These signals are manual-review support language and future implementation guidance; they do not run in `analyzeEvidenceFile`, do not change `LocalAnalysisResult`, do not affect scoring, and do not change upload, UI, report mapping, fixtures, receipt parsing, metadata extraction behavior, routing, storage, integrations, or case queues.

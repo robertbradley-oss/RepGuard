@@ -45,6 +45,8 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - `analyzeEvidenceFile` remains the live receipt analyzer entrypoint and still protects the shipped receipt pipeline.
 - `LocalAnalysisResult` remains unchanged and receipt-path shaped.
 - The shared-result and product-photo result probes confirm product-photo shared results do not require receipt-only OCR/parser/result fields and keep external verification as not performed / not externally verified.
+- A pushed isolated product-photo report view-model boundary now maps product-photo shared results to a dev/probe-only, display-safe view model without using `LocalAnalysisResult`, `MockAnalysisReport`, `mapLocalAnalysisToReport`, `analyzeEvidenceFile`, analyzer routing, UI, upload, scoring, parser, fixtures, providers, storage, integrations, or case queues.
+- The product-photo report view-model keeps score, review priority, confidence, and limitations separate; keeps external verification not performed; clamps unsupported clear-style labels away from a display outcome; and omits raw photo bytes, image buffers, raw EXIF, raw metadata, original filenames, raw label values, provider output, storage handles, integration handles, and case queue handles.
 - Probe-only isolation assertions now explicitly record that the product-photo shared-result boundary does not invoke `analyzeEvidenceFile`, analyzer routing, UI, upload, report mapping, scoring, parser, fixtures, providers, storage, integrations, or case queues.
 - Probe sample data is synthetic and records no file bytes, image buffers, raw EXIF objects, provider handles, storage handles, integration handles, or case queue handles.
 - No runtime analyzer routing, upload, UI, report, scoring, parser, metadata extraction, or fixture behavior changed during Phase 2.0, Phase 2.1, or Phase 2.2 helper/boundary work.
@@ -54,7 +56,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 
 ## Next Safe Tasks
 
-1. Complete the docs-only product-photo report/UI mapping gate before any product-photo display work.
+1. Complete the docs-only product-photo report/UI display gate before any product-photo display work.
 2. Keep the decision-only public analyzer routing wrapper out of live UI/upload/report/scoring/parser paths until a separate live-routing plan is explicitly opened.
 3. Keep the dev-only routing adapter out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 4. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
@@ -296,6 +298,141 @@ Recommended next implementation prompt after this docs gate is committed and pus
 /claimguardagent implement the first product-photo-safe report/UI mapping probe slice only: add an isolated product-photo mapping boundary and required probes without changing report-adapter.ts, UI components, upload routing, analyzeEvidenceFile, LocalAnalysisResult, receipt behavior, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; expand safety checks only if needed; run lint, build, report semantics, and diff check; commit only if safe; do not push
 ```
 
+## Phase 2.2 Product-Photo Report/UI Display Gate
+
+This is a docs-only planning gate. It defines what a future product-photo display slice must prove before product-photo review output appears in the app. It does not implement UI display, upload routing, live analyzer routing, live report-adapter mapping, scoring behavior, parser behavior, fixtures, providers, storage, integrations, case queues, or case workflow.
+
+Product-photo report/UI display means a support-facing display surface that consumes `ProductPhotoReportViewModel` or a similarly narrow product-photo-specific display model. It does not mean displaying `ProductPhotoEvidenceAnalysisResult` directly, reusing `MockAnalysisReport`, forcing product-photo into `LocalAnalysisResult`, or adding product-photo to `mapLocalAnalysisToReport`.
+
+The first future display slice should be an isolated display component and probe path. It should not modify `ClaimReviewWorkflow.tsx` unless a later prompt explicitly opens a live UI insertion slice. The safest initial target is a standalone product-photo display component that can be reviewed with synthetic view-model data before any upload, analyzer, or main workflow wiring.
+
+What future product-photo UI display means:
+
+- Showing a compact product-photo review context surface from the product-photo report view model.
+- Keeping the evidence preview as the visual anchor and placing product-photo review context near the existing completed-result rail only after a live UI insertion slice is explicitly opened.
+- Showing review readiness, local evidence quality, product context, relevant-area visibility review context, requested additional views, manual-review support action, customer-safe wording, score meaning, review priority, confidence, limitations, and external verification not performed.
+- Keeping product-photo display support-rep focused and evidence-first, without a broad redesign or generic image-review dashboard.
+
+What future product-photo UI display does not mean:
+
+- Changing upload evidence routing.
+- Changing `analyzeEvidenceFile`.
+- Changing analyzer routing or enabling product-photo runtime behavior.
+- Changing `mapLocalAnalysisToReport` or receipt report behavior.
+- Displaying product-photo output inside receipt-specific OCR, parser, receipt structure, or extracted-field sections.
+- Adding product-photo scoring, parser behavior, fixtures, providers, storage, integrations, case queues, or case workflow.
+- Exporting raw product-photo evidence or raw metadata.
+
+Required prerequisites before any future display implementation:
+
+- Start from a clean `main` synced with `origin/main`.
+- Confirm `0c7efed` or a later pushed checkpoint includes the product-photo report view-model boundary.
+- Keep `ProductPhotoReportViewModel` as the only allowed display input for the first display component.
+- Keep `LocalAnalysisResult` unchanged and receipt-shaped.
+- Keep `analyzeEvidenceFile` as the live receipt analyzer entrypoint.
+- Keep `mapLocalAnalysisToReport(result: LocalAnalysisResult)` receipt-only and unchanged.
+- Keep `routeAnalyzerEvidenceInput` and guarded analyzer-routing boundaries decision-only and unwired from UI/upload/report/scoring/parser paths.
+- Keep product-photo runtime non-live until a separate runtime-routing slice is explicitly opened.
+- Add display-specific probes before any live UI insertion.
+- Include every new product-photo display/export file in safety wording and privacy semantic coverage.
+- Preserve receipt UI behavior and receipt report output.
+
+Safe product-photo UI copy rules:
+
+- Use `Evidence Reliability Score`.
+- Explain that the score means local evidence quality and review readiness only.
+- State that a high score does not prove the product photo or claim.
+- Show `External Verification: Not performed` and `Not externally verified`.
+- Keep score, review priority, confidence, and limitations as separate UI concepts.
+- Use neutral review language such as product-photo review context, local evidence quality, review readiness, manual review recommended, product context may be incomplete, image consistency needs manual review, metadata is context only, additional context may be needed, and receipt or order match may be needed.
+- Customer-facing copy should request the minimum useful additional context and avoid internal score details by default.
+- Do not use proof language, final outcome language, customer-accusation language, automatic-disposition language, or wording implying external verification happened.
+
+Allowed display fields from the product-photo view model:
+
+- `reviewTitle`, `reviewSummary`, `reviewStatus`, `reviewPriority`, and `confidence`.
+- `score.label`, `score.value`, `score.scope`, `score.meaning`, and score safety notes.
+- `evidenceQuality.qualityLevel`, `evidenceQuality.qualitySummary`, and `evidenceQuality.qualityLimitCount`.
+- `productContext.subjectType`, `productContext.productContextStatus`, `productContext.damageVisibilityReviewContext`, `productContext.labelContextSummary`, `productContext.purchaseOrOrderMatchNeeded`, and `productContext.requestedAdditionalViews`.
+- `reviewSignals` as review-support signals only.
+- `limitations`.
+- `recommendedSupportAction`.
+- `customerSafeWording`, if the display keeps it neutral and copy-safe.
+- `externalVerification.status`, `externalVerification.externalVerification`, and `externalVerification.summary`.
+- Privacy posture booleans showing that raw/private-bearing fields are excluded.
+
+Forbidden display/export fields:
+
+- Raw photo bytes, image buffers, object URLs, retained image fingerprints, or raw image-derived provider payloads.
+- Raw EXIF, raw metadata, precise timestamps, GPS coordinates, device owner fields, device serial fields, software fields, file paths, original filenames, raw metadata notes, or copied metadata objects.
+- Raw serial, model, label, barcode, or QR values.
+- Faces, people, addresses, customer identifiers, private backgrounds, private evidence snippets, or real customer evidence details.
+- Provider output, storage IDs or handles, integration IDs or handles, case queue IDs, or case workflow identifiers.
+- Receipt-only fields such as OCR text, parsed receipt fields, receipt source classification, receipt score breakdown, receipt image heuristics, internal receipt structure confidence, or receipt-specific finding groups.
+- Final evidence outcome, customer intent, claim outcome, automatic disposition, policy disposition, or any result-shape field that implies a completed support decision.
+
+Required probes/checks before implementation:
+
+- Product-photo UI/display shape probe proving the display consumes `ProductPhotoReportViewModel` or another product-photo-specific display model, not `LocalAnalysisResult` or `MockAnalysisReport`.
+- UI isolation probe proving product-photo display does not invoke upload routing, live analyzer routing, `analyzeEvidenceFile`, parser, receipt scoring, fixtures, providers, storage, integrations, or case queues.
+- Receipt preservation checks proving the receipt UI/report path still uses the existing receipt analyzer and receipt report adapter, and that receipt output remains unchanged.
+- Privacy display/export checks proving no raw photo bytes, image buffers, raw EXIF, raw metadata, original filenames, raw labels, private evidence, provider output, storage handles, integration handles, or case queue handles can render or copy.
+- Result-shape cases for no requested views, requested additional views, low/medium/high score, limited or missing metadata, label context present with raw values omitted, and overconfident source labels clamped to review-safe display.
+- Safe wording checks covering every new product-photo display/export file.
+- `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run check:report-semantics`, `git diff --check`, and final `git status --short --branch`.
+
+Allowed files for the future display implementation slice:
+
+- A new isolated product-photo display component under `src/components/`, only if explicitly opened.
+- A new product-photo display probe under `src/lib/analysis/` or a narrow test/probe location consistent with existing patterns.
+- `scripts/check-report-semantics.mjs`, only to add required display/export safety coverage.
+- `NEXT_STEPS.md`, `PHASE_2_PHOTO_EVIDENCE_PLAN.md`, and `AGENT_LOG.md` for status updates.
+
+Protected files for the future display implementation slice unless explicitly opened in a separate prompt:
+
+- `src/components/ClaimReviewWorkflow.tsx`.
+- `src/components/AnalysisReport.tsx`.
+- `src/components/AuthenticityResultCard.tsx`.
+- `src/lib/analysis/report-adapter.ts`.
+- `src/lib/analysis/analyzer.ts`.
+- `src/lib/analysis/analyzer-routing.ts`.
+- `src/lib/analysis/product-photo-analyzer.ts`.
+- `src/lib/analysis/product-photo-report-view-model.ts`.
+- `src/lib/analysis/types.ts`.
+- Existing `src/lib/analysis/*.probe.ts`, unless a future prompt explicitly opens probe updates.
+- Upload files.
+- Scoring files.
+- Parser files.
+- Fixtures.
+- Package scripts and dependencies.
+- Providers, storage, integrations, and case queues.
+
+Stop conditions for the future display implementation:
+
+- Product-photo display requires `LocalAnalysisResult`, `MockAnalysisReport`, receipt OCR/parser fields, or receipt score breakdown.
+- Product-photo output is placed inside receipt-specific extracted-data, OCR, parser, receipt structure, or receipt source-classification UI.
+- `analyzeEvidenceFile`, `LocalAnalysisResult`, receipt analyzer behavior, receipt report mapping, or receipt UI output changes unexpectedly.
+- Product-photo display reaches live upload routing, analyzer routing, report-adapter live paths, scoring, parser, fixtures, providers, storage, integrations, or case queues before a separate slice is explicitly opened.
+- UI or export code spreads `ProductPhotoEvidenceAnalysisResult`, `moduleDetails`, `privacySafeMetadataSummary`, raw metadata objects, or raw provider/model payloads.
+- Any raw photo, raw metadata, original filename, raw label value, private evidence, provider output, storage handle, integration handle, or case queue handle appears in display, export, fixture, screenshot, log, or docs.
+- Any wording implies proof, external verification, customer wrongdoing, final outcome, or automatic disposition.
+- New display/export files are not covered by semantic checks.
+- Any required check fails or cannot be interpreted safely.
+
+Why routing, providers, and case workflow remain separate:
+
+- UI display only controls how an already-safe view model is presented.
+- Upload and analyzer routing decide when product-photo analysis runs, which remains blocked.
+- Provider behavior would change evidence generation and privacy obligations, so it requires a separate provider/privacy/QA gate.
+- Case workflow would introduce persistence, reviewer state, and audit concerns, so it belongs to a later phase gate.
+- Keeping these separate protects the shipped receipt workflow and prevents product-photo output from becoming live before routing, privacy, wording, and QA are ready.
+
+Recommended next implementation prompt after this docs gate is committed and pushed:
+
+```text
+/claimguardagent implement the first isolated product-photo UI display probe slice only: add a standalone product-photo display component and required probes that consume ProductPhotoReportViewModel only; do not edit ClaimReviewWorkflow.tsx, upload routing, analyzeEvidenceFile, analyzer-routing live behavior, report-adapter.ts, LocalAnalysisResult, receipt behavior, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; expand semantic checks only for the new display surface; run lint, build, report semantics, and diff check; commit only if safe; do not push
+```
+
 ## Future Evidence Review UX Direction
 
 Robert wants the eventual result screen to feel like an evidence triage workspace, not a stack of competing result cards. This is product direction only; do not implement it during the current Phase 2.2 runtime-boundary work.
@@ -325,5 +462,5 @@ Robert wants the eventual result screen to feel like an evidence triage workspac
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent implement the first product-photo-safe report/UI mapping probe slice only: add an isolated product-photo mapping boundary and required probes without changing report-adapter.ts, UI components, upload routing, analyzeEvidenceFile, LocalAnalysisResult, receipt behavior, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; expand safety checks only if needed; run lint, build, report semantics, and diff check; commit only if safe; do not push
+/claimguardagent implement the first isolated product-photo UI display probe slice only: add a standalone product-photo display component and required probes that consume ProductPhotoReportViewModel only; do not edit ClaimReviewWorkflow.tsx, upload routing, analyzeEvidenceFile, analyzer-routing live behavior, report-adapter.ts, LocalAnalysisResult, receipt behavior, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; expand semantic checks only for the new display surface; run lint, build, report semantics, and diff check; commit only if safe; do not push
 ```
