@@ -11,7 +11,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - Phase 2.0 scaffold work is closed.
 - Phase 2.1 Product Photo Local Heuristic Design is reviewed and closed for the current planning slice.
 - Phase 2.2 Product Photo Boundary and Display Readiness is closed. It produced small, local-only, manual-review-support-only, intentionally unwired helper, boundary, probe, display, and visual QA surfaces without making product-photo runtime live.
-- Phase 2.3 is ready to open only as an explicitly prompted, unwired local heuristic analyzer slice. It must not wire product-photo into upload, `analyzeEvidenceFile`, `ClaimReviewWorkflow`, report adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues.
+- Phase 2.3 is open as an explicitly prompted, unwired local heuristic analyzer slice. It must not wire product-photo into upload, `analyzeEvidenceFile`, `ClaimReviewWorkflow`, report adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues.
 - Completed pushed Phase 2.2 work includes:
   - `44d09f0` added unwired product-photo signal builders.
   - `50f8284` added unwired product-photo file summary, review completeness, and local review signal helpers.
@@ -54,6 +54,8 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - The first isolated `ProductPhotoReviewPanel` component now exists as a standalone, unwired display surface that accepts exactly `viewModel: ProductPhotoReportViewModel`, renders derived product-photo review summaries only, keeps status, priority, confidence, evidence quality, score, recommended action, limitations, review signals, and privacy posture separate, and is covered by a dedicated component probe plus semantic/import/privacy guards. It is not inserted into `ClaimReviewWorkflow` or any live route.
 - The first non-live synthetic visual verification host for `ProductPhotoReviewPanel` now exists at `src/app/dev/product-photo-review-panel/page.tsx` with colocated literal `ProductPhotoReportViewModel` render cases in `render-cases.ts`. The route is unlinked, production-disabled by default with `notFound()`, synthetic-only, includes low-confidence, medium-priority, and stronger manual-review cases, and is covered by semantic/import/privacy guards. It is not `/test-evidence`, not `ClaimReviewWorkflow`, and not connected to upload, analyzer, analyzer-routing, report-adapter, scoring, parser, fixtures, providers, storage, integrations, or case queues.
 - Dedicated desktop and mobile browser QA for `/dev/product-photo-review-panel` passed after commit `6f48370`: the host rendered all three synthetic cases, showed manual-review-only and external-verification-not-performed copy, had no relevant console errors/warnings, no horizontal overflow, no primary nested review scroll containers, no sibling panel overlap, no image/media elements, and `/` remained the Phase 1 receipt workflow with no visible host link.
+- Phase 2.3 opened with a first thin local heuristic analyzer boundary, `analyzeProductPhotoEvidenceWithLocalHeuristics`, that composes the existing product-photo detail/result boundary from synthetic or bucketed review context only. It remains manual-review-only, local-only, non-live, and unwired from upload, `analyzeEvidenceFile`, analyzer routing, UI, report adapter mapping, scoring, parser, fixtures, providers, storage, integrations, and case queues.
+- The Phase 2.3 analyzer probe now covers complete context, missing wider view, limited image quality, unavailable metadata context, serial/model label context with raw values omitted, proof-of-purchase-match-needed, hostile caller-copy sanitization, separate score/confidence/review-priority/limitations/recommended-action semantics, bucket-only metadata summaries, and import/isolation boundaries.
 - Probe sample data is synthetic and records no file bytes, image buffers, raw EXIF objects, provider handles, storage handles, integration handles, or case queue handles.
 - No runtime analyzer routing, upload, UI, report, scoring, parser, metadata extraction, or fixture behavior changed during Phase 2.0, Phase 2.1, or Phase 2.2 helper/boundary work.
 - Runtime routing remains blocked until Robert explicitly opens that slice.
@@ -62,7 +64,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 
 ## Next Safe Tasks
 
-1. Open Phase 2.3 only with an explicit prompt for a narrow, unwired local product-photo heuristic analyzer slice. Start with deterministic product-photo module/probe work, synthetic/file-like inputs only, and no live workflow wiring.
+1. Continue Phase 2.3 with the next narrow, unwired local product-photo heuristic analyzer probe slice only if explicitly prompted. Keep deterministic product-photo module/probe work synthetic or file-like, and keep all live workflow wiring out of scope.
 2. Keep the decision-only public analyzer routing wrapper out of live UI/upload/report/scoring/parser paths until a separate live-routing plan is explicitly opened.
 3. Keep the dev-only routing adapter out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 4. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.

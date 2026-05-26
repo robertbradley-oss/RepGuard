@@ -60,6 +60,11 @@ export type ProductPhotoEvidenceAnalysisResultInput = ProductPhotoAnalysisDetail
   sourceKind?: EvidenceSourceKind;
 };
 
+export type ProductPhotoLocalHeuristicAnalyzerInput = ProductPhotoAnalysisDetailsInput & {
+  evidenceLabel?: string;
+  sourceKind?: Extract<EvidenceSourceKind, "manual-review-context" | "synthetic-fixture">;
+};
+
 export const PRODUCT_PHOTO_RESULT_BOUNDARY_STATUS = {
   boundary: "product-photo-result-boundary",
   devOnly: true,
@@ -67,6 +72,19 @@ export const PRODUCT_PHOTO_RESULT_BOUNDARY_STATUS = {
   runtimeLive: false,
   analyzerInvoked: false,
   uiOrReportBehaviorExercised: false,
+} as const;
+
+export const PRODUCT_PHOTO_LOCAL_HEURISTIC_ANALYZER_STATUS = {
+  boundary: "product-photo-local-heuristic-analyzer",
+  localOnly: true,
+  syntheticProbeOnly: true,
+  manualReviewOnly: true,
+  runtimeLive: false,
+  localAnalysisResultRequired: false,
+  analyzeEvidenceFileInvoked: false,
+  analyzerRoutingInvoked: false,
+  uiUploadReportScoringParserFixturePathsInvoked: false,
+  providersStorageIntegrationsCaseQueuesInvoked: false,
 } as const;
 
 export function buildDefaultProductPhotoMetadataSummary(): EvidenceMetadataSummary {
@@ -457,4 +475,38 @@ export function prepareProductPhotoEvidenceAnalysisResultForDevOnlyBoundary(
       productPhoto: details,
     },
   };
+}
+
+export function analyzeProductPhotoEvidenceWithLocalHeuristics(
+  input: ProductPhotoLocalHeuristicAnalyzerInput = {},
+): ProductPhotoEvidenceAnalysisResult {
+  const {
+    subjectType,
+    damageVisibility,
+    productContext,
+    productLabelContext,
+    metadataSummary,
+    fileSummary,
+    requestedAdditionalViews,
+    missingContext,
+    purchaseOrReceiptMatchNeeded,
+    includeManualReviewRecommendation,
+    evidenceLabel,
+    sourceKind,
+  } = input;
+
+  return prepareProductPhotoEvidenceAnalysisResultForDevOnlyBoundary({
+    subjectType,
+    damageVisibility,
+    productContext,
+    productLabelContext,
+    metadataSummary,
+    fileSummary,
+    requestedAdditionalViews,
+    missingContext,
+    purchaseOrReceiptMatchNeeded,
+    includeManualReviewRecommendation,
+    evidenceLabel,
+    sourceKind: sourceKind === "synthetic-fixture" ? "synthetic-fixture" : "manual-review-context",
+  });
 }

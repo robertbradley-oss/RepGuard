@@ -13,7 +13,9 @@ const filesToCheck = [
   "src/lib/analysis/scoring.ts",
   "src/lib/analysis/types.ts",
   "src/lib/analysis/product-photo-analyzer.ts",
+  "src/lib/analysis/product-photo-analyzer.probe.ts",
   "src/lib/analysis/product-photo-heuristics.ts",
+  "src/lib/analysis/product-photo-heuristics.probe.ts",
   "src/lib/analysis/product-photo-result.probe.ts",
   "src/lib/analysis/shared-result.probe.ts",
   "src/lib/analysis/product-photo-report-view-model.ts",
@@ -239,6 +241,9 @@ const forbiddenRedactedDiagnosticPatterns = [
 ];
 const productPhotoReportViewModel =
   fileContents.get("src/lib/analysis/product-photo-report-view-model.ts") ?? "";
+const productPhotoAnalyzer = fileContents.get("src/lib/analysis/product-photo-analyzer.ts") ?? "";
+const productPhotoAnalyzerProbe = fileContents.get("src/lib/analysis/product-photo-analyzer.probe.ts") ?? "";
+const productPhotoHeuristicsProbe = fileContents.get("src/lib/analysis/product-photo-heuristics.probe.ts") ?? "";
 const productPhotoReportViewModelProbe =
   fileContents.get("src/lib/analysis/product-photo-report-view-model.probe.ts") ?? "";
 const productPhotoReviewPanel = fileContents.get("src/components/ProductPhotoReviewPanel.tsx") ?? "";
@@ -285,6 +290,124 @@ const requiredProductPhotoMapperSignals = [
   {
     label: "targeted product-photo manual review support action",
     patterns: [/Manual review recommended/i],
+  },
+];
+const forbiddenProductPhotoAnalyzerImports = [
+  "@/lib/analysis/analyzer",
+  "@/lib/analysis/analyzer-routing",
+  "@/lib/analysis/report-adapter",
+  "@/lib/analysis/scoring",
+  "@/lib/analysis/receipt-parser",
+  "@/lib/test-evidence",
+  "@/components/",
+  "@/lib/claim-data",
+];
+const requiredProductPhotoAnalyzerSignals = [
+  {
+    label: "local heuristic analyzer status",
+    patterns: [/PRODUCT_PHOTO_LOCAL_HEURISTIC_ANALYZER_STATUS/],
+  },
+  {
+    label: "local heuristic analyzer entrypoint",
+    patterns: [/analyzeProductPhotoEvidenceWithLocalHeuristics/],
+  },
+  {
+    label: "local heuristic analyzer synthetic probe only flag",
+    patterns: [/syntheticProbeOnly:\s*true/],
+  },
+  {
+    label: "local heuristic analyzer manual-review-only flag",
+    patterns: [/manualReviewOnly:\s*true/],
+  },
+  {
+    label: "local heuristic analyzer runtime non-live flag",
+    patterns: [/runtimeLive:\s*false/],
+  },
+  {
+    label: "local heuristic analyzer does not require receipt-shaped result",
+    patterns: [/localAnalysisResultRequired:\s*false/],
+  },
+  {
+    label: "local heuristic analyzer analyzeEvidenceFile not invoked",
+    patterns: [/analyzeEvidenceFileInvoked:\s*false/],
+  },
+  {
+    label: "local heuristic analyzer analyzer routing not invoked",
+    patterns: [/analyzerRoutingInvoked:\s*false/],
+  },
+  {
+    label: "local heuristic analyzer UI/upload/report/scoring/parser/fixture paths not invoked",
+    patterns: [/uiUploadReportScoringParserFixturePathsInvoked:\s*false/],
+  },
+  {
+    label: "local heuristic analyzer provider/storage/integration/case queue paths not invoked",
+    patterns: [/providersStorageIntegrationsCaseQueuesInvoked:\s*false/],
+  },
+];
+const requiredProductPhotoAnalyzerProbeSignals = [
+  {
+    label: "analyzer probe active shape checks",
+    patterns: [/assertProbeChecksPass\("shape", shapeChecks\)/],
+  },
+  {
+    label: "analyzer probe active heuristic output checks",
+    patterns: [/assertProbeChecksPass\("heuristic outputs", heuristicOutputChecks\)/],
+  },
+  {
+    label: "analyzer probe active safety checks",
+    patterns: [/assertProbeChecksPass\("safety", safetyChecks\)/],
+  },
+  {
+    label: "analyzer probe active privacy checks",
+    patterns: [/assertProbeChecksPass\("privacy", privacyChecks\)/],
+  },
+  {
+    label: "analyzer probe active isolation checks",
+    patterns: [/assertProbeChecksPass\("isolation", isolationChecks\)/],
+  },
+  {
+    label: "analyzer probe complete context case",
+    patterns: [/completeContextAnalyzerResult/],
+  },
+  {
+    label: "analyzer probe missing wider view case",
+    patterns: [/missingWiderViewAnalyzerResult/],
+  },
+  {
+    label: "analyzer probe limited quality case",
+    patterns: [/limitedQualityAnalyzerResult/],
+  },
+  {
+    label: "analyzer probe unavailable metadata case",
+    patterns: [/unavailableMetadataAnalyzerResult/],
+  },
+  {
+    label: "analyzer probe serial label context case",
+    patterns: [/serialLabelContextAnalyzerResult/],
+  },
+  {
+    label: "analyzer probe caller-copy safety case",
+    patterns: [/hostileInputAnalyzerResult/],
+  },
+  {
+    label: "analyzer probe confidence priority score separation",
+    patterns: [/confidenceSeparateFromReviewPriority/, /scoreSeparateFromConfidence/],
+  },
+  {
+    label: "analyzer probe limitations recommendation separation",
+    patterns: [/limitationsSeparateFromRecommendation/],
+  },
+  {
+    label: "analyzer probe bucket-only metadata marker",
+    patterns: [/metadataUsesBucketsNotExactDimensions/],
+  },
+  {
+    label: "analyzer probe source import boundary markers",
+    patterns: [/analyzerDoesNotImportLiveAnalyzer/, /analyzerDoesNotImportAnalyzerRouting/],
+  },
+  {
+    label: "analyzer probe receipt preservation marker",
+    patterns: [/receiptReportAdapterSignatureStillReceiptOnly/],
   },
 ];
 const requiredProductPhotoDisplayProbeSignals = [
@@ -700,6 +823,47 @@ for (const signal of requiredProductPhotoMapperSignals) {
   if (!signal.patterns.some((pattern) => pattern.test(productPhotoReportViewModel))) {
     failures.push(`Product-photo report mapping boundary check failed: missing ${signal.label}`);
   }
+}
+
+for (const importPath of forbiddenProductPhotoAnalyzerImports) {
+  const doubleQuotedImport = `from "${importPath}"`;
+  const singleQuotedImport = `from '${importPath}'`;
+
+  if (productPhotoAnalyzer.includes(doubleQuotedImport) || productPhotoAnalyzer.includes(singleQuotedImport)) {
+    failures.push(`Product-photo analyzer boundary check failed: analyzer imports forbidden path ${importPath}`);
+  }
+}
+
+if (/LocalAnalysisResult/.test(productPhotoAnalyzer) || /LocalAnalysisResult/.test(productPhotoAnalyzerProbe)) {
+  failures.push("Product-photo analyzer boundary check failed: analyzer slice depends on LocalAnalysisResult.");
+}
+
+if (/\bFile\b|\bBlob\b|createObjectURL|\bobjectUrl\b|\bimageUrl\b|\bdataUrl\b/i.test(productPhotoAnalyzer)) {
+  failures.push("Product-photo analyzer privacy check failed: analyzer references file/blob/object-url/image-url data.");
+}
+
+if (
+  /rawMetadata|originalFilename(?!Omitted)|rawLabelValue|providerOutput|storageHandle|integrationHandle|caseQueueHandle/.test(
+    productPhotoAnalyzer,
+  )
+) {
+  failures.push("Product-photo analyzer privacy check failed: analyzer references forbidden raw/private output fields.");
+}
+
+for (const signal of requiredProductPhotoAnalyzerSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(productPhotoAnalyzer))) {
+    failures.push(`Product-photo analyzer boundary check failed: missing ${signal.label}`);
+  }
+}
+
+for (const signal of requiredProductPhotoAnalyzerProbeSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(productPhotoAnalyzerProbe))) {
+    failures.push(`Product-photo analyzer probe check failed: missing ${signal.label}`);
+  }
+}
+
+if (!/PRODUCT_PHOTO_HEURISTICS_DEVELOPER_PROBE/.test(productPhotoHeuristicsProbe)) {
+  failures.push("Product-photo heuristics probe check failed: heuristics probe is missing from semantic coverage.");
 }
 
 for (const signal of requiredProductPhotoDisplayProbeSignals) {
