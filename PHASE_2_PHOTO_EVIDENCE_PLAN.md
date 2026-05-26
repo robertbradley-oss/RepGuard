@@ -539,6 +539,36 @@ Before implementation, require:
 
 Stop if product-photo display requires receipt-only fields, appears inside receipt-specific OCR/parser/extracted-data UI, changes receipt behavior, exposes raw/private-bearing evidence, implies proof or a completed support outcome, or depends on live routing/provider/case-workflow behavior before those slices are explicitly opened.
 
+### First Standalone Component Slice
+
+The first standalone product-photo display component slice should be planned as a component contract before implementation.
+
+The future component is a support-facing product-photo evidence-review panel, tentatively `ProductPhotoReviewPanel`. It consumes only the safe report view model and remains separate from the live upload/analyzer workflow.
+
+Required prop contract:
+
+```ts
+import type { ProductPhotoReportViewModel } from "@/lib/analysis/product-photo-report-view-model";
+
+type ProductPhotoReviewPanelProps = {
+  viewModel: ProductPhotoReportViewModel;
+};
+```
+
+Do not add additional props in the first component slice. In particular, do not pass files, blobs, object URLs, image URLs, image bytes, metadata summaries, raw product-photo results, callbacks, export payloads, upload state, receipt report types, or live analyzer state.
+
+The component should render one cohesive evidence-review panel rather than a generic card stack. Required sections are:
+
+- Header with review title, manual-review/local-only status, and external verification not performed.
+- Separate review priority, confidence, evidence quality, score meaning, limitations, and recommended action.
+- Product context with requested additional views and purchase/order match need.
+- Review signals as the primary rationale, with severity, confidence, review note, and recommended review step.
+- Privacy posture showing derived-summary-only handling and raw/private-bearing fields excluded.
+
+The component must not own image preview display. Any evidence preview anchoring belongs to a later `ClaimReviewWorkflow` insertion slice and must not introduce object URLs, raw images, or file handles into the display component.
+
+The future slice must add semantic/privacy coverage for every new display/export file, prove receipt UI/report behavior remains unchanged, and keep product-photo runtime non-live. Stop if the component needs live routing, report-adapter mapping, receipt-only fields, raw/private data, provider output, storage/integration/case handles, final outcome wording, or external-verification wording beyond not performed.
+
 ## 17. Phase 2.1 First-Pass Local Heuristic Signals
 
 Phase 2.1 starts with a small signal catalog only. These signals are manual-review support language and future implementation guidance; they do not run in `analyzeEvidenceFile`, do not change `LocalAnalysisResult`, do not affect scoring, and do not change upload, UI, report mapping, fixtures, receipt parsing, metadata extraction behavior, routing, storage, integrations, or case queues.

@@ -49,6 +49,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - The product-photo report view-model keeps score, review priority, confidence, and limitations separate; keeps external verification not performed; clamps unsupported clear-style labels away from a display outcome; and omits raw photo bytes, image buffers, raw EXIF, raw metadata, original filenames, raw label values, provider output, storage handles, integration handles, and case queue handles.
 - Probe-only isolation assertions now explicitly record that the product-photo shared-result boundary does not invoke `analyzeEvidenceFile`, analyzer routing, UI, upload, report mapping, scoring, parser, fixtures, providers, storage, integrations, or case queues.
 - The first isolated product-photo UI display contract probe now strengthens the existing product-photo report view-model probe without adding a UI component or live workflow wiring. It proves future display surfaces can consume `ProductPhotoReportViewModel` only, covers missing-context and complete-context display cases, low/medium/high score semantics, missing metadata summaries, label-context raw value omission, overconfident review-label clamping, recursive private-key denial, sentinel private-value omission, and receipt/report-adapter preservation.
+- A docs-only standalone product-photo display component plan now defines the future component as an isolated `ProductPhotoReviewPanel`-style evidence-review panel with exactly one prop, `viewModel: ProductPhotoReportViewModel`. The planned component remains unwired from `ClaimReviewWorkflow`, owns no image preview or object URL, adds no upload/analyzer/report/scoring/parser/fixture behavior, and must receive semantic/privacy coverage before implementation.
 - Probe sample data is synthetic and records no file bytes, image buffers, raw EXIF objects, provider handles, storage handles, integration handles, or case queue handles.
 - No runtime analyzer routing, upload, UI, report, scoring, parser, metadata extraction, or fixture behavior changed during Phase 2.0, Phase 2.1, or Phase 2.2 helper/boundary work.
 - Runtime routing remains blocked until Robert explicitly opens that slice.
@@ -57,7 +58,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 
 ## Next Safe Tasks
 
-1. Keep the first product-photo display work probe-only and unwired; do not add a standalone display component or live UI insertion until a separate prompt explicitly opens that slice.
+1. Implement the first standalone product-photo display component only after an explicit implementation prompt: keep it `ProductPhotoReportViewModel`-only, unwired from the live workflow, covered by semantic/privacy checks, and out of `ClaimReviewWorkflow`.
 2. Keep the decision-only public analyzer routing wrapper out of live UI/upload/report/scoring/parser paths until a separate live-routing plan is explicitly opened.
 3. Keep the dev-only routing adapter out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
 4. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
@@ -434,6 +435,135 @@ Recommended next implementation prompt after this docs gate is committed and pus
 /claimguardagent plan the first standalone product-photo display component slice only: keep it isolated from ClaimReviewWorkflow, upload routing, analyzeEvidenceFile, analyzer-routing live behavior, report-adapter.ts, LocalAnalysisResult, receipt behavior, scoring, parser behavior, fixtures, providers, storage, integrations, and case queues; require ProductPhotoReportViewModel-only props and semantic coverage for the new display surface; do not implement live UI insertion or push
 ```
 
+## Phase 2.2 Standalone Product-Photo Display Component Plan
+
+This is a docs-only component-slice plan. It defines the first future standalone product-photo display component before any component file exists. It does not implement a component, create a route, insert product-photo output into `ClaimReviewWorkflow`, change upload routing, enable analyzer routing, change report-adapter mapping, add scoring/parser behavior, touch fixtures, connect providers, add storage, add integrations, or create case queues.
+
+The future component means:
+
+- A standalone product-photo evidence-review panel, tentatively `ProductPhotoReviewPanel`.
+- A support-review surface that consumes only the already display-safe product-photo report view model.
+- A dark forensic panel that fits the current ClaimGuard analyzer/command-panel language without redesigning the whole app.
+- A review aid for synthetic/dev-only product-photo view-model data until a separate live insertion slice is explicitly opened.
+
+The future component does not mean:
+
+- A live product-photo result in the main workflow.
+- An image preview owner, image upload surface, analyzer trigger, export system, case workflow, or routing adapter.
+- A generic repeated card stack or image-review dashboard.
+- A receipt report replacement or receipt-specific detail drawer.
+- A customer-facing outcome or support policy decision.
+
+Required component input contract:
+
+```ts
+import type { ProductPhotoReportViewModel } from "@/lib/analysis/product-photo-report-view-model";
+
+type ProductPhotoReviewPanelProps = {
+  viewModel: ProductPhotoReportViewModel;
+};
+```
+
+The first implementation must keep that exact single input shape. Do not add `className`, callbacks, copy/export handlers, upload state, `File`, `Blob`, object URL, image URL, data URL, raw metadata, raw result, `ProductPhotoEvidenceAnalysisResult`, `EvidenceAnalysisResult`, `LocalAnalysisResult`, `MockAnalysisReport`, or receipt report props in the first component slice. Any preview anchoring belongs to a later live UI insertion slice, and image preview ownership must stay outside this standalone component.
+
+Required layout/content sections:
+
+1. Header with product-photo review title, local/manual-review status, and external verification not performed.
+2. Compact metric band for review priority, confidence, and evidence quality. These must be visibly separate from the score.
+3. Evidence Reliability Score section with label, value, local-only scope, meaning, and high-score safety note.
+4. Product context section with subject type, context status, relevant-area visibility review context, label context summary, purchase/order match needed, and requested additional views.
+5. Recommended support action section using manual-review-only language.
+6. Limitations section that includes local-only analysis, external verification not performed, score-is-not-proof meaning, metadata context-only posture, and any additional-context need.
+7. Review signals section as the centerpiece, showing label, category, severity, confidence percent, review note, and recommended review step.
+8. Privacy posture section showing derived-summary-only handling and raw/private-bearing fields excluded.
+
+Layout rules:
+
+- Render one cohesive evidence-review panel, not nested cards inside cards.
+- Avoid internal nested scrolling for primary review content. Let the host page or isolated review surface scroll normally.
+- Use text labels as well as color for priority/severity/confidence.
+- Use semantic headings or sections for Priority, Confidence, Evidence quality, Recommended action, Limitations, and Review signals.
+- Motion is optional and should be limited to a subtle result reveal if used; do not add analysis-running animation because the component is non-live. Respect reduced-motion behavior.
+
+Safe UI copy rules:
+
+- Use manual-review-only language: product-photo review context, review priority, evidence quality, review readiness, requested additional view, review signal, limitations, manual review recommended, additional context may be needed, and external verification not performed.
+- Keep score, review priority, confidence, and limitations as separate concepts.
+- State that the Evidence Reliability Score reflects local evidence quality and review readiness only.
+- State that a high score does not prove the product photo or claim.
+- Keep customer-safe wording neutral and focused on requesting minimum useful context.
+- Do not use proof language, final-decision language, customer-accusation language, pass/fail authenticity wording, automatic outcome language, or wording implying external verification happened.
+
+Forbidden imports and data surfaces:
+
+- No `LocalAnalysisResult`, `MockAnalysisReport`, `EvidenceAnalysisResult`, `ProductPhotoEvidenceAnalysisResult`, `moduleDetails`, `privacySafeMetadataSummary`, raw product-photo result, receipt OCR/parser fields, receipt score breakdown, or receipt report types.
+- No analyzer, analyzer routing, report adapter, scoring, parser, fixture, upload, metadata-service, provider, storage, integration, case queue, or `ClaimReviewWorkflow` imports.
+- No `File`, `Blob`, object URL, image URL, data URL, image bytes, image buffer, retained image fingerprint, raw EXIF, raw metadata, original filename, precise timestamp, GPS, device owner field, device serial field, raw serial/model/label/barcode/QR value, people/faces/addresses/customer identifiers/private backgrounds, provider payload, storage handle, integration handle, case queue handle, or case workflow identifier.
+
+Privacy limits:
+
+- Display only derived fields from `ProductPhotoReportViewModel`.
+- Export/copy behavior is out of scope for the first component. If a later slice adds it, the output must be derived-summary-only and covered by semantic/privacy checks.
+- Do not render, log, screenshot, copy, or fixture real customer photos, private backgrounds, raw metadata, raw labels, or filenames.
+- Do not add real product-photo fixtures or metadata fixtures.
+
+Required probes/checks before and during implementation:
+
+- A component shape probe proving the component props are exactly `{ viewModel: ProductPhotoReportViewModel }`.
+- Import-boundary checks proving the component does not import analyzer, analyzer routing, report adapter, scoring, parser, fixtures, upload, providers, storage, integrations, case queues, receipt report types, or `ClaimReviewWorkflow`.
+- A rendering/shape probe using synthetic `ProductPhotoReportViewModel` data for missing context, complete context, no requested views, multiple requested views, low/medium/high score, limited/missing metadata, label context with raw values omitted, and overconfident labels clamped to review-safe display.
+- Privacy checks for recursive forbidden keys, sentinel private-value omission, no object URL/image/file/blob props, no raw metadata spreading, no raw result spreading, and no copy/export leakage.
+- Receipt preservation checks proving `mapLocalAnalysisToReport(result: LocalAnalysisResult)` remains receipt-only, `ClaimReviewWorkflow` still uses the receipt analyzer/report adapter path, and receipt UI/report output is not changed.
+- Add every new product-photo display/export file to `scripts/check-report-semantics.mjs`; missing semantic coverage for a new display file is a stop condition.
+- Run `git status --short --branch`, `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run check:report-semantics`, `git diff --check`, and final `git status --short --branch`.
+- If an isolated route, story, harness, or other renderable host is added for the standalone component, run a browser/render check and verify no console errors, no primary content overflow, no text overlap, no nested primary scroll, and responsive behavior. If no renderable host exists, report that visual/browser verification is not available for the slice.
+
+Allowed files for the future implementation slice:
+
+- One new isolated component file under `src/components/`, such as `src/components/ProductPhotoReviewPanel.tsx`.
+- One narrow component probe/test file in a location consistent with existing project patterns.
+- `scripts/check-report-semantics.mjs`, only to cover the new display surface and any display/export wording.
+- `NEXT_STEPS.md`, `PHASE_2_PHOTO_EVIDENCE_PLAN.md`, and `AGENT_LOG.md` for status updates.
+
+Protected files for the future implementation slice:
+
+- `src/components/ClaimReviewWorkflow.tsx`.
+- `src/components/AnalysisReport.tsx`.
+- `src/components/AuthenticityResultCard.tsx`.
+- `src/lib/analysis/product-photo-report-view-model.ts`, unless a tiny additive display-contract field is separately authorized.
+- Existing `src/lib/analysis/*.probe.ts`, unless the future prompt explicitly opens probe updates.
+- `src/lib/analysis/report-adapter.ts`.
+- `src/lib/analysis/analyzer.ts`.
+- `src/lib/analysis/analyzer-routing.ts`.
+- `src/lib/analysis/product-photo-analyzer.ts`.
+- `src/lib/analysis/types.ts`.
+- Upload files, scoring, parser, fixtures, package scripts/dependencies, providers, storage, integrations, and case queues.
+
+Stop conditions for the future implementation:
+
+- The component needs anything other than `viewModel: ProductPhotoReportViewModel`.
+- The component needs image preview ownership, object URLs, files, blobs, image bytes, raw metadata, raw labels, original filenames, raw product-photo results, or receipt-only fields.
+- The component imports analyzer, analyzer routing, report adapter, scoring, parser, upload, fixtures, providers, storage, integrations, case queues, or `ClaimReviewWorkflow`.
+- The component is wired into `ClaimReviewWorkflow`, upload routing, analyzer routing, report-adapter live paths, scoring, parser, fixtures, providers, storage, integrations, or case queues.
+- Receipt UI/report behavior changes, `LocalAnalysisResult` changes, `analyzeEvidenceFile` changes, or product-photo runtime becomes live.
+- Any wording implies proof, external verification, customer wrongdoing, final outcome, automatic disposition, or support policy disposition.
+- Any new product-photo display/export file is missing semantic/privacy coverage.
+- Required checks fail or cannot be interpreted safely.
+
+Why later slices remain separate:
+
+- `ClaimReviewWorkflow` insertion is a live workflow change and must wait for a separate insertion prompt.
+- Upload routing and analyzer routing decide when product-photo analysis runs, so they must remain blocked until a separate runtime-routing slice.
+- Report-adapter mapping is receipt-live today and must stay receipt-only unless a separate shared-report migration is opened.
+- Providers, storage, integrations, and case queues change privacy, retention, and audit responsibilities, so they are not part of a standalone display component.
+- The first component slice only proves a safe presentation surface for an already derived, non-live view model.
+
+Recommended next implementation prompt after this docs plan is committed and pushed:
+
+```text
+/claimguardagent implement the first standalone product-photo display component slice only: create an isolated ProductPhotoReviewPanel-style component that accepts exactly viewModel: ProductPhotoReportViewModel; do not wire it into ClaimReviewWorkflow or any live route; do not add upload routing, analyzer routing, report-adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; add/extend only the required component probe and semantic checker coverage for the new display file; run lint, build, report semantics, diff check, and a browser/render check only if a renderable isolated host is added; commit only if safe; do not push
+```
+
 ## Future Evidence Review UX Direction
 
 Robert wants the eventual result screen to feel like an evidence triage workspace, not a stack of competing result cards. This is product direction only; do not implement it during the current Phase 2.2 runtime-boundary work.
@@ -463,5 +593,5 @@ Robert wants the eventual result screen to feel like an evidence triage workspac
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent implement the first isolated product-photo UI display probe slice only: add a standalone product-photo display component and required probes that consume ProductPhotoReportViewModel only; do not edit ClaimReviewWorkflow.tsx, upload routing, analyzeEvidenceFile, analyzer-routing live behavior, report-adapter.ts, LocalAnalysisResult, receipt behavior, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; expand semantic checks only for the new display surface; run lint, build, report semantics, and diff check; commit only if safe; do not push
+/claimguardagent implement the first standalone product-photo display component slice only: create an isolated ProductPhotoReviewPanel-style component that accepts exactly viewModel: ProductPhotoReportViewModel; do not wire it into ClaimReviewWorkflow or any live route; do not add upload routing, analyzer routing, report-adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, or case queues; add/extend only the required component probe and semantic checker coverage for the new display file; run lint, build, report semantics, diff check, and a browser/render check only if a renderable isolated host is added; commit only if safe; do not push
 ```
