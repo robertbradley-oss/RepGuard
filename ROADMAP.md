@@ -51,7 +51,7 @@ Explicitly deferred from Phase 1:
 
 ## Phase 2: Photo Evidence
 
-Status: Phase 2.1 has officially started as Product Photo Local Heuristic Design. Phase 2.0 scaffold work is closed. Phase 2.1 is documentation and planning only: local-only, manual-review-safe signal design with no runtime analyzer behavior wired.
+Status: Phase 2.0 scaffold work, Phase 2.1 Product Photo Local Heuristic Design, and Phase 2.2 Product Photo Boundary and Display Readiness are closed. Phase 2.3 is ready to open only with an explicit prompt for a narrow, unwired local heuristic analyzer slice. Product-photo runtime analyzer behavior is still not live.
 
 Meaning:
 
@@ -65,7 +65,8 @@ Current implementation boundary:
 
 - Shared evidence and product-photo scaffold/type-boundary work is allowed.
 - Shared evidence model types and product-photo scaffold/defaults exist.
-- Phase 2.1 may define the first product-photo heuristic signal categories and future implementation order in planning docs.
+- Phase 2.1 defined the first product-photo heuristic signal categories and future implementation order in planning docs.
+- Phase 2.2 added non-live product-photo helper boundaries, guarded routing decisions, shared result shape readiness, a product-photo report view-model, an isolated `ProductPhotoReviewPanel`, a production-disabled synthetic render host, semantic/privacy guards, and desktop/mobile browser QA.
 - No product-photo analyzer behavior is live yet.
 - No runtime analyzer, upload, UI, report, scoring, parser, fixture, storage, integration, or external provider behavior is live for Phase 2 yet.
 - `product-photo` is canonical.
@@ -73,7 +74,7 @@ Current implementation boundary:
 
 Deferred until Robert explicitly opens a later Phase 2 runtime slice:
 
-- Implementing product damage photo analysis.
+- Wiring product damage photo analysis into the live app.
 - Connecting AI vision providers.
 - Changing the current app to add photo-analysis behavior.
 - Storing or sending real customer photos to services.

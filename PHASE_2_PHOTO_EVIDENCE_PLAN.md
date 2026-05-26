@@ -2,7 +2,9 @@
 
 This document defines Phase 2 before runtime implementation. It is planning guidance only.
 
-Phase 1 Receipt Intelligence is closed, pushed, deployed, and production-smoked. Phase 2.0 scaffold work is closed. Phase 2.1 has officially started as Product Photo Local Heuristic Design, limited to local-only, manual-review-safe signal design. Phase 2.1 does not change app code, analyzer logic, fixtures, upload behavior, provider integrations, scoring, report mapping, or UI behavior.
+Phase 1 Receipt Intelligence is closed, pushed, deployed, and production-smoked. Phase 2.0 scaffold work is closed. Phase 2.1 Product Photo Local Heuristic Design is reviewed and closed. Phase 2.2 Product Photo Boundary and Display Readiness is closed after non-live helper, result, routing, view-model, display, synthetic render-host, semantic/privacy guard, and desktop/mobile browser-QA work. Phase 2.3 is ready to open only with an explicit prompt for a narrow, unwired local heuristic analyzer slice.
+
+Phase 2.2 did not make product-photo runtime live. `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, receipt UI/report behavior remains unchanged, and product-photo remains out of upload routing, live report adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, and case queues.
 
 ClaimGuard is a fraud-risk screening and evidence intelligence platform for support and warranty teams. Receipt analysis is one evidence module inside that broader system. Phase 2 should add photo evidence readiness without turning ClaimGuard into a toy image checker, a generic AI chatbot, a generic SaaS dashboard, or an automatic decision system.
 
