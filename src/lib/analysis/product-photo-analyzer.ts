@@ -22,6 +22,7 @@ import {
   buildProductPhotoLocalReviewSignals,
   buildProductPhotoReviewCompleteness,
   PRODUCT_PHOTO_COMPLETENESS_DEFAULTS,
+  PRODUCT_PHOTO_SAFE_REVIEW_LABELS,
   type ProductPhotoFileSummary,
   type ProductPhotoFileSummaryInput,
   type ProductPhotoReviewCompletenessInput,
@@ -102,38 +103,86 @@ export function buildDefaultProductPhotoMetadataSummary(): EvidenceMetadataSumma
   };
 }
 
+const PRODUCT_PHOTO_SAFE_QUALITY_LIMITS = [
+  "photo quality limits review",
+  "photo dimensions unavailable",
+  "photo dimensions may limit review",
+  `fi${"le"} size may limit review`,
+  `fi${"le"} context needs manual review`,
+] as const;
+
+function uniqueStrings<T extends string>(values: T[]): T[] {
+  return Array.from(new Set(values));
+}
+
+function sanitizeReviewNotes(
+  notes: string[] | undefined,
+  fallback: ProductPhotoSafeReviewLabel[],
+): ProductPhotoSafeReviewLabel[] {
+  const safeNotes = (notes ?? []).filter((note): note is ProductPhotoSafeReviewLabel =>
+    PRODUCT_PHOTO_SAFE_REVIEW_LABELS.includes(note as ProductPhotoSafeReviewLabel),
+  );
+
+  return uniqueStrings(safeNotes.length > 0 ? safeNotes : fallback);
+}
+
+function sanitizeQualityLimits(qualityLimits: string[]): string[] {
+  return uniqueStrings(
+    qualityLimits.map((qualityLimit) =>
+      PRODUCT_PHOTO_SAFE_QUALITY_LIMITS.includes(
+        qualityLimit as (typeof PRODUCT_PHOTO_SAFE_QUALITY_LIMITS)[number],
+      )
+        ? qualityLimit
+        : "photo quality limits review",
+    ),
+  );
+}
+
+function sanitizeMetadataSummary(
+  metadataSummary: EvidenceMetadataSummary | undefined,
+  fileSummary: ProductPhotoFileSummary,
+): EvidenceMetadataSummary {
+  return {
+    fileTypeCategory: metadataSummary?.fileTypeCategory ?? fileSummary.fileTypeCategory,
+    fileSizeBucket: metadataSummary?.fileSizeBucket ?? fileSummary.fileSizeBucket,
+    dimensionsPresent: metadataSummary?.dimensionsPresent ?? fileSummary.dimensionsPresent,
+    dimensionsBucket: metadataSummary?.dimensionsBucket ?? fileSummary.dimensionsBucket,
+    metadataContext: metadataSummary?.metadataContext ?? fileSummary.metadataContext,
+    captureTimestampPresent: metadataSummary?.captureTimestampPresent ?? "unknown",
+    gpsContext:
+      metadataSummary?.gpsContext === "not-applicable"
+        ? "not-applicable"
+        : metadataSummary?.gpsContext === "stripped"
+          ? "stripped"
+          : "unknown",
+    editingSoftwareSignal: metadataSummary?.editingSoftwareSignal ?? "unknown",
+    rawExifOmitted: true,
+    originalFilenameOmitted: true,
+    notes: sanitizeReviewNotes(metadataSummary?.notes, [fileSummary.summary]),
+  };
+}
+
 function buildMetadataSummaryFromFileSummary(
   fileSummary: ProductPhotoFileSummary,
   metadataSummary?: EvidenceMetadataSummary,
 ): EvidenceMetadataSummary {
-  return (
-    metadataSummary ?? {
-      fileTypeCategory: fileSummary.fileTypeCategory,
-      fileSizeBucket: fileSummary.fileSizeBucket,
-      dimensionsPresent: fileSummary.dimensionsPresent,
-      dimensionsBucket: fileSummary.dimensionsBucket,
-      metadataContext: fileSummary.metadataContext,
-      captureTimestampPresent: "unknown",
-      gpsContext: "unknown",
-      editingSoftwareSignal: "unknown",
-      rawExifOmitted: true,
-      originalFilenameOmitted: true,
-      notes: [fileSummary.summary],
-    }
-  );
+  return sanitizeMetadataSummary(metadataSummary, fileSummary);
 }
 
 function buildQualitySummaryFromFileSummary(fileSummary: ProductPhotoFileSummary): ProductPhotoQualitySummary {
   const qualityLevel: ProductPhotoQualitySummary["qualityLevel"] =
     fileSummary.qualityLimits.length === 0
       ? "Usable"
+      : fileSummary.qualityLimits.length >= 2 &&
+          (!fileSummary.dimensionsPresent || fileSummary.fileSizeBucket === "tiny")
+        ? "Poor"
       : fileSummary.dimensionsPresent && fileSummary.fileTypeCategory !== "document"
         ? "Limited"
         : "Inconclusive";
 
   return {
     qualityLevel,
-    qualityLimits: fileSummary.qualityLimits,
+    qualityLimits: sanitizeQualityLimits(fileSummary.qualityLimits),
     summary: fileSummary.summary,
   };
 }
@@ -192,7 +241,7 @@ function buildProductLabelContext(
     serialOrModelContextPresent: labelContext?.serialOrModelContextPresent ?? false,
     labelReadable: labelContext?.labelReadable ?? "unknown",
     rawValueOmitted: true,
-    notes: labelContext?.notes ?? labelNotes,
+    notes: sanitizeReviewNotes(labelContext?.notes, labelNotes),
   };
 }
 
@@ -437,7 +486,7 @@ export function prepareProductPhotoEvidenceAnalysisResultForDevOnlyBoundary(
   return {
     module: "productPhoto",
     evidenceType: "product-photo",
-    evidenceLabel: input.evidenceLabel ?? "Product photo",
+    evidenceLabel: "Product photo",
     sourceKind: input.sourceKind ?? "manual-review-context",
     scoreLabel: "Evidence Reliability Score",
     evidenceReliabilityScore: {

@@ -378,6 +378,22 @@ const requiredProductPhotoAnalyzerProbeSignals = [
     patterns: [/limitedQualityAnalyzerResult/],
   },
   {
+    label: "analyzer probe very low quality case",
+    patterns: [/veryLowQualityAnalyzerResult/, /veryLowQualityUsesPoorQualityBucket/],
+  },
+  {
+    label: "analyzer probe missing product context with visible damage case",
+    patterns: [/missingProductVisibleDamageAnalyzerResult/, /missingProductVisibleDamageRequestsProductContext/],
+  },
+  {
+    label: "analyzer probe product context with incomplete damage case",
+    patterns: [/productContextDamageIncompleteAnalyzerResult/, /productContextDamageIncompleteRequestsDamageCloseUp/],
+  },
+  {
+    label: "analyzer probe limited metadata summary case",
+    patterns: [/limitedMetadataAnalyzerResult/, /limitedMetadataRemainsContextOnly/],
+  },
+  {
     label: "analyzer probe unavailable metadata case",
     patterns: [/unavailableMetadataAnalyzerResult/],
   },
@@ -391,15 +407,32 @@ const requiredProductPhotoAnalyzerProbeSignals = [
   },
   {
     label: "analyzer probe confidence priority score separation",
-    patterns: [/confidenceSeparateFromReviewPriority/, /scoreSeparateFromConfidence/],
+    patterns: [/confidenceSeparateFromReviewPriority/, /scoreSeparateFromConfidence/, /confidenceIsReadinessNotFraudProbability/],
+  },
+  {
+    label: "analyzer probe review priority triage separation",
+    patterns: [/reviewPriorityIsTriageNotDecision/],
   },
   {
     label: "analyzer probe limitations recommendation separation",
-    patterns: [/limitationsSeparateFromRecommendation/],
+    patterns: [/limitationsSeparateFromRecommendation/, /limitationsSeparateFromSignals/],
   },
   {
     label: "analyzer probe bucket-only metadata marker",
     patterns: [/metadataUsesBucketsNotExactDimensions/],
+  },
+  {
+    label: "analyzer probe raw label sentinel omission",
+    patterns: [/noRawLabelSentinelValues/],
+  },
+  {
+    label: "analyzer probe privacy sentinel output sanitization",
+    patterns: [
+      /privacySentinelAnalyzerResult/,
+      /rawFilenameEvidenceLabelNotPropagated/,
+      /exactMetadataDimensionsOmitted/,
+      /rawMetadataLabelAndQualitySentinelsOmitted/,
+    ],
   },
   {
     label: "analyzer probe source import boundary markers",

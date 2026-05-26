@@ -28,10 +28,16 @@ type ReceiptOnlyResultKeys =
 type RawPhotoOrPrivateEvidenceKeys =
   | "fileBytes"
   | "imageBuffer"
+  | "objectUrl"
+  | "imageUrl"
+  | "dataUrl"
   | "rawExif"
   | "rawMetadata"
   | "originalFilename"
   | "rawLabelValue"
+  | "rawSerialOrModelText"
+  | "preciseTimestamp"
+  | "gpsCoordinates"
   | "privateEvidence"
   | "providerOutput"
   | "storageHandle"
@@ -129,6 +135,74 @@ const limitedQualityAnalyzerResult = analyzeProductPhotoEvidenceWithLocalHeurist
   purchaseOrReceiptMatchNeeded: false,
 });
 
+const veryLowQualityAnalyzerResult = analyzeProductPhotoEvidenceWithLocalHeuristics({
+  evidenceLabel: "Synthetic product-photo probe",
+  sourceKind: "synthetic-fixture",
+  subjectType: "damage-close-up",
+  damageVisibility: "inconclusive",
+  productContext: "inconclusive",
+  fileSummary: {
+    fileTypeCategory: "image",
+    fileSizeBucket: "tiny",
+    dimensionsPresent: false,
+    dimensionsBucket: "small",
+    metadataContext: "Unavailable",
+    qualityLimits: ["photo quality limits review"],
+  },
+  requestedAdditionalViews: ["clearer-damage-close-up", "wider-product-photo"],
+  missingContext: ["clearer-damage-close-up", "wider-product-photo"],
+  purchaseOrReceiptMatchNeeded: false,
+});
+
+const missingProductVisibleDamageAnalyzerResult = analyzeProductPhotoEvidenceWithLocalHeuristics({
+  evidenceLabel: "Synthetic product-photo probe",
+  sourceKind: "synthetic-fixture",
+  subjectType: "damage-close-up",
+  damageVisibility: "damage-area-visible-context-missing",
+  productContext: "missing",
+  metadataSummary: bucketedAvailableMetadata,
+  requestedAdditionalViews: ["wider-product-photo"],
+  missingContext: ["wider-product-photo"],
+  purchaseOrReceiptMatchNeeded: false,
+});
+
+const productContextDamageIncompleteAnalyzerResult = analyzeProductPhotoEvidenceWithLocalHeuristics({
+  evidenceLabel: "Synthetic product-photo probe",
+  sourceKind: "synthetic-fixture",
+  subjectType: "full-product-context",
+  damageVisibility: "product-visible-damage-area-missing",
+  productContext: "complete",
+  metadataSummary: bucketedAvailableMetadata,
+  requestedAdditionalViews: ["clearer-damage-close-up"],
+  missingContext: ["clearer-damage-close-up"],
+  purchaseOrReceiptMatchNeeded: false,
+});
+
+const limitedMetadataAnalyzerResult = analyzeProductPhotoEvidenceWithLocalHeuristics({
+  evidenceLabel: "Synthetic product-photo probe",
+  sourceKind: "synthetic-fixture",
+  subjectType: "full-product-context",
+  damageVisibility: "partially-visible",
+  productContext: "complete",
+  metadataSummary: {
+    fileTypeCategory: "image",
+    fileSizeBucket: "medium",
+    dimensionsPresent: true,
+    dimensionsBucket: "large",
+    metadataContext: "Limited",
+    captureTimestampPresent: "unknown",
+    gpsContext: "stripped",
+    editingSoftwareSignal: "unknown",
+    rawExifOmitted: true,
+    originalFilenameOmitted: true,
+    notes: ["metadata context limited"],
+  },
+  requestedAdditionalViews: [],
+  missingContext: [],
+  purchaseOrReceiptMatchNeeded: false,
+  includeManualReviewRecommendation: false,
+});
+
 const unavailableMetadataAnalyzerResult = analyzeProductPhotoEvidenceWithLocalHeuristics({
   evidenceLabel: "Synthetic product-photo probe",
   sourceKind: "synthetic-fixture",
@@ -152,12 +226,64 @@ const serialLabelContextAnalyzerResult = analyzeProductPhotoEvidenceWithLocalHeu
     serialOrModelContextPresent: true,
     labelReadable: true,
     rawValueOmitted: true,
+    rawLabelValue: "RAW-SERIAL-VALUE-SHOULD-NOT-APPEAR",
+    rawSerialOrModelText: "RAW-MODEL-TEXT-SHOULD-NOT-APPEAR",
     notes: ["local-only review signal"],
+  } as Partial<ProductPhotoEvidenceAnalysisResult["moduleDetails"]["productPhoto"]["productLabelContext"]> & {
+    rawLabelValue: string;
+    rawSerialOrModelText: string;
   },
   requestedAdditionalViews: [],
   missingContext: [],
   purchaseOrReceiptMatchNeeded: false,
   includeManualReviewRecommendation: false,
+});
+
+const rawFilenameSentinel = ["RAW", "FILENAME", "SENTINEL.jpg"].join("_");
+const rawMetadataNoteSentinel = "PRIVATE-METADATA-NOTE-SHOULD-NOT-APPEAR";
+const rawLabelNoteSentinel = "PRIVATE-LABEL-NOTE-SHOULD-NOT-APPEAR";
+const rawQualityLimitSentinel = "PRIVATE-QUALITY-LIMIT-SHOULD-NOT-APPEAR";
+
+const privacySentinelAnalyzerResult = analyzeProductPhotoEvidenceWithLocalHeuristics({
+  evidenceLabel: rawFilenameSentinel,
+  sourceKind: "manual-review-context",
+  subjectType: "serial-model-label",
+  damageVisibility: "partially-visible",
+  productContext: "complete",
+  metadataSummary: {
+    fileTypeCategory: "image",
+    fileSizeBucket: "medium",
+    dimensionsPresent: true,
+    dimensionsBucket: "large",
+    dimensions: {
+      width: 4032,
+      height: 3024,
+    },
+    metadataContext: "Limited",
+    captureTimestampPresent: true,
+    gpsContext: "present",
+    editingSoftwareSignal: "present",
+    rawExifOmitted: true,
+    originalFilenameOmitted: true,
+    notes: [rawMetadataNoteSentinel, "metadata context limited"],
+  },
+  fileSummary: {
+    fileTypeCategory: "image",
+    fileSizeBucket: "tiny",
+    dimensionsPresent: false,
+    dimensionsBucket: "small",
+    metadataContext: "Limited",
+    qualityLimits: [rawQualityLimitSentinel, "photo quality limits review"],
+  },
+  productLabelContext: {
+    serialOrModelContextPresent: true,
+    labelReadable: true,
+    rawValueOmitted: true,
+    notes: [rawLabelNoteSentinel, "local-only review signal"],
+  },
+  requestedAdditionalViews: ["clearer-damage-close-up"],
+  missingContext: ["clearer-damage-close-up"],
+  purchaseOrReceiptMatchNeeded: false,
 });
 
 const sentinelUnsafeText = [
@@ -238,6 +364,12 @@ function hasNoForbiddenExactKeys(value: unknown, forbiddenKeys: readonly string[
   return forbiddenKeys.every((key) => !serialized.includes(`"${key}"`));
 }
 
+function resultTextOmitsValues(result: ProductPhotoEvidenceAnalysisResult, values: readonly string[]) {
+  const serialized = JSON.stringify(result);
+
+  return values.every((value) => !serialized.includes(value));
+}
+
 function importsPath(source: string, path: string) {
   return source.includes(`from "${path}"`) || source.includes(`from '${path}'`);
 }
@@ -265,6 +397,31 @@ const heuristicOutputChecks = {
     limitedQualityAnalyzerResult.moduleDetails.productPhoto.imageQuality.qualityLimits.length > 0,
   limitedQualityRequestsClearerCloseUp:
     limitedQualityAnalyzerResult.moduleDetails.productPhoto.requestedAdditionalViews.includes("clearer-damage-close-up"),
+  veryLowQualityUsesPoorQualityBucket:
+    veryLowQualityAnalyzerResult.moduleDetails.productPhoto.imageQuality.qualityLevel === "Poor",
+  veryLowQualityKeepsManualReviewRecommendation:
+    veryLowQualityAnalyzerResult.recommendedSupportAction.toLowerCase().includes("manual review recommended"),
+  missingProductVisibleDamageRequestsProductContext:
+    missingProductVisibleDamageAnalyzerResult.moduleDetails.productPhoto.fullProductContext === "missing" &&
+    missingProductVisibleDamageAnalyzerResult.moduleDetails.productPhoto.damageVisibility ===
+      "damage-area-visible-context-missing" &&
+    missingProductVisibleDamageAnalyzerResult.moduleDetails.productPhoto.requestedAdditionalViews.includes(
+      "wider-product-photo",
+    ),
+  productContextDamageIncompleteRequestsDamageCloseUp:
+    productContextDamageIncompleteAnalyzerResult.moduleDetails.productPhoto.fullProductContext === "complete" &&
+    productContextDamageIncompleteAnalyzerResult.moduleDetails.productPhoto.damageVisibility ===
+      "product-visible-damage-area-missing" &&
+    productContextDamageIncompleteAnalyzerResult.moduleDetails.productPhoto.requestedAdditionalViews.includes(
+      "clearer-damage-close-up",
+    ),
+  limitedMetadataRemainsContextOnly:
+    limitedMetadataAnalyzerResult.moduleDetails.productPhoto.metadataContext.contextOnly === true &&
+    limitedMetadataAnalyzerResult.moduleDetails.productPhoto.metadataContext.metadataSummary.metadataContext === "Limited",
+  limitedMetadataUsesSummarizedNotesOnly:
+    limitedMetadataAnalyzerResult.privacySafeMetadataSummary.notes.every((note) =>
+      ["metadata context limited"].includes(note),
+    ),
   unavailableMetadataContextIsContextOnly:
     unavailableMetadataAnalyzerResult.moduleDetails.productPhoto.metadataContext.contextOnly === true,
   unavailableMetadataUsesLimitedSummary:
@@ -291,8 +448,21 @@ const safetyChecks = {
     String(completeContextAnalyzerResult.confidenceLevel) !== String(completeContextAnalyzerResult.reviewPriority),
   scoreSeparateFromConfidence:
     String(completeContextAnalyzerResult.score) !== String(completeContextAnalyzerResult.confidenceLevel),
+  confidenceIsReadinessNotFraudProbability:
+    !serializedResultText(completeContextAnalyzerResult).toLowerCase().includes("fraud probability") &&
+    !serializedResultText(veryLowQualityAnalyzerResult).toLowerCase().includes("fraud probability"),
+  reviewPriorityIsTriageNotDecision:
+    ["Review", "Manual review"].includes(veryLowQualityAnalyzerResult.reviewPriority) &&
+    !serializedResultText(veryLowQualityAnalyzerResult)
+      .toLowerCase()
+      .includes(["automatic", "decision"].join(" ")),
   limitationsSeparateFromRecommendation:
     completeContextAnalyzerResult.scoreMeaning.safetyNote !== completeContextAnalyzerResult.recommendedSupportAction,
+  limitationsSeparateFromSignals:
+    veryLowQualityAnalyzerResult.moduleDetails.productPhoto.imageQuality.qualityLimits.length > 0 &&
+    veryLowQualityAnalyzerResult.signals.every(
+      (signal) => !veryLowQualityAnalyzerResult.moduleDetails.productPhoto.imageQuality.qualityLimits.includes(signal.id),
+    ),
 } as const;
 
 const privacyChecks = {
@@ -307,18 +477,59 @@ const privacyChecks = {
     unavailableMetadataAnalyzerResult.privacySafeMetadataSummary.originalFilenameOmitted,
   productLabelRawValueOmitted:
     serialLabelContextAnalyzerResult.moduleDetails.productPhoto.productLabelContext.rawValueOmitted,
+  rawFilenameEvidenceLabelNotPropagated: privacySentinelAnalyzerResult.evidenceLabel === "Product photo",
+  exactMetadataDimensionsOmitted:
+    !("dimensions" in privacySentinelAnalyzerResult.privacySafeMetadataSummary) &&
+    !("dimensions" in privacySentinelAnalyzerResult.moduleDetails.productPhoto.metadataContext.metadataSummary),
+  gpsPresenceNotPropagated: privacySentinelAnalyzerResult.privacySafeMetadataSummary.gpsContext !== "present",
+  metadataNotesAreAllowlisted:
+    privacySentinelAnalyzerResult.privacySafeMetadataSummary.notes.every((note) =>
+      ["metadata context limited", "photo quality limits review", "local-only review signal"].includes(note),
+    ),
+  labelNotesAreAllowlisted:
+    privacySentinelAnalyzerResult.moduleDetails.productPhoto.productLabelContext.notes.every((note) =>
+      ["metadata context limited", "photo quality limits review", "local-only review signal"].includes(note),
+    ),
+  qualityLimitsAreAllowlisted:
+    privacySentinelAnalyzerResult.moduleDetails.productPhoto.imageQuality.qualityLimits.every((qualityLimit) =>
+      [
+        "photo quality limits review",
+        "photo dimensions unavailable",
+        "photo dimensions may limit review",
+        "file size may limit review",
+        "file context needs manual review",
+      ].includes(qualityLimit),
+    ),
+  rawMetadataLabelAndQualitySentinelsOmitted:
+    resultTextOmitsValues(privacySentinelAnalyzerResult, [
+      rawFilenameSentinel,
+      rawMetadataNoteSentinel,
+      rawLabelNoteSentinel,
+      rawQualityLimitSentinel,
+    ]),
   noRawPhotoPrivateOrIntegrationKeys: hasNoForbiddenExactKeys(serialLabelContextAnalyzerResult, [
     "fileBytes",
     "imageBuffer",
+    "objectUrl",
+    "imageUrl",
+    "dataUrl",
     "rawExif",
     "rawMetadata",
     "originalFilename",
     "rawLabelValue",
+    "rawSerialOrModelText",
+    "preciseTimestamp",
+    "gpsCoordinates",
     "providerOutput",
     "storageHandle",
     "integrationHandle",
     "caseQueueHandle",
   ]),
+  noRawLabelSentinelValues:
+    resultTextOmitsValues(serialLabelContextAnalyzerResult, [
+      "RAW-SERIAL-VALUE-SHOULD-NOT-APPEAR",
+      "RAW-MODEL-TEXT-SHOULD-NOT-APPEAR",
+    ]),
 } as const;
 
 const isolationChecks = {
@@ -366,8 +577,13 @@ export const PRODUCT_PHOTO_ANALYZER_DEVELOPER_PROBE = {
     completeContext: completeContextAnalyzerResult,
     missingWiderView: missingWiderViewAnalyzerResult,
     limitedQuality: limitedQualityAnalyzerResult,
+    veryLowQuality: veryLowQualityAnalyzerResult,
+    missingProductVisibleDamage: missingProductVisibleDamageAnalyzerResult,
+    productContextDamageIncomplete: productContextDamageIncompleteAnalyzerResult,
+    limitedMetadata: limitedMetadataAnalyzerResult,
     unavailableMetadata: unavailableMetadataAnalyzerResult,
     serialLabelContext: serialLabelContextAnalyzerResult,
+    privacySentinel: privacySentinelAnalyzerResult,
     hostileInputSanitized: hostileInputAnalyzerResult,
   },
   expectations: {
