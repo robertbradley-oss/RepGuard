@@ -51,7 +51,7 @@ Explicitly deferred from Phase 1:
 
 ## Phase 2: Photo Evidence
 
-Status: Phase 2.0 scaffold work, Phase 2.1 Product Photo Local Heuristic Design, and Phase 2.2 Product Photo Boundary and Display Readiness are closed. Phase 2.3 is open as a narrow, unwired local heuristic analyzer slice; the first analyzer slice and Phase 2.3.1 probe refinement are closed and pushed. Product-photo runtime analyzer behavior is still not live.
+Status: Phase 2.0 scaffold work, Phase 2.1 Product Photo Local Heuristic Design, and Phase 2.2 Product Photo Boundary and Display Readiness are closed. Phase 2.3 is open as a narrow, unwired local heuristic analyzer slice; the first analyzer slice, Phase 2.3.1 probe refinement, and Phase 2.3.3 raw-result override sanitizer are closed and pushed. Phase 2.3.4 reviewed guarded-readiness and recommended one more non-live hardening slice before integration. Product-photo runtime analyzer behavior is still not live.
 
 Meaning:
 
@@ -67,7 +67,7 @@ Current implementation boundary:
 - Shared evidence model types and product-photo scaffold/defaults exist.
 - Phase 2.1 defined the first product-photo heuristic signal categories and future implementation order in planning docs.
 - Phase 2.2 added non-live product-photo helper boundaries, guarded routing decisions, shared result shape readiness, a product-photo report view-model, an isolated `ProductPhotoReviewPanel`, a production-disabled synthetic render host, semantic/privacy guards, and desktop/mobile browser QA.
-- Phase 2.3 added the first unwired local product-photo heuristic analyzer plus probe refinements for low-quality buckets, context gaps, privacy-safe metadata and label summaries, manual-review-only wording, and non-live isolation.
+- Phase 2.3 added the first unwired local product-photo heuristic analyzer plus probe refinements for low-quality buckets, context gaps, privacy-safe metadata and label summaries, manual-review-only wording, raw-result override sanitization, and non-live isolation.
 - No product-photo analyzer behavior is live yet.
 - No runtime analyzer, upload, UI, report, scoring, parser, fixture, storage, integration, or external provider behavior is live for Phase 2 yet.
 - `product-photo` is canonical.
