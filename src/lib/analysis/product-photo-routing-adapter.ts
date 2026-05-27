@@ -307,6 +307,27 @@ function defaultReadinessResult(
   };
 }
 
+function legacyDamagePhotoQuarantineResult(): ProductPhotoAdapterReadinessResult {
+  return defaultReadinessResult("legacy-quarantine", {
+    legacyCompatibility: {
+      alias: "damage-photo",
+      canonicalEvidenceType: "product-photo",
+      quarantined: true,
+      runtimeCandidate: false,
+      note: "Legacy damage-photo input is compatibility-only and is not accepted as adapter readiness.",
+    },
+    limitations: ["Legacy damage-photo cannot become canonical product-photo adapter output"],
+  });
+}
+
+function nestedAnalysisEvidenceType(input: ProductPhotoAdapterReadinessInput): unknown {
+  if (input.inputKind !== "analysis-result") {
+    return undefined;
+  }
+
+  return (input.result as { evidenceType?: unknown } | undefined)?.evidenceType;
+}
+
 function readinessFromAnalysisResult(result: ProductPhotoEvidenceAnalysisResult): ProductPhotoAdapterReadinessResult {
   const score = clampPercent(result.score);
   const signals = result.signals.slice(0, 6).map(readinessSignalFromShared);
@@ -416,20 +437,17 @@ export function routeProductPhotoEvidenceForDevOnlyBoundary(
 export function prepareProductPhotoAdapterReadinessForDevOnlyBoundary(
   input: ProductPhotoAdapterReadinessInput = {},
 ): ProductPhotoAdapterReadinessResult {
-  if (input.evidenceType === "damage-photo") {
-    return defaultReadinessResult("legacy-quarantine", {
-      legacyCompatibility: {
-        alias: "damage-photo",
-        canonicalEvidenceType: "product-photo",
-        quarantined: true,
-        runtimeCandidate: false,
-        note: "Legacy damage-photo input is compatibility-only and is not accepted as adapter readiness.",
-      },
-      limitations: ["Legacy damage-photo cannot become canonical product-photo adapter output"],
-    });
+  const analysisEvidenceType = nestedAnalysisEvidenceType(input);
+
+  if (input.evidenceType === "damage-photo" || analysisEvidenceType === "damage-photo") {
+    return legacyDamagePhotoQuarantineResult();
   }
 
-  if (input.inputKind === "analysis-result" && input.result?.module === "productPhoto") {
+  if (
+    input.inputKind === "analysis-result" &&
+    input.result?.module === "productPhoto" &&
+    analysisEvidenceType === "product-photo"
+  ) {
     return readinessFromAnalysisResult(input.result);
   }
 

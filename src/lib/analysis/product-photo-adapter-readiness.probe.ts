@@ -14,7 +14,7 @@ import {
   type ProductPhotoAdapterReadinessInput,
   type ProductPhotoAdapterReadinessResult,
 } from "@/lib/analysis/product-photo-routing-adapter";
-import type { EvidenceMetadataSummary } from "@/lib/analysis/types";
+import type { EvidenceMetadataSummary, ProductPhotoEvidenceAnalysisResult } from "@/lib/analysis/types";
 
 type HasAnyKey<T, TKey extends PropertyKey> = Extract<keyof T, TKey> extends never ? false : true;
 type AssertFalse<T extends false> = T extends false ? true : never;
@@ -101,6 +101,36 @@ const canonicalAnalysisResult =
   prepareProductPhotoEvidenceAnalysisResultForDevOnlyBoundary(canonicalProductPhotoInput);
 const canonicalViewModel = mapProductPhotoAnalysisToReportViewModel(canonicalAnalysisResult);
 
+const hostileNestedDamagePhotoAnalysisResult = {
+  ...canonicalAnalysisResult,
+  evidenceType: "damage-photo",
+  rawMetadata: "RAW_METADATA_SENTINEL",
+  objectUrl: "OBJECT_URL_SENTINEL",
+  providerId: "PROVIDER_ID_SENTINEL",
+  storageKey: "STORAGE_KEY_SENTINEL",
+  integrationId: "INTEGRATION_ID_SENTINEL",
+  caseQueueId: "CASE_QUEUE_ID_SENTINEL",
+} as unknown as ProductPhotoEvidenceAnalysisResult;
+
+const hostileNestedReceiptAnalysisResult = {
+  ...canonicalAnalysisResult,
+  evidenceType: "receipt",
+} as unknown as ProductPhotoEvidenceAnalysisResult;
+
+const hostileNestedUnknownAnalysisResult = {
+  ...canonicalAnalysisResult,
+  evidenceType: "unknown",
+} as unknown as ProductPhotoEvidenceAnalysisResult;
+
+const hostileNestedUnsupportedAnalysisResult = {
+  ...canonicalAnalysisResult,
+  evidenceType: "unsupported",
+} as unknown as ProductPhotoEvidenceAnalysisResult;
+
+const hostileNestedMissingEvidenceTypeAnalysisResult = Object.fromEntries(
+  Object.entries(canonicalAnalysisResult).filter(([key]) => key !== "evidenceType"),
+) as unknown as ProductPhotoEvidenceAnalysisResult;
+
 const analysisReadinessResult = prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
   inputKind: "analysis-result",
   result: canonicalAnalysisResult,
@@ -118,6 +148,47 @@ const viewModelReadinessResult = prepareProductPhotoAdapterReadinessForDevOnlyBo
 const legacyDamagePhotoQuarantineResult = prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
   inputKind: "legacy-compatibility",
   evidenceType: "damage-photo",
+  runtimeRequested: true,
+});
+
+const hostileNestedDamagePhotoQuarantineResult = prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
+  inputKind: "analysis-result",
+  result: hostileNestedDamagePhotoAnalysisResult,
+  evidenceType: "product-photo",
+  runtimeRequested: true,
+});
+
+const hostileNestedDamagePhotoOmittedTopLevelResult = prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
+  inputKind: "analysis-result",
+  result: hostileNestedDamagePhotoAnalysisResult,
+  runtimeRequested: true,
+});
+
+const hostileNestedReceiptResult = prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
+  inputKind: "analysis-result",
+  result: hostileNestedReceiptAnalysisResult,
+  evidenceType: "product-photo",
+  runtimeRequested: true,
+});
+
+const hostileNestedUnknownResult = prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
+  inputKind: "analysis-result",
+  result: hostileNestedUnknownAnalysisResult,
+  evidenceType: "product-photo",
+  runtimeRequested: true,
+});
+
+const hostileNestedUnsupportedResult = prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
+  inputKind: "analysis-result",
+  result: hostileNestedUnsupportedAnalysisResult,
+  evidenceType: "product-photo",
+  runtimeRequested: true,
+});
+
+const hostileNestedMissingEvidenceTypeResult = prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
+  inputKind: "analysis-result",
+  result: hostileNestedMissingEvidenceTypeAnalysisResult,
+  evidenceType: "product-photo",
   runtimeRequested: true,
 });
 
@@ -375,6 +446,31 @@ const quarantineChecks = {
     legacyDamagePhotoQuarantineResult.evidenceType === "product-photo" &&
     legacyDamagePhotoQuarantineResult.runtimeLive === false &&
     legacyDamagePhotoQuarantineResult.manualReviewOnly === true,
+  hostileNestedDamagePhotoRejected:
+    hostileNestedDamagePhotoQuarantineResult.readinessAccepted === false &&
+    hostileNestedDamagePhotoOmittedTopLevelResult.readinessAccepted === false,
+  hostileNestedDamagePhotoQuarantined:
+    hostileNestedDamagePhotoQuarantineResult.inputKind === "legacy-quarantine" &&
+    hostileNestedDamagePhotoOmittedTopLevelResult.inputKind === "legacy-quarantine" &&
+    hostileNestedDamagePhotoQuarantineResult.legacyCompatibility?.alias === "damage-photo" &&
+    hostileNestedDamagePhotoOmittedTopLevelResult.legacyCompatibility?.alias === "damage-photo" &&
+    hostileNestedDamagePhotoQuarantineResult.legacyCompatibility.quarantined === true &&
+    hostileNestedDamagePhotoOmittedTopLevelResult.legacyCompatibility.quarantined === true,
+  hostileNestedDamagePhotoCannotBecomeCanonicalAdapterOutput:
+    hostileNestedDamagePhotoQuarantineResult.readinessAccepted === false &&
+    hostileNestedDamagePhotoQuarantineResult.inputKind !== "analysis-result" &&
+    hostileNestedDamagePhotoQuarantineResult.evidenceType === "product-photo" &&
+    hostileNestedDamagePhotoQuarantineResult.runtimeLive === false &&
+    hostileNestedDamagePhotoQuarantineResult.manualReviewOnly === true,
+  hostileUnsupportedNestedEvidenceTypesCollapsed:
+    hostileNestedReceiptResult.readinessAccepted === false &&
+    hostileNestedUnknownResult.readinessAccepted === false &&
+    hostileNestedUnsupportedResult.readinessAccepted === false &&
+    hostileNestedMissingEvidenceTypeResult.readinessAccepted === false &&
+    hostileNestedReceiptResult.inputKind === "unsupported" &&
+    hostileNestedUnknownResult.inputKind === "unsupported" &&
+    hostileNestedUnsupportedResult.inputKind === "unsupported" &&
+    hostileNestedMissingEvidenceTypeResult.inputKind === "unsupported",
   receiptLikeInputCollapsed:
     unsupportedReceiptResult.readinessAccepted === false &&
     unsupportedReceiptResult.inputKind === "unsupported" &&
@@ -385,7 +481,13 @@ const privacyChecks = {
   analysisOutputOmitsPrivateSentinels: outputOmitsPrivateSentinels(analysisReadinessResult),
   viewModelOutputOmitsPrivateSentinels: outputOmitsPrivateSentinels(viewModelReadinessResult),
   hostileOutputOmitsPrivateSentinels: outputOmitsPrivateSentinels(hostileViewModelReadinessResult),
+  hostileNestedDamageOutputOmitsPrivateSentinels: outputOmitsPrivateSentinels(
+    hostileNestedDamagePhotoQuarantineResult,
+  ),
   hostileOutputOmitsForbiddenKeys: outputOmitsForbiddenKeys(hostileViewModelReadinessResult),
+  hostileNestedDamageOutputOmitsForbiddenKeys: outputOmitsForbiddenKeys(
+    hostileNestedDamagePhotoQuarantineResult,
+  ),
   exactDimensionsNotPropagated: !stringifyForProbe(analysisReadinessResult).includes("1800"),
   privacyFlagsAreDerivedOmissionOnly:
     hostileViewModelReadinessResult.privacy.derivedSummaryOnly === true &&
@@ -448,6 +550,12 @@ export const PRODUCT_PHOTO_ADAPTER_READINESS_DEVELOPER_PROBE = {
     mediumScoreReadinessResult,
     highScoreReadinessResult,
     legacyDamagePhotoQuarantineResult,
+    hostileNestedDamagePhotoQuarantineResult,
+    hostileNestedDamagePhotoOmittedTopLevelResult,
+    hostileNestedReceiptResult,
+    hostileNestedUnknownResult,
+    hostileNestedUnsupportedResult,
+    hostileNestedMissingEvidenceTypeResult,
     unsupportedReceiptResult,
   },
   expectations: {
@@ -461,6 +569,20 @@ export const PRODUCT_PHOTO_ADAPTER_READINESS_DEVELOPER_PROBE = {
       alias: legacyDamagePhotoQuarantineResult.legacyCompatibility?.alias,
       quarantined: legacyDamagePhotoQuarantineResult.legacyCompatibility?.quarantined,
       runtimeCandidate: legacyDamagePhotoQuarantineResult.legacyCompatibility?.runtimeCandidate,
+    },
+    hostileNestedDamagePhotoQuarantine: {
+      accepted: hostileNestedDamagePhotoQuarantineResult.readinessAccepted,
+      inputKind: hostileNestedDamagePhotoQuarantineResult.inputKind,
+      alias: hostileNestedDamagePhotoQuarantineResult.legacyCompatibility?.alias,
+      quarantined: hostileNestedDamagePhotoQuarantineResult.legacyCompatibility?.quarantined,
+      runtimeLive: hostileNestedDamagePhotoQuarantineResult.runtimeLive,
+      manualReviewOnly: hostileNestedDamagePhotoQuarantineResult.manualReviewOnly,
+    },
+    hostileUnsupportedNestedEvidenceTypes: {
+      receipt: hostileNestedReceiptResult.inputKind,
+      unknown: hostileNestedUnknownResult.inputKind,
+      unsupported: hostileNestedUnsupportedResult.inputKind,
+      missing: hostileNestedMissingEvidenceTypeResult.inputKind,
     },
     hostileCanonicalization: {
       score: hostileViewModelReadinessResult.score.value,
