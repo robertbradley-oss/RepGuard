@@ -1,8 +1,10 @@
 # Product-Photo Adapter Readiness Plan
 
-This is the Phase 2.4 guarded non-live adapter readiness plan. It is planning guidance only.
+This is the Phase 2.4 guarded non-live adapter readiness plan.
 
 Phase 2.3 analyzer hardening is closed. Product-photo analyzer, result, report view-model, display, visual host, semantic guard, and executable probes remain non-live and unwired. `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior remains unchanged.
+
+Phase 2.4.1 implementation note: the first guarded non-live adapter readiness boundary now exists inside `src/lib/analysis/product-photo-routing-adapter.ts` as `prepareProductPhotoAdapterReadinessForDevOnlyBoundary`, with active probe coverage in `src/lib/analysis/product-photo-adapter-readiness.probe.ts`. It remains dev/probe-only and does not open live product-photo routing.
 
 ## 1. Phase 2.4 Objective
 

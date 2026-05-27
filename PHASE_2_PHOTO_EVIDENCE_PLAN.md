@@ -608,7 +608,7 @@ Stop if the host touches `ClaimReviewWorkflow`, `/`, `/test-evidence`, upload ro
 
 ## 16C. Product-Photo Adapter Readiness Gate
 
-Phase 2.4 plans the future non-live adapter contract before any adapter implementation. The complete adapter readiness plan is maintained in `PRODUCT_PHOTO_ADAPTER_READINESS_PLAN.md`.
+Phase 2.4 plans and hardens the non-live adapter contract before any live adapter implementation. The complete adapter readiness plan is maintained in `PRODUCT_PHOTO_ADAPTER_READINESS_PLAN.md`.
 
 The adapter readiness gate means:
 
@@ -619,11 +619,19 @@ The adapter readiness gate means:
 - The future adapter must not require `LocalAnalysisResult`, `MockAnalysisReport`, receipt OCR fields, receipt parser fields, receipt score breakdown, receipt report adapter output, or receipt fixtures.
 - The future adapter must keep all product-photo findings manual-review-only and must not imply proof, customer wrongdoing, final claim outcome, automatic handling, external verification, approval, rejection, denial, or policy disposition.
 
+Phase 2.4.1 implementation status:
+
+- `prepareProductPhotoAdapterReadinessForDevOnlyBoundary` exists inside the isolated product-photo adapter module as a dev/probe-only readiness boundary.
+- The readiness boundary accepts sanitized `ProductPhotoEvidenceAnalysisResult` and `ProductPhotoReportViewModel` shaped data only, derives/canonicalizes readiness fields, and keeps `runtimeLive: false`.
+- The adapter-readiness probe actively checks canonical `product-photo` result/view-model inputs, hostile unsupported values, low/medium/high score scope, privacy sentinels, exact metadata omission, and import/isolation boundaries.
+- The readiness boundary is not imported by upload, UI, live report mapping, `analyzeEvidenceFile`, analyzer routing, receipt scoring/parser/fixtures, providers, storage, integrations, or case queues.
+
 Legacy `damage-photo` handling remains quarantine-only:
 
 - New adapter/readiness files should use canonical `product-photo`.
 - `damage-photo` may appear in future probes only as a compatibility/quarantine scenario.
 - The adapter must not treat `damage-photo` as canonical runtime support.
+- The Phase 2.4.1 dev routing adapter now refuses to build product-photo details for the legacy alias and the readiness probe confirms the alias is not accepted as adapter readiness.
 - Future live routing must handle legacy `damage-photo` quarantine in a separate authorized slice before product-photo runtime support.
 
 Before any Phase 2.4.1 adapter contract implementation, the future prompt must preserve:

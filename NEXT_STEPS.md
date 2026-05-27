@@ -12,7 +12,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - Phase 2.1 Product Photo Local Heuristic Design is reviewed and closed for the current planning slice.
 - Phase 2.2 Product Photo Boundary and Display Readiness is closed. It produced small, local-only, manual-review-support-only, intentionally unwired helper, boundary, probe, display, and visual QA surfaces without making product-photo runtime live.
 - Phase 2.3 analyzer hardening is closed after the no-live-wiring readiness closeout. Latest pushed checkpoint remains `89b694d` (`fix: harden product photo analyzer readiness boundaries`).
-- Phase 2.4 is open as guarded non-live product-photo adapter readiness planning only. It must not implement adapter code, product-photo runtime routing, upload wiring, `ClaimReviewWorkflow` insertion, live report adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, case queues, real photos, or real metadata fixtures.
+- Phase 2.4.1 guarded non-live product-photo adapter contract/probe implementation adds only a dev/probe-only adapter readiness boundary inside the isolated product-photo adapter module plus active probes/semantic guards; it does not add product-photo runtime routing, upload wiring, `ClaimReviewWorkflow` insertion, live report adapter mapping, scoring, parser behavior, fixtures, providers, storage, integrations, case queues, real photos, or real metadata fixtures.
 - Completed pushed Phase 2.2 work includes:
   - `44d09f0` added unwired product-photo signal builders.
   - `50f8284` added unwired product-photo file summary, review completeness, and local review signal helpers.
@@ -62,6 +62,9 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - Phase 2.3.5 hardens the non-live product-photo analyzer boundary without wiring product-photo into runtime. The product-photo result boundary now derives score, confidence, review priority, and local signal level from sanitized local details instead of trusting caller overrides; runtime product-photo enum/string-like inputs collapse to allowlisted safe values; product-photo probe assertions execute through `npm.cmd run check:product-photo-probes`; and semantic guards cover structured readiness override regressions plus product-photo recognition/routing probe coverage.
 - Phase 2.3.6 closed Phase 2.3 analyzer hardening as a review-only pass. Lint, build, report semantics, product-photo probes, diff check, and targeted boundary scans passed with no file changes.
 - Phase 2.4.0 added the guarded non-live adapter readiness plan in `PRODUCT_PHOTO_ADAPTER_READINESS_PLAN.md`. The plan defines future adapter contract boundaries, score/safety derivation rules, privacy limits, legacy `damage-photo` quarantine expectations, semantic/probe gates, protected live paths, and Phase 2.4.1 pass/fail criteria.
+- Phase 2.4.1 adds `prepareProductPhotoAdapterReadinessForDevOnlyBoundary` as a dev/probe-only adapter readiness boundary. It accepts sanitized `ProductPhotoEvidenceAnalysisResult` or `ProductPhotoReportViewModel` data, derives/canonicalizes readiness score, confidence, review priority, local signal level, source kind, summary, support action, customer wording, limitations, and signals, keeps runtime live flags false, and returns only canonical `product-photo` readiness output.
+- The Phase 2.4.1 adapter readiness probe actively checks canonical result input, report-view-model input, hostile override collapse, low/medium/high score scope, legacy `damage-photo` quarantine, unsupported receipt-like input collapse, raw/private sentinel omission, exact metadata omission, no `LocalAnalysisResult` dependency, no `analyzeEvidenceFile` invocation, and no UI/upload/live report/scoring/parser/fixture/provider/storage/integration/case-queue coupling.
+- The older dev routing adapter now quarantines legacy `damage-photo` compatibility alias inputs instead of building product-photo details for them. This remains non-live and probe-only; it does not change the live receipt-shaped upload/analyzer path.
 - Legacy `damage-photo` remains a receipt-era/mock compatibility alias and not the canonical Phase 2 product-photo runtime. Canonical product-photo analyzer and report-view-model boundaries must not reference `damage-photo`; future live routing must handle legacy `damage-photo` quarantine in a separate approved slice before any product-photo runtime support.
 - Probe sample data is synthetic and records no file bytes, image buffers, raw EXIF objects, provider handles, storage handles, integration handles, or case queue handles.
 - No runtime analyzer routing, upload, UI, report, scoring, parser, metadata extraction, or fixture behavior changed during Phase 2.0, Phase 2.1, or Phase 2.2 helper/boundary work.
@@ -71,17 +74,16 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 
 ## Next Safe Tasks
 
-1. Phase 2.4.1 should be a guarded non-live product-photo adapter contract/probe implementation only if explicitly prompted. Keep it dev/probe-only, synthetic, canonical `product-photo`, manual-review-only, and outside all live runtime paths.
-2. Use `PRODUCT_PHOTO_ADAPTER_READINESS_PLAN.md` as the implementation gate for any Phase 2.4.1 adapter contract work.
-3. Keep the decision-only public analyzer routing wrapper out of live UI/upload/report/scoring/parser paths until a separate live-routing plan is explicitly opened.
-4. Keep the dev-only routing adapter out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
-5. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
-6. Keep the analyzer routing guard and optional file-aware boundary out of the live UI/upload flow until a separate live-routing plan is explicitly opened.
-7. Keep `LocalAnalysisResult` receipt-path shaped until a separate shared-result migration slice is explicitly opened.
-8. Keep image-consistency uncertainty dormant until a future explicitly opened provider, validated local-metrics, and QA-evidence slice.
-9. Keep the product-photo helpers, analyzer builder, probes, recognition boundary, routing adapter, analyzer routing guard, optional file-aware boundary, preservation probe, public wrapper, report view-model, review panel, and visual host unwired from runtime analyzer, upload, UI insertion, live report mapping, scoring, parser, metadata extraction, and fixture behavior.
-10. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
-11. Preserve a clean operational queue after each completed agent task.
+1. Run a Phase 2.4.1 closeout review after this guarded adapter-readiness commit, with no new implementation unless Robert explicitly opens another slice.
+2. Keep the decision-only public analyzer routing wrapper out of live UI/upload/report/scoring/parser paths until a separate live-routing plan is explicitly opened.
+3. Keep the dev-only routing adapter and adapter-readiness boundary out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
+4. Keep `recognizeProductPhotoEvidence` out of `analyzeEvidenceFile` until Robert explicitly opens a runtime-routing slice.
+5. Keep the analyzer routing guard and optional file-aware boundary out of the live UI/upload flow until a separate live-routing plan is explicitly opened.
+6. Keep `LocalAnalysisResult` receipt-path shaped until a separate shared-result migration slice is explicitly opened.
+7. Keep image-consistency uncertainty dormant until a future explicitly opened provider, validated local-metrics, and QA-evidence slice.
+8. Keep the product-photo helpers, analyzer builder, probes, recognition boundary, routing adapter, adapter-readiness boundary, analyzer routing guard, optional file-aware boundary, preservation probe, public wrapper, report view-model, review panel, and visual host unwired from runtime analyzer, upload, UI insertion, live report mapping, scoring, parser, metadata extraction, and fixture behavior.
+9. Keep the shipped receipt module stable unless Robert explicitly requests maintenance.
+10. Preserve a clean operational queue after each completed agent task.
 
 ## Phase 2.3 Entry Criteria And Boundaries
 
@@ -764,5 +766,5 @@ Robert wants the eventual result screen to feel like an evidence triage workspac
 ## Current Recommended Next Prompt
 
 ```text
-/claimguardagent implement the Phase 2.4.1 guarded non-live product-photo adapter contract/probe only: create a probe/dev-only adapter readiness boundary that accepts sanitized product-photo result or report-view-model data, derives/canonicalizes score, confidence, review priority, local signal level, source kind, summary, support action, customer wording, limitations, and signals, quarantines legacy damage-photo as compatibility-only, and proves no LocalAnalysisResult, analyzeEvidenceFile, upload, ClaimReviewWorkflow, live report adapter, receipt scoring/parser/fixtures, providers, storage, integrations, case queues, real photos, or real metadata fixtures are touched; add semantic/probe coverage; run lint, build, report-semantics, product-photo-probes, diff check, and boundary scans; commit if safe; do not push
+/claimguardagent perform a Phase 2.4.1 closeout review after the guarded non-live product-photo adapter readiness commit: verify the adapter-readiness boundary remains dev/probe-only and unwired, legacy damage-photo remains quarantine-only, analyzeEvidenceFile/LocalAnalysisResult/ClaimReviewWorkflow/report-adapter/upload/scoring/parser/fixtures/providers/storage/integrations/case queues are untouched, lint/build/report-semantics/product-photo-probes/diff-check/boundary scans pass, and recommend the next smallest non-live readiness task; do not push
 ```

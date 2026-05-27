@@ -94,6 +94,40 @@ const orderScreenshotLikeResult = routeProductPhotoEvidenceForDevOnlyBoundary(or
 const pdfLikeResult = routeProductPhotoEvidenceForDevOnlyBoundary(pdfLikeInput);
 const unknownResult = routeProductPhotoEvidenceForDevOnlyBoundary(unknownInput);
 
+function assertProbeChecksPass(group: string, checks: Record<string, boolean>) {
+  const failed = Object.entries(checks)
+    .filter(([, passed]) => !passed)
+    .map(([name]) => name);
+
+  if (failed.length > 0) {
+    throw new Error(`Product-photo routing adapter probe failed (${group}): ${failed.join(", ")}`);
+  }
+}
+
+const routingChecks = {
+  productPhotoCompatibleRouted:
+    productPhotoCompatibleResult.routed === true &&
+    Boolean(productPhotoCompatibleResult.productPhotoDetails) &&
+    productPhotoCompatibleResult.recognition.evidenceType === "product-photo",
+  legacyDamagePhotoQuarantined:
+    compatibilityAliasResult.routed === false &&
+    !compatibilityAliasResult.productPhotoDetails &&
+    compatibilityAliasResult.recognition.compatibilityAlias?.alias === "damage-photo" &&
+    compatibilityAliasResult.limitations.some((limitation) =>
+      limitation.includes("legacy damage-photo compatibility alias is quarantined"),
+    ),
+  receiptLikeNotRouted: receiptLikeResult.routed === false && !receiptLikeResult.productPhotoDetails,
+  orderScreenshotLikeNotRouted:
+    orderScreenshotLikeResult.routed === false && !orderScreenshotLikeResult.productPhotoDetails,
+  pdfLikeNotRouted: pdfLikeResult.routed === false && !pdfLikeResult.productPhotoDetails,
+  unknownNotRouted:
+    unknownResult.routed === false &&
+    !unknownResult.productPhotoDetails &&
+    unknownResult.recognition.recognitionState === "inconclusive",
+};
+
+assertProbeChecksPass("routing", routingChecks);
+
 export const PRODUCT_PHOTO_ROUTING_ADAPTER_DEVELOPER_PROBE = {
   cases: {
     productPhotoCompatible: productPhotoCompatibleResult,
@@ -115,7 +149,9 @@ export const PRODUCT_PHOTO_ROUTING_ADAPTER_DEVELOPER_PROBE = {
       hasProductPhotoDetails: Boolean(compatibilityAliasResult.productPhotoDetails),
       evidenceType: compatibilityAliasResult.recognition.evidenceType,
       alias: compatibilityAliasResult.recognition.compatibilityAlias?.alias,
-      subjectType: compatibilityAliasResult.productPhotoDetails?.subjectType,
+      quarantined: compatibilityAliasResult.limitations.some((limitation) =>
+        limitation.includes("legacy damage-photo compatibility alias is quarantined"),
+      ),
     },
     receiptLike: {
       routed: receiptLikeResult.routed,

@@ -21,6 +21,7 @@ const filesToCheck = [
   "src/lib/analysis/product-photo-result.probe.ts",
   "src/lib/analysis/product-photo-routing-adapter.ts",
   "src/lib/analysis/product-photo-routing-adapter.probe.ts",
+  "src/lib/analysis/product-photo-adapter-readiness.probe.ts",
   "src/lib/analysis/shared-result.probe.ts",
   "src/lib/analysis/product-photo-report-view-model.ts",
   "src/lib/analysis/product-photo-report-view-model.probe.ts",
@@ -161,8 +162,14 @@ const productPhotoBannedPhrases = [
   /\bfake\b/i,
   /\bapproved\b/i,
   /\brejected\b/i,
+  /\bdenied\b/i,
+  /\bcleared\b/i,
+  /\bgenuine\b/i,
+  /\bnot genuine\b/i,
   /\b(?:photo|image|claim|evidence)\s+verified\b/i,
   /\bverified\s+(?:photo|image|claim|evidence|authentic|authenticity)\b/i,
+  /\b(?:valid|invalid)\s+claim\b/i,
+  /\bclaim\s+(?:valid|invalid|complete)\b/i,
   /\b(?:approve|deny|reject)\s+(?:this\s+)?claim\b/i,
   /automatic\s+(?:outcome|decision|disposition)/i,
 ];
@@ -255,6 +262,8 @@ const productPhotoRecognitionProbe = fileContents.get("src/lib/analysis/product-
 const productPhotoRoutingAdapter = fileContents.get("src/lib/analysis/product-photo-routing-adapter.ts") ?? "";
 const productPhotoRoutingAdapterProbe =
   fileContents.get("src/lib/analysis/product-photo-routing-adapter.probe.ts") ?? "";
+const productPhotoAdapterReadinessProbe =
+  fileContents.get("src/lib/analysis/product-photo-adapter-readiness.probe.ts") ?? "";
 const productPhotoReportViewModelProbe =
   fileContents.get("src/lib/analysis/product-photo-report-view-model.probe.ts") ?? "";
 const productPhotoProbeRunner = fileContents.get("scripts/run-product-photo-probes.cjs") ?? "";
@@ -984,12 +993,87 @@ if (!/PRODUCT_PHOTO_ROUTING_ADAPTER_DEVELOPER_PROBE/.test(productPhotoRoutingAda
   failures.push("Product-photo routing-adapter probe check failed: routing-adapter probe is missing from semantic coverage.");
 }
 
+const requiredProductPhotoRoutingAdapterSignals = [
+  {
+    label: "routing adapter active assertions",
+    patterns: [/assertProbeChecksPass\("routing", routingChecks\)/],
+  },
+  {
+    label: "routing adapter legacy damage-photo quarantine",
+    patterns: [/legacyDamagePhotoQuarantined/, /legacy damage-photo compatibility alias is quarantined/],
+  },
+];
+
+for (const signal of requiredProductPhotoRoutingAdapterSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(productPhotoRoutingAdapterProbe))) {
+    failures.push(`Product-photo routing-adapter probe check failed: missing ${signal.label}`);
+  }
+}
+
+const requiredProductPhotoAdapterReadinessSignals = [
+  {
+    label: "adapter readiness probe export",
+    patterns: [/PRODUCT_PHOTO_ADAPTER_READINESS_DEVELOPER_PROBE/],
+  },
+  {
+    label: "adapter readiness active type checks",
+    patterns: [/assertProbeChecksPass\("types", typeChecks\)/],
+  },
+  {
+    label: "adapter readiness active shape checks",
+    patterns: [/assertProbeChecksPass\("shape", shapeChecks\)/],
+  },
+  {
+    label: "adapter readiness active canonicalization checks",
+    patterns: [/assertProbeChecksPass\("canonicalization", canonicalizationChecks\)/],
+  },
+  {
+    label: "adapter readiness active quarantine checks",
+    patterns: [/assertProbeChecksPass\("quarantine", quarantineChecks\)/],
+  },
+  {
+    label: "adapter readiness active privacy checks",
+    patterns: [/assertProbeChecksPass\("privacy", privacyChecks\)/],
+  },
+  {
+    label: "adapter readiness active wording checks",
+    patterns: [/assertProbeChecksPass\("wording", wordingChecks\)/],
+  },
+  {
+    label: "adapter readiness active source-boundary checks",
+    patterns: [/assertProbeChecksPass\("source boundaries", sourceBoundaryChecks\)/],
+  },
+  {
+    label: "adapter readiness legacy damage-photo quarantine case",
+    patterns: [/legacyDamagePhotoQuarantineResult/, /damagePhotoReadinessRejected/],
+  },
+  {
+    label: "adapter readiness raw/private sentinel omission",
+    patterns: [/forbiddenPrivateSentinelValues/, /hostileOutputOmitsPrivateSentinels/],
+  },
+  {
+    label: "adapter readiness no LocalAnalysisResult dependency marker",
+    patterns: [/adapterOutputHasNoReceiptOnlyKeys/, /localAnalysisResultRequired:\s*false/],
+  },
+  {
+    label: "adapter readiness non-live marker",
+    patterns: [/runtimeLive:\s*false/, /runtimeStaysNonLive/],
+  },
+];
+
+for (const signal of requiredProductPhotoAdapterReadinessSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(productPhotoAdapterReadinessProbe))) {
+    failures.push(`Product-photo adapter readiness probe check failed: missing ${signal.label}`);
+  }
+}
+
 const requiredProductPhotoProbeRunnerSignals = [
   /PRODUCT_PHOTO_HEURISTICS_DEVELOPER_PROBE/,
   /PRODUCT_PHOTO_RESULT_BOUNDARY_DEVELOPER_PROBE/,
   /SHARED_RESULT_DEVELOPER_PROBE/,
   /PRODUCT_PHOTO_RECOGNITION_DEVELOPER_PROBE/,
   /PRODUCT_PHOTO_ROUTING_ADAPTER_DEVELOPER_PROBE/,
+  /PRODUCT_PHOTO_ADAPTER_READINESS_DEVELOPER_PROBE/,
   /PRODUCT_PHOTO_ANALYZER_DEVELOPER_PROBE/,
   /PRODUCT_PHOTO_REPORT_VIEW_MODEL_DEVELOPER_PROBE/,
 ];

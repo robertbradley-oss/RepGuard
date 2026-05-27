@@ -65,6 +65,10 @@ const probeModules = [
     exportName: "PRODUCT_PHOTO_ROUTING_ADAPTER_DEVELOPER_PROBE",
   },
   {
+    path: "src/lib/analysis/product-photo-adapter-readiness.probe.ts",
+    exportName: "PRODUCT_PHOTO_ADAPTER_READINESS_DEVELOPER_PROBE",
+  },
+  {
     path: "src/lib/analysis/product-photo-analyzer.probe.ts",
     exportName: "PRODUCT_PHOTO_ANALYZER_DEVELOPER_PROBE",
   },
