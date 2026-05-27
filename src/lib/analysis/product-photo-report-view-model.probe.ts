@@ -18,6 +18,7 @@ import type {
 } from "@/lib/analysis/types";
 
 type HasAnyKey<T, TKey extends PropertyKey> = Extract<keyof T, TKey> extends never ? false : true;
+type AssertFalse<T extends false> = T extends false ? true : never;
 
 type ReceiptOnlyResultKeys =
   | "ocr"
@@ -199,11 +200,11 @@ const sharedResultShape = productPhotoMappingResult satisfies EvidenceAnalysisRe
 const productPhotoReportViewModelShape = productPhotoReportViewModel satisfies ProductPhotoReportViewModel;
 const localAnalysisResultStillReceiptOnly = true satisfies LocalAnalysisResultStillReceiptOnly;
 const productPhotoReportDoesNotExposeReceiptOnlyFields =
-  false satisfies HasAnyKey<ProductPhotoReportViewModel, ReceiptOnlyResultKeys>;
+  true satisfies AssertFalse<HasAnyKey<ProductPhotoReportViewModel, ReceiptOnlyResultKeys>>;
 const productPhotoReportDoesNotExposeRawPhotoOrPrivateEvidenceFields =
-  false satisfies HasAnyKey<ProductPhotoReportViewModel, RawPhotoOrPrivateEvidenceKeys>;
+  true satisfies AssertFalse<HasAnyKey<ProductPhotoReportViewModel, RawPhotoOrPrivateEvidenceKeys>>;
 const productPhotoReportDoesNotExposeFinalOutcomeFields =
-  false satisfies HasAnyKey<ProductPhotoReportViewModel, FinalOutcomeKeys>;
+  true satisfies AssertFalse<HasAnyKey<ProductPhotoReportViewModel, FinalOutcomeKeys>>;
 
 function allChecksPass(checks: Record<string, boolean>) {
   return Object.values(checks).every(Boolean);
@@ -211,7 +212,12 @@ function allChecksPass(checks: Record<string, boolean>) {
 
 function assertProbeChecksPass(label: string, checks: Record<string, boolean>) {
   if (!allChecksPass(checks)) {
-    throw new Error(`Product-photo report view-model probe failed: ${label}`);
+    const failedChecks = Object.entries(checks)
+      .filter(([, passed]) => !passed)
+      .map(([check]) => check)
+      .join(", ");
+
+    throw new Error(`Product-photo report view-model probe failed: ${label}: ${failedChecks}`);
   }
 }
 

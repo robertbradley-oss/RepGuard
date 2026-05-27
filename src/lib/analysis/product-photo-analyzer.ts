@@ -16,6 +16,7 @@ import type {
   RequestedPhotoView,
   SharedEvidenceFindingGroup,
   SharedEvidenceSignal,
+  SignalSeverity,
 } from "@/lib/analysis/types";
 import {
   buildProductPhotoFileSummary,
@@ -111,8 +112,97 @@ const PRODUCT_PHOTO_SAFE_QUALITY_LIMITS = [
   `fi${"le"} context needs manual review`,
 ] as const;
 
+const PRODUCT_PHOTO_SUBJECT_TYPES = [
+  "damage-close-up",
+  "full-product-context",
+  "serial-model-label",
+  "packaging-damage",
+  "installation-context",
+  "mixed-evidence-image",
+  "inconclusive-photo",
+] as const satisfies readonly ProductPhotoSubjectType[];
+
+const PRODUCT_PHOTO_DAMAGE_VISIBILITY_STATUSES = [
+  "clearly-visible",
+  "partially-visible",
+  "claimed-but-not-visible",
+  "damage-area-visible-context-missing",
+  "product-visible-damage-area-missing",
+  "inconclusive",
+] as const satisfies readonly DamageVisibilityStatus[];
+
+const PRODUCT_PHOTO_CONTEXT_STATUSES = [
+  "complete",
+  "partial",
+  "missing",
+  "not-applicable",
+  "inconclusive",
+] as const satisfies readonly ProductContextStatus[];
+
+const PRODUCT_PHOTO_REQUESTED_VIEWS = [
+  "wider-product-photo",
+  "clearer-damage-close-up",
+  "serial-or-model-label",
+  "packaging-context",
+  "installation-context",
+  "proof-of-purchase-match",
+] as const satisfies readonly RequestedPhotoView[];
+
+const PRODUCT_PHOTO_FILE_TYPE_CATEGORIES = [
+  "image",
+  "pdf",
+  "screenshot",
+  "document",
+  "unknown",
+] as const satisfies readonly EvidenceMetadataSummary["fileTypeCategory"][];
+
+const PRODUCT_PHOTO_FILE_SIZE_BUCKETS = [
+  "tiny",
+  "small",
+  "medium",
+  "large",
+  "very-large",
+  "unknown",
+] as const satisfies readonly EvidenceMetadataSummary["fileSizeBucket"][];
+
+const PRODUCT_PHOTO_DIMENSION_BUCKETS = [
+  "small",
+  "medium",
+  "large",
+  "very-large",
+  "unknown",
+] as const satisfies readonly NonNullable<EvidenceMetadataSummary["dimensionsBucket"]>[];
+
+const PRODUCT_PHOTO_METADATA_CONTEXTS = [
+  "Available",
+  "Limited",
+  "Unavailable",
+] as const satisfies readonly EvidenceMetadataSummary["metadataContext"][];
+
+const PRODUCT_PHOTO_SIGNAL_SEVERITIES = ["Low", "Medium", "High"] as const satisfies readonly SignalSeverity[];
+
 function uniqueStrings<T extends string>(values: T[]): T[] {
   return Array.from(new Set(values));
+}
+
+function canonicalValue<T extends string>(
+  value: unknown,
+  allowedValues: readonly T[],
+  fallback: T,
+): T {
+  return typeof value === "string" && allowedValues.includes(value as T) ? (value as T) : fallback;
+}
+
+function canonicalRequestedPhotoViews(views: unknown): RequestedPhotoView[] | undefined {
+  if (!Array.isArray(views)) {
+    return undefined;
+  }
+
+  return uniqueStrings(
+    views
+      .map((view) => canonicalValue(view, PRODUCT_PHOTO_REQUESTED_VIEWS, "wider-product-photo"))
+      .filter((view): view is RequestedPhotoView => PRODUCT_PHOTO_REQUESTED_VIEWS.includes(view)),
+  );
 }
 
 function sanitizeReviewNotes(
@@ -136,6 +226,115 @@ function sanitizeQualityLimits(qualityLimits: string[]): string[] {
         : "photo quality limits review",
     ),
   );
+}
+
+function sanitizeProductPhotoSignal(signal: SharedEvidenceSignal): SharedEvidenceSignal {
+  const severity = canonicalValue(signal.severity, PRODUCT_PHOTO_SIGNAL_SEVERITIES, "Medium");
+  const confidence = Number.isFinite(signal.confidence)
+    ? Math.max(0, Math.min(100, Math.round(signal.confidence)))
+    : 60;
+
+  return {
+    id: signal.id,
+    title: signal.title,
+    category: signal.category,
+    severity,
+    confidence,
+    evidenceSource: "Local-only product-photo review signal",
+    explanation: signal.explanation,
+    recommendation: signal.recommendation,
+  };
+}
+
+function canonicalProductPhotoMetadataSummary(
+  metadataSummary: EvidenceMetadataSummary | undefined,
+): EvidenceMetadataSummary | undefined {
+  if (!metadataSummary) {
+    return undefined;
+  }
+
+  return {
+    fileTypeCategory: canonicalValue(metadataSummary.fileTypeCategory, PRODUCT_PHOTO_FILE_TYPE_CATEGORIES, "unknown"),
+    fileSizeBucket: canonicalValue(metadataSummary.fileSizeBucket, PRODUCT_PHOTO_FILE_SIZE_BUCKETS, "unknown"),
+    dimensionsPresent: metadataSummary.dimensionsPresent === true,
+    dimensionsBucket: canonicalValue(metadataSummary.dimensionsBucket, PRODUCT_PHOTO_DIMENSION_BUCKETS, "unknown"),
+    metadataContext: canonicalValue(metadataSummary.metadataContext, PRODUCT_PHOTO_METADATA_CONTEXTS, "Unavailable"),
+    captureTimestampPresent:
+      metadataSummary.captureTimestampPresent === true || metadataSummary.captureTimestampPresent === false
+        ? metadataSummary.captureTimestampPresent
+        : "unknown",
+    gpsContext:
+      metadataSummary.gpsContext === "not-applicable"
+        ? "not-applicable"
+        : metadataSummary.gpsContext === "stripped"
+          ? "stripped"
+          : "unknown",
+    editingSoftwareSignal: metadataSummary.editingSoftwareSignal === "not-present" ? "not-present" : "unknown",
+    rawExifOmitted: true,
+    originalFilenameOmitted: true,
+    notes: sanitizeReviewNotes(metadataSummary.notes, ["metadata context limited"]),
+  };
+}
+
+function canonicalProductPhotoFileSummaryInput(
+  fileSummary: ProductPhotoAnalysisDetailsInput["fileSummary"],
+): ProductPhotoAnalysisDetailsInput["fileSummary"] {
+  if (!fileSummary) {
+    return undefined;
+  }
+
+  const nestedMetadataSummary = "metadataSummary" in fileSummary ? fileSummary.metadataSummary : undefined;
+
+  return {
+    fileTypeCategory: canonicalValue(fileSummary.fileTypeCategory, PRODUCT_PHOTO_FILE_TYPE_CATEGORIES, "unknown"),
+    fileSizeBucket: canonicalValue(fileSummary.fileSizeBucket, PRODUCT_PHOTO_FILE_SIZE_BUCKETS, "unknown"),
+    dimensionsPresent: fileSummary.dimensionsPresent === true,
+    dimensionsBucket: canonicalValue(fileSummary.dimensionsBucket, PRODUCT_PHOTO_DIMENSION_BUCKETS, "unknown"),
+    metadataContext: canonicalValue(fileSummary.metadataContext, PRODUCT_PHOTO_METADATA_CONTEXTS, "Unavailable"),
+    qualityLimits: sanitizeQualityLimits(fileSummary.qualityLimits ?? []),
+    metadataSummary: canonicalProductPhotoMetadataSummary(nestedMetadataSummary),
+  };
+}
+
+function canonicalProductPhotoAnalysisDetailsInput(
+  input: ProductPhotoAnalysisDetailsInput,
+): ProductPhotoAnalysisDetailsInput {
+  const requestedAdditionalViews = canonicalRequestedPhotoViews(input.requestedAdditionalViews);
+  const missingContext = canonicalRequestedPhotoViews(input.missingContext);
+
+  return {
+    subjectType: canonicalValue(
+      input.subjectType,
+      PRODUCT_PHOTO_SUBJECT_TYPES,
+      PRODUCT_PHOTO_COMPLETENESS_DEFAULTS.subjectType,
+    ),
+    damageVisibility: canonicalValue(
+      input.damageVisibility,
+      PRODUCT_PHOTO_DAMAGE_VISIBILITY_STATUSES,
+      PRODUCT_PHOTO_COMPLETENESS_DEFAULTS.damageVisibility,
+    ),
+    productContext: canonicalValue(
+      input.productContext,
+      PRODUCT_PHOTO_CONTEXT_STATUSES,
+      PRODUCT_PHOTO_COMPLETENESS_DEFAULTS.productContext,
+    ),
+    productLabelContext: {
+      serialOrModelContextPresent: input.productLabelContext?.serialOrModelContextPresent === true,
+      labelReadable:
+        input.productLabelContext?.labelReadable === true || input.productLabelContext?.labelReadable === false
+          ? input.productLabelContext.labelReadable
+          : "unknown",
+      rawValueOmitted: true,
+      notes: sanitizeReviewNotes(input.productLabelContext?.notes, ["local-only review signal"]),
+    },
+    metadataSummary: canonicalProductPhotoMetadataSummary(input.metadataSummary),
+    fileSummary: canonicalProductPhotoFileSummaryInput(input.fileSummary),
+    requestedAdditionalViews,
+    missingContext,
+    purchaseOrReceiptMatchNeeded:
+      input.purchaseOrReceiptMatchNeeded === undefined ? undefined : input.purchaseOrReceiptMatchNeeded === true,
+    includeManualReviewRecommendation: input.includeManualReviewRecommendation,
+  };
 }
 
 function sanitizeMetadataSummary(
@@ -248,22 +447,23 @@ function buildProductLabelContext(
 export function buildProductPhotoAnalysisDetails(
   input: ProductPhotoAnalysisDetailsInput = {},
 ): ProductPhotoAnalysisDetails {
+  const canonicalInput = canonicalProductPhotoAnalysisDetailsInput(input);
   const requestedAdditionalViews =
-    input.requestedAdditionalViews ?? PRODUCT_PHOTO_COMPLETENESS_DEFAULTS.requestedAdditionalViews;
+    canonicalInput.requestedAdditionalViews ?? PRODUCT_PHOTO_COMPLETENESS_DEFAULTS.requestedAdditionalViews;
   const purchaseOrReceiptMatchNeeded =
-    input.purchaseOrReceiptMatchNeeded ?? requestedAdditionalViews.includes("proof-of-purchase-match");
+    canonicalInput.purchaseOrReceiptMatchNeeded ?? requestedAdditionalViews.includes("proof-of-purchase-match");
   const metadataSummary =
-    input.metadataSummary ?? (input.fileSummary ? undefined : buildDefaultProductPhotoMetadataSummary());
+    canonicalInput.metadataSummary ?? (canonicalInput.fileSummary ? undefined : buildDefaultProductPhotoMetadataSummary());
   const fileSummary = buildProductPhotoFileSummary(
-    input.fileSummary ?? {
+    canonicalInput.fileSummary ?? {
       metadataSummary,
     },
   );
   const reviewCompletenessInput: ProductPhotoReviewCompletenessInput = {
-    subjectType: input.subjectType,
+    subjectType: canonicalInput.subjectType,
     requestedAdditionalViews,
-    missingContext: input.missingContext,
-    productContext: input.productContext,
+    missingContext: canonicalInput.missingContext,
+    productContext: canonicalInput.productContext,
     purchaseOrReceiptMatchNeeded,
   };
   const reviewCompleteness = buildProductPhotoReviewCompleteness(reviewCompletenessInput);
@@ -279,10 +479,10 @@ export function buildProductPhotoAnalysisDetails(
     : "local-only review signal";
 
   return {
-    subjectType: input.subjectType ?? PRODUCT_PHOTO_COMPLETENESS_DEFAULTS.subjectType,
-    damageVisibility: input.damageVisibility ?? PRODUCT_PHOTO_COMPLETENESS_DEFAULTS.damageVisibility,
-    fullProductContext: productContextFromReviewState(input.productContext, reviewCompleteness.missingContext),
-    productLabelContext: buildProductLabelContext(input, reviewCompleteness.missingContext),
+    subjectType: canonicalInput.subjectType ?? PRODUCT_PHOTO_COMPLETENESS_DEFAULTS.subjectType,
+    damageVisibility: canonicalInput.damageVisibility ?? PRODUCT_PHOTO_COMPLETENESS_DEFAULTS.damageVisibility,
+    fullProductContext: productContextFromReviewState(canonicalInput.productContext, reviewCompleteness.missingContext),
+    productLabelContext: buildProductLabelContext(canonicalInput, reviewCompleteness.missingContext),
     imageQuality: buildQualitySummaryFromFileSummary(fileSummary),
     imageConsistency: buildConsistencySummaryFromLocalSignals(localReviewSignals),
     metadataContext: {
@@ -304,12 +504,20 @@ export function buildDefaultProductPhotoAnalysisDetails(
 }
 
 function clampProductPhotoScore(score: number) {
+  if (!Number.isFinite(score)) {
+    return 56;
+  }
+
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
 function defaultProductPhotoScoreFor(details: ProductPhotoAnalysisDetails) {
   if (details.reviewCompleteness.status === "complete" && details.imageQuality.qualityLevel === "Clear") {
     return 78;
+  }
+
+  if (details.reviewCompleteness.status === "complete" && details.imageQuality.qualityLevel === "Usable") {
+    return 76;
   }
 
   if (details.reviewCompleteness.status === "partial" || details.imageQuality.qualityLevel === "Usable") {
@@ -335,6 +543,10 @@ function defaultProductPhotoSignalLevelFor(signals: SharedEvidenceSignal[]): Loc
   return "None";
 }
 
+function productPhotoSignalsForOutput(signals: SharedEvidenceSignal[]) {
+  return signals.map(sanitizeProductPhotoSignal);
+}
+
 function defaultProductPhotoReviewPriorityFor(details: ProductPhotoAnalysisDetails): ReviewPriority {
   if (details.reviewCompleteness.status === "complete" && !details.purchaseOrReceiptMatchNeeded) {
     return "Review";
@@ -344,7 +556,10 @@ function defaultProductPhotoReviewPriorityFor(details: ProductPhotoAnalysisDetai
 }
 
 function defaultProductPhotoConfidenceFor(details: ProductPhotoAnalysisDetails): EvidenceConfidence {
-  if (details.reviewCompleteness.status === "complete" && details.imageQuality.qualityLevel === "Clear") {
+  if (
+    details.reviewCompleteness.status === "complete" &&
+    (details.imageQuality.qualityLevel === "Clear" || details.imageQuality.qualityLevel === "Usable")
+  ) {
     return "Medium confidence";
   }
 
@@ -484,8 +699,8 @@ export function prepareProductPhotoEvidenceAnalysisResultForDevOnlyBoundary(
   input: ProductPhotoEvidenceAnalysisResultInput = {},
 ): ProductPhotoEvidenceAnalysisResult {
   const details = buildProductPhotoAnalysisDetails(input);
-  const signals = details.imageConsistency.signals;
-  const score = clampProductPhotoScore(input.score ?? defaultProductPhotoScoreFor(details));
+  const signals = productPhotoSignalsForOutput(details.imageConsistency.signals);
+  const score = clampProductPhotoScore(defaultProductPhotoScoreFor(details));
 
   return {
     module: "productPhoto",
@@ -506,9 +721,9 @@ export function prepareProductPhotoEvidenceAnalysisResultForDevOnlyBoundary(
         "Low or medium score means image quality, product context, or receipt/order matching may require manual review.",
       safetyNote: "High score does not prove the product photo or claim. Manual review may still be required.",
     },
-    localSignalLevel: input.localSignalLevel ?? defaultProductPhotoSignalLevelFor(signals),
-    reviewPriority: input.reviewPriority ?? defaultProductPhotoReviewPriorityFor(details),
-    confidenceLevel: input.confidenceLevel ?? defaultProductPhotoConfidenceFor(details),
+    localSignalLevel: defaultProductPhotoSignalLevelFor(signals),
+    reviewPriority: defaultProductPhotoReviewPriorityFor(details),
+    confidenceLevel: defaultProductPhotoConfidenceFor(details),
     reviewLabel: defaultProductPhotoReviewLabelFor(details),
     verificationStatus: {
       status: "Not externally verified",

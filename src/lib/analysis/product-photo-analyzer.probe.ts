@@ -18,6 +18,7 @@ import type {
 } from "@/lib/analysis/types";
 
 type HasAnyKey<T, TKey extends PropertyKey> = Extract<keyof T, TKey> extends never ? false : true;
+type AssertFalse<T extends false> = T extends false ? true : never;
 
 type ReceiptOnlyResultKeys =
   | "ocr"
@@ -336,6 +337,24 @@ const directBoundaryHostileNarrativeResult = prepareProductPhotoEvidenceAnalysis
   customerSafeWording: sentinelUnsafeText,
 } satisfies ProductPhotoEvidenceAnalysisResultInput);
 
+const directBoundaryHostileStructuredOverrideResult =
+  prepareProductPhotoEvidenceAnalysisResultForDevOnlyBoundary({
+    evidenceLabel: rawFilenameSentinel,
+    sourceKind: "future-provider-signal",
+    subjectType: "damage-close-up",
+    damageVisibility: "inconclusive",
+    productContext: "missing",
+    metadataSummary: bucketedUnavailableMetadata,
+    requestedAdditionalViews: ["wider-product-photo", "proof-of-purchase-match"],
+    missingContext: ["wider-product-photo", "proof-of-purchase-match"],
+    purchaseOrReceiptMatchNeeded: true,
+    score: 100,
+    localSignalLevel: "None",
+    reviewPriority: "Standard",
+    confidenceLevel: "High confidence",
+    reviewLabel: "Clear",
+  } satisfies ProductPhotoEvidenceAnalysisResultInput);
+
 const directDetailsProbe = buildProductPhotoAnalysisDetails({
   subjectType: "damage-close-up",
   damageVisibility: "inconclusive",
@@ -349,11 +368,11 @@ const productPhotoAnalyzerResultShape =
   completeContextAnalyzerResult satisfies ProductPhotoEvidenceAnalysisResult;
 const sharedAnalyzerResultShape = completeContextAnalyzerResult satisfies EvidenceAnalysisResult;
 const productPhotoAnalyzerDoesNotExposeReceiptOnlyFields =
-  false satisfies HasAnyKey<ProductPhotoEvidenceAnalysisResult, ReceiptOnlyResultKeys>;
+  true satisfies AssertFalse<HasAnyKey<ProductPhotoEvidenceAnalysisResult, ReceiptOnlyResultKeys>>;
 const productPhotoAnalyzerDoesNotExposeRawPhotoOrPrivateEvidenceFields =
-  false satisfies HasAnyKey<ProductPhotoEvidenceAnalysisResult, RawPhotoOrPrivateEvidenceKeys>;
+  true satisfies AssertFalse<HasAnyKey<ProductPhotoEvidenceAnalysisResult, RawPhotoOrPrivateEvidenceKeys>>;
 const productPhotoAnalyzerDoesNotExposeFinalOutcomeFields =
-  false satisfies HasAnyKey<ProductPhotoEvidenceAnalysisResult, FinalOutcomeKeys>;
+  true satisfies AssertFalse<HasAnyKey<ProductPhotoEvidenceAnalysisResult, FinalOutcomeKeys>>;
 
 function allChecksPass(checks: Record<string, boolean>) {
   return Object.values(checks).every(Boolean);
@@ -361,7 +380,12 @@ function allChecksPass(checks: Record<string, boolean>) {
 
 function assertProbeChecksPass(label: string, checks: Record<string, boolean>) {
   if (!allChecksPass(checks)) {
-    throw new Error(`Product-photo analyzer probe failed: ${label}`);
+    const failedChecks = Object.entries(checks)
+      .filter(([, passed]) => !passed)
+      .map(([check]) => check)
+      .join(", ");
+
+    throw new Error(`Product-photo analyzer probe failed: ${label}: ${failedChecks}`);
   }
 }
 
@@ -474,6 +498,18 @@ const safetyChecks = {
   directBoundaryExternalVerificationStillNotPerformed:
     directBoundaryHostileNarrativeResult.externalVerification === "Not performed",
   directBoundarySourceKindCanonicalized: directBoundaryHostileNarrativeResult.sourceKind === "manual-review-context",
+  directBoundaryStructuredScoreDerived:
+    directBoundaryHostileStructuredOverrideResult.score < 100 &&
+    directBoundaryHostileStructuredOverrideResult.evidenceReliabilityScore.value ===
+      directBoundaryHostileStructuredOverrideResult.score,
+  directBoundaryStructuredSignalLevelDerived:
+    directBoundaryHostileStructuredOverrideResult.localSignalLevel !== "None",
+  directBoundaryStructuredReviewPriorityDerived:
+    directBoundaryHostileStructuredOverrideResult.reviewPriority === "Manual review",
+  directBoundaryStructuredConfidenceDerived:
+    directBoundaryHostileStructuredOverrideResult.confidenceLevel === "Low confidence",
+  directBoundaryStructuredReviewLabelDerived:
+    directBoundaryHostileStructuredOverrideResult.reviewLabel === "Manual review recommended",
   manualReviewOnlyAction:
     missingWiderViewAnalyzerResult.recommendedSupportAction.toLowerCase().includes("manual review recommended"),
   unsafeCallerCopyNotPropagated: resultHasNoUnsafeSentinelCopy(hostileInputAnalyzerResult),
@@ -619,6 +655,7 @@ export const PRODUCT_PHOTO_ANALYZER_DEVELOPER_PROBE = {
     privacySentinel: privacySentinelAnalyzerResult,
     hostileInputSanitized: hostileInputAnalyzerResult,
     directBoundaryHostileNarrative: directBoundaryHostileNarrativeResult,
+    directBoundaryHostileStructuredOverride: directBoundaryHostileStructuredOverrideResult,
   },
   expectations: {
     shape: shapeChecks,

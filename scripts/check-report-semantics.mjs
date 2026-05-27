@@ -16,7 +16,11 @@ const filesToCheck = [
   "src/lib/analysis/product-photo-analyzer.probe.ts",
   "src/lib/analysis/product-photo-heuristics.ts",
   "src/lib/analysis/product-photo-heuristics.probe.ts",
+  "src/lib/analysis/product-photo-recognition.ts",
+  "src/lib/analysis/product-photo-recognition.probe.ts",
   "src/lib/analysis/product-photo-result.probe.ts",
+  "src/lib/analysis/product-photo-routing-adapter.ts",
+  "src/lib/analysis/product-photo-routing-adapter.probe.ts",
   "src/lib/analysis/shared-result.probe.ts",
   "src/lib/analysis/product-photo-report-view-model.ts",
   "src/lib/analysis/product-photo-report-view-model.probe.ts",
@@ -30,6 +34,8 @@ const filesToCheck = [
   "src/app/test-evidence/page.tsx",
   "src/lib/test-evidence/fixtures.ts",
   "src/lib/test-evidence/tuning-thresholds.ts",
+  "scripts/run-product-photo-probes.cjs",
+  "package.json",
   "TEST_EVIDENCE.md",
 ];
 
@@ -244,8 +250,15 @@ const productPhotoReportViewModel =
 const productPhotoAnalyzer = fileContents.get("src/lib/analysis/product-photo-analyzer.ts") ?? "";
 const productPhotoAnalyzerProbe = fileContents.get("src/lib/analysis/product-photo-analyzer.probe.ts") ?? "";
 const productPhotoHeuristicsProbe = fileContents.get("src/lib/analysis/product-photo-heuristics.probe.ts") ?? "";
+const productPhotoRecognition = fileContents.get("src/lib/analysis/product-photo-recognition.ts") ?? "";
+const productPhotoRecognitionProbe = fileContents.get("src/lib/analysis/product-photo-recognition.probe.ts") ?? "";
+const productPhotoRoutingAdapter = fileContents.get("src/lib/analysis/product-photo-routing-adapter.ts") ?? "";
+const productPhotoRoutingAdapterProbe =
+  fileContents.get("src/lib/analysis/product-photo-routing-adapter.probe.ts") ?? "";
 const productPhotoReportViewModelProbe =
   fileContents.get("src/lib/analysis/product-photo-report-view-model.probe.ts") ?? "";
+const productPhotoProbeRunner = fileContents.get("scripts/run-product-photo-probes.cjs") ?? "";
+const packageJson = fileContents.get("package.json") ?? "";
 const productPhotoReviewPanel = fileContents.get("src/components/ProductPhotoReviewPanel.tsx") ?? "";
 const productPhotoReviewPanelProbe = fileContents.get("src/components/ProductPhotoReviewPanel.probe.tsx") ?? "";
 const productPhotoReviewPanelHostPage =
@@ -432,6 +445,22 @@ const requiredProductPhotoAnalyzerProbeSignals = [
   {
     label: "analyzer probe direct-boundary source-kind canonicalization",
     patterns: [/directBoundarySourceKindCanonicalized/],
+  },
+  {
+    label: "analyzer probe direct-boundary structured override case",
+    patterns: [/directBoundaryHostileStructuredOverrideResult/],
+  },
+  {
+    label: "analyzer probe direct-boundary structured score derivation",
+    patterns: [/directBoundaryStructuredScoreDerived/],
+  },
+  {
+    label: "analyzer probe direct-boundary structured readiness derivation",
+    patterns: [
+      /directBoundaryStructuredSignalLevelDerived/,
+      /directBoundaryStructuredReviewPriorityDerived/,
+      /directBoundaryStructuredConfidenceDerived/,
+    ],
   },
   {
     label: "analyzer probe confidence priority score separation",
@@ -912,6 +941,12 @@ if (
 }
 
 const forbiddenProductPhotoAnalyzerOverridePatterns = [
+  /const\s+score\s*=\s*clampProductPhotoScore\(input\.score/,
+  /score:\s*input\.score/,
+  /evidenceReliabilityScore:\s*\{[\s\S]*value:\s*input\.score/,
+  /localSignalLevel:\s*input\.localSignalLevel/,
+  /reviewPriority:\s*input\.reviewPriority/,
+  /confidenceLevel:\s*input\.confidenceLevel/,
   /reviewLabel:\s*input\.reviewLabel/,
   /evidenceSummary:\s*input\.evidenceSummary/,
   /recommendedSupportAction:\s*input\.recommendedSupportAction/,
@@ -939,6 +974,56 @@ for (const signal of requiredProductPhotoAnalyzerProbeSignals) {
 
 if (!/PRODUCT_PHOTO_HEURISTICS_DEVELOPER_PROBE/.test(productPhotoHeuristicsProbe)) {
   failures.push("Product-photo heuristics probe check failed: heuristics probe is missing from semantic coverage.");
+}
+
+if (!/PRODUCT_PHOTO_RECOGNITION_DEVELOPER_PROBE/.test(productPhotoRecognitionProbe)) {
+  failures.push("Product-photo recognition probe check failed: recognition probe is missing from semantic coverage.");
+}
+
+if (!/PRODUCT_PHOTO_ROUTING_ADAPTER_DEVELOPER_PROBE/.test(productPhotoRoutingAdapterProbe)) {
+  failures.push("Product-photo routing-adapter probe check failed: routing-adapter probe is missing from semantic coverage.");
+}
+
+const requiredProductPhotoProbeRunnerSignals = [
+  /PRODUCT_PHOTO_HEURISTICS_DEVELOPER_PROBE/,
+  /PRODUCT_PHOTO_RESULT_BOUNDARY_DEVELOPER_PROBE/,
+  /SHARED_RESULT_DEVELOPER_PROBE/,
+  /PRODUCT_PHOTO_RECOGNITION_DEVELOPER_PROBE/,
+  /PRODUCT_PHOTO_ROUTING_ADAPTER_DEVELOPER_PROBE/,
+  /PRODUCT_PHOTO_ANALYZER_DEVELOPER_PROBE/,
+  /PRODUCT_PHOTO_REPORT_VIEW_MODEL_DEVELOPER_PROBE/,
+];
+
+if (!/"check:product-photo-probes"\s*:\s*"node scripts\/run-product-photo-probes\.cjs"/.test(packageJson)) {
+  failures.push("Product-photo probe execution check failed: package script is missing.");
+}
+
+for (const pattern of requiredProductPhotoProbeRunnerSignals) {
+  if (!pattern.test(productPhotoProbeRunner)) {
+    failures.push(`Product-photo probe execution check failed: runner does not import ${pattern}.`);
+  }
+}
+
+const productPhotoRecognitionAndRoutingCorpus = [
+  productPhotoRecognition,
+  productPhotoRecognitionProbe,
+  productPhotoRoutingAdapter,
+  productPhotoRoutingAdapterProbe,
+].join("\n");
+const forbiddenProductPhotoRecognitionRoutingPrivacyPatterns = [
+  /objectUrl|imageUrl|dataUrl|fileBytes|imageBuffer|rawExif(?!Omitted)|rawMetadata|originalFilename(?!Omitted)/,
+  /rawLabelValue|rawSerialOrModelText|providerOutput|storageHandle|integrationHandle|caseQueueHandle/,
+  /caseQueue|storageId|integrationId|providerHandle/,
+];
+
+for (const pattern of forbiddenProductPhotoRecognitionRoutingPrivacyPatterns) {
+  if (pattern.test(productPhotoRecognitionAndRoutingCorpus)) {
+    failures.push(`Product-photo recognition/routing privacy check failed: forbidden pattern ${pattern}`);
+  }
+}
+
+if (/damage-photo/i.test(`${productPhotoAnalyzer}\n${productPhotoReportViewModel}`)) {
+  failures.push("Product-photo canonical boundary check failed: canonical analyzer/report model references legacy damage-photo.");
 }
 
 for (const signal of requiredProductPhotoDisplayProbeSignals) {
