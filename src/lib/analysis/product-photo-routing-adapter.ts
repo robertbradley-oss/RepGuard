@@ -328,6 +328,14 @@ function nestedAnalysisEvidenceType(input: ProductPhotoAdapterReadinessInput): u
   return (input.result as { evidenceType?: unknown } | undefined)?.evidenceType;
 }
 
+function nestedViewModelEvidenceType(input: ProductPhotoAdapterReadinessInput): unknown {
+  if (input.inputKind !== "report-view-model") {
+    return undefined;
+  }
+
+  return (input.viewModel as { evidenceType?: unknown } | undefined)?.evidenceType;
+}
+
 function topLevelEvidenceTypeIsProductPhotoOrAbsent(input: ProductPhotoAdapterReadinessInput) {
   return input.evidenceType === undefined || input.evidenceType === "product-photo";
 }
@@ -442,8 +450,13 @@ export function prepareProductPhotoAdapterReadinessForDevOnlyBoundary(
   input: ProductPhotoAdapterReadinessInput = {},
 ): ProductPhotoAdapterReadinessResult {
   const analysisEvidenceType = nestedAnalysisEvidenceType(input);
+  const viewModelEvidenceType = nestedViewModelEvidenceType(input);
 
-  if (input.evidenceType === "damage-photo" || analysisEvidenceType === "damage-photo") {
+  if (
+    input.evidenceType === "damage-photo" ||
+    analysisEvidenceType === "damage-photo" ||
+    viewModelEvidenceType === "damage-photo"
+  ) {
     return legacyDamagePhotoQuarantineResult();
   }
 

@@ -1048,6 +1048,10 @@ const requiredProductPhotoAdapterReadinessSignals = [
     patterns: [/legacyDamagePhotoQuarantineResult/, /damagePhotoReadinessRejected/],
   },
   {
+    label: "adapter readiness nested report-view-model damage-photo quarantine case",
+    patterns: [/hostileNestedDamagePhotoReportViewModelQuarantineResult/, /hostileNestedDamagePhotoReportViewModelQuarantined/],
+  },
+  {
     label: "adapter readiness top-level mismatch quarantine cases",
     patterns: [/topLevelEvidenceTypeMismatches/, /topLevelAnalysisEvidenceTypeMismatchesCollapsed/],
   },

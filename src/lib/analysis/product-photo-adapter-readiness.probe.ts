@@ -112,6 +112,18 @@ const hostileNestedDamagePhotoAnalysisResult = {
   caseQueueId: "CASE_QUEUE_ID_SENTINEL",
 } as unknown as ProductPhotoEvidenceAnalysisResult;
 
+const hostileNestedDamagePhotoReportViewModel = {
+  ...canonicalViewModel,
+  evidenceType: "damage-photo",
+  privateEvidence: {
+    customerId: "CUSTOMER_ID_SENTINEL",
+    providerId: "PROVIDER_ID_SENTINEL",
+    storageKey: "STORAGE_KEY_SENTINEL",
+    rawMetadata: "RAW_METADATA_SENTINEL",
+    objectUrl: "OBJECT_URL_SENTINEL",
+  },
+} as unknown as ProductPhotoReportViewModel;
+
 const hostileNestedReceiptAnalysisResult = {
   ...canonicalAnalysisResult,
   evidenceType: "receipt",
@@ -233,6 +245,21 @@ const hostileNestedDamagePhotoOmittedTopLevelResult = prepareProductPhotoAdapter
   result: hostileNestedDamagePhotoAnalysisResult,
   runtimeRequested: true,
 });
+
+const hostileNestedDamagePhotoReportViewModelQuarantineResult =
+  prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
+    inputKind: "report-view-model",
+    viewModel: hostileNestedDamagePhotoReportViewModel,
+    evidenceType: "product-photo",
+    runtimeRequested: true,
+  });
+
+const hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult =
+  prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
+    inputKind: "report-view-model",
+    viewModel: hostileNestedDamagePhotoReportViewModel,
+    runtimeRequested: true,
+  });
 
 const hostileNestedReceiptResult = prepareProductPhotoAdapterReadinessForDevOnlyBoundary({
   inputKind: "analysis-result",
@@ -521,14 +548,33 @@ const quarantineChecks = {
     legacyDamagePhotoQuarantineResult.manualReviewOnly === true,
   hostileNestedDamagePhotoRejected:
     hostileNestedDamagePhotoQuarantineResult.readinessAccepted === false &&
-    hostileNestedDamagePhotoOmittedTopLevelResult.readinessAccepted === false,
+    hostileNestedDamagePhotoOmittedTopLevelResult.readinessAccepted === false &&
+    hostileNestedDamagePhotoReportViewModelQuarantineResult.readinessAccepted === false &&
+    hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult.readinessAccepted === false,
   hostileNestedDamagePhotoQuarantined:
     hostileNestedDamagePhotoQuarantineResult.inputKind === "legacy-quarantine" &&
     hostileNestedDamagePhotoOmittedTopLevelResult.inputKind === "legacy-quarantine" &&
+    hostileNestedDamagePhotoReportViewModelQuarantineResult.inputKind === "legacy-quarantine" &&
+    hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult.inputKind === "legacy-quarantine" &&
     hostileNestedDamagePhotoQuarantineResult.legacyCompatibility?.alias === "damage-photo" &&
     hostileNestedDamagePhotoOmittedTopLevelResult.legacyCompatibility?.alias === "damage-photo" &&
+    hostileNestedDamagePhotoReportViewModelQuarantineResult.legacyCompatibility?.alias === "damage-photo" &&
+    hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult.legacyCompatibility?.alias === "damage-photo" &&
     hostileNestedDamagePhotoQuarantineResult.legacyCompatibility.quarantined === true &&
-    hostileNestedDamagePhotoOmittedTopLevelResult.legacyCompatibility.quarantined === true,
+    hostileNestedDamagePhotoOmittedTopLevelResult.legacyCompatibility.quarantined === true &&
+    hostileNestedDamagePhotoReportViewModelQuarantineResult.legacyCompatibility.quarantined === true &&
+    hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult.legacyCompatibility.quarantined === true,
+  hostileNestedDamagePhotoReportViewModelQuarantined:
+    hostileNestedDamagePhotoReportViewModelQuarantineResult.readinessAccepted === false &&
+    hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult.readinessAccepted === false &&
+    hostileNestedDamagePhotoReportViewModelQuarantineResult.inputKind === "legacy-quarantine" &&
+    hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult.inputKind === "legacy-quarantine" &&
+    hostileNestedDamagePhotoReportViewModelQuarantineResult.legacyCompatibility?.runtimeCandidate === false &&
+    hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult.legacyCompatibility?.runtimeCandidate === false &&
+    hostileNestedDamagePhotoReportViewModelQuarantineResult.runtimeLive === false &&
+    hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult.runtimeLive === false &&
+    hostileNestedDamagePhotoReportViewModelQuarantineResult.manualReviewOnly === true &&
+    hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult.manualReviewOnly === true,
   hostileNestedDamagePhotoCannotBecomeCanonicalAdapterOutput:
     hostileNestedDamagePhotoQuarantineResult.readinessAccepted === false &&
     hostileNestedDamagePhotoQuarantineResult.inputKind !== "analysis-result" &&
@@ -597,9 +643,15 @@ const privacyChecks = {
   hostileNestedDamageOutputOmitsPrivateSentinels: outputOmitsPrivateSentinels(
     hostileNestedDamagePhotoQuarantineResult,
   ),
+  hostileNestedDamageViewModelOutputOmitsPrivateSentinels: outputOmitsPrivateSentinels(
+    hostileNestedDamagePhotoReportViewModelQuarantineResult,
+  ),
   hostileOutputOmitsForbiddenKeys: outputOmitsForbiddenKeys(hostileViewModelReadinessResult),
   hostileNestedDamageOutputOmitsForbiddenKeys: outputOmitsForbiddenKeys(
     hostileNestedDamagePhotoQuarantineResult,
+  ),
+  hostileNestedDamageViewModelOutputOmitsForbiddenKeys: outputOmitsForbiddenKeys(
+    hostileNestedDamagePhotoReportViewModelQuarantineResult,
   ),
   exactDimensionsNotPropagated: !stringifyForProbe(analysisReadinessResult).includes("1800"),
   privacyFlagsAreDerivedOmissionOnly:
@@ -675,6 +727,8 @@ export const PRODUCT_PHOTO_ADAPTER_READINESS_DEVELOPER_PROBE = {
     topLevelDamagePhotoViewModelMismatchResult,
     hostileNestedDamagePhotoQuarantineResult,
     hostileNestedDamagePhotoOmittedTopLevelResult,
+    hostileNestedDamagePhotoReportViewModelQuarantineResult,
+    hostileNestedDamagePhotoReportViewModelOmittedTopLevelResult,
     hostileNestedReceiptResult,
     hostileNestedUnknownResult,
     hostileNestedUnsupportedResult,
@@ -700,6 +754,10 @@ export const PRODUCT_PHOTO_ADAPTER_READINESS_DEVELOPER_PROBE = {
       inputKind: hostileNestedDamagePhotoQuarantineResult.inputKind,
       alias: hostileNestedDamagePhotoQuarantineResult.legacyCompatibility?.alias,
       quarantined: hostileNestedDamagePhotoQuarantineResult.legacyCompatibility?.quarantined,
+      viewModelAccepted: hostileNestedDamagePhotoReportViewModelQuarantineResult.readinessAccepted,
+      viewModelInputKind: hostileNestedDamagePhotoReportViewModelQuarantineResult.inputKind,
+      viewModelAlias: hostileNestedDamagePhotoReportViewModelQuarantineResult.legacyCompatibility?.alias,
+      viewModelQuarantined: hostileNestedDamagePhotoReportViewModelQuarantineResult.legacyCompatibility?.quarantined,
       runtimeLive: hostileNestedDamagePhotoQuarantineResult.runtimeLive,
       manualReviewOnly: hostileNestedDamagePhotoQuarantineResult.manualReviewOnly,
     },
