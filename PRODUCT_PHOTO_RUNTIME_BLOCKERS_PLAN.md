@@ -216,7 +216,7 @@ Stop future work if:
 - Browser QA is required but cannot be run.
 - Worktree status shows unexpected runtime/code/component/route changes during docs-only work.
 
-## Phase 2.4.5 Decision, Phase 2.4.6 Hardening, And Recommended Phase 2.4.7
+## Phase 2.4.5 Decision, Phase 2.4.6 Hardening, Phase 2.4.8 Review, And Recommended Phase 2.4.9
 
 Phase 2.4.5 is complete as the docs-only legacy `damage-photo` quarantine/migration plan in `LEGACY_DAMAGE_PHOTO_QUARANTINE_PLAN.md`.
 
@@ -238,9 +238,11 @@ Phase 2.4.6 is complete as no-live legacy `damage-photo` classifier quarantine h
 - `check:product-photo-probes` imports 10 modules, including classifier quarantine and analyzer-routing guard probes.
 - `check:report-semantics` covers the classifier quarantine markers, analyzer-routing forbidden imports, and active probe registrations.
 
-The safest next milestone is Phase 2.4.7: review-only classifier quarantine closeout. Do not start dev-only adapter harness implementation, product-photo upload classification, live report mapping, `analyzeEvidenceFile` integration, `LocalAnalysisResult` migration, provider work, storage, integrations, or case workflow before this hardening is reviewed.
+Phase 2.4.8 review confirms the classifier quarantine is complete enough for its intended no-live scope. It is acceptable only short-term that product-photo-like filenames collapse into the existing receipt/default analyzer flow. The remaining risk is that those files still reach OCR and metadata processing before a true unsupported boundary exists.
 
-Likely allowed files for Phase 2.4.7 review-only status updates must be named by the future prompt and should stay narrow:
+The safest next milestone is Phase 2.4.9: docs-only pre-OCR/pre-metadata unsupported boundary planning. Do not start dev-only adapter harness implementation, product-photo upload classification, live report mapping, `analyzeEvidenceFile` integration, `LocalAnalysisResult` migration, provider work, storage, integrations, or case workflow before that boundary is planned.
+
+Likely allowed files for Phase 2.4.9 docs-only status/planning updates must be named by the future prompt and should stay narrow:
 
 - `NEXT_STEPS.md`.
 - `PHASE_2_PHOTO_EVIDENCE_PLAN.md`.
@@ -248,7 +250,7 @@ Likely allowed files for Phase 2.4.7 review-only status updates must be named by
 - `LEGACY_DAMAGE_PHOTO_QUARANTINE_PLAN.md`.
 - `AGENT_LOG.md`.
 
-Protected files for Phase 2.4.7 unless separately authorized:
+Protected files for Phase 2.4.9 unless separately authorized:
 
 - The `analyzeEvidenceFile` runtime body and returned `LocalAnalysisResult` shape.
 - `src/lib/analysis/analyzer-classifier.ts`.

@@ -197,8 +197,14 @@ Phase 2.4.6 pass status:
 - Analyzer-routing guard coverage is now active in `check:product-photo-probes`, and semantic guards now scan `analyzer-routing.ts` for forbidden live/runtime imports.
 - `analyzeEvidenceFile`, `LocalAnalysisResult`, upload, UI, live report mapping, scoring, parser, fixtures, providers, storage, integrations, and case queues remain protected.
 
+Phase 2.4.8 review status:
+
+- The classifier quarantine is complete enough for its intended no-live scope.
+- Product-photo-like filenames still follow the existing receipt/default analyzer path after classifier collapse, so a true pre-OCR/pre-metadata unsupported boundary remains future work.
+- Dev-only adapter harness work should wait until that unsupported-boundary plan is written.
+
 Suggested next prompt:
 
 ```text
-/claimguardagent run Phase 2.4.7 as a review-only classifier quarantine closeout: inspect the Phase 2.4.6 classifier quarantine patch, confirm legacy damage-photo filename cues collapse away from canonical product-photo runtime, confirm this remains classifier-label hardening only and not a pre-OCR/pre-metadata unsupported boundary, confirm analyzeEvidenceFile remains the receipt analyzer entrypoint, LocalAnalysisResult is unchanged, receipt/PDF/screenshot behavior is preserved, product-photo remains non-live and unwired, active semantic/probe coverage includes the classifier quarantine and analyzer-routing guard probes plus source-backed analyzer-routing forbidden-import coverage, and no upload/UI/live report adapter/scoring/parser/fixtures/providers/storage/integrations/case queues/real photos/real metadata fixtures/deployment work appeared; run lint, build, check:report-semantics, check:product-photo-probes, git diff --check, and final status; commit docs-only status if needed; do not push
+/claimguardagent plan Phase 2.4.9 as docs-only pre-OCR/pre-metadata unsupported boundary readiness: define how product-photo-like files should be stopped before OCR/metadata without changing receipt behavior; name exact allowed/protected files, required probes/scans/checks, privacy gates, and stop conditions; do not implement code, routes, UI, upload, analyzer runtime changes, report adapter mapping, LocalAnalysisResult migration, scoring, parser, fixtures, providers, storage, integrations, case queues, real photos, metadata fixtures, deployment, commit, push, or runtime work.
 ```
