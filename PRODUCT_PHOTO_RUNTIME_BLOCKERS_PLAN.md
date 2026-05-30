@@ -1,5 +1,7 @@
 # Product-Photo Runtime Blockers Plan
 
+> Status: Phase 2.4.10 implemented the no-live `pre-analysis-evidence-gate` contract/probe, and Phase 2.5 added both dev-only review harnesses. The runtime blockers below remain accurate. Phase 2.6.0 (`PHASE_2_6_RUNTIME_SCOPE_PLAN.md`) is the canonical runtime-facing sequencing plan and identifies a guard-only gate wiring (block/quarantine before OCR/metadata, no product-photo analysis, additive unsupported result that avoids `LocalAnalysisResult` migration) as the safest eventual first runtime slice, preceded by a docs-only Phase 2.6.1 design spike. No runtime implementation is authorized.
+
 This is the Phase 2.4.4 docs-only closeout and next-runtime-blockers plan.
 
 Phase 2.4 adapter readiness planning is complete enough to close the adapter-readiness planning checkpoint. The completed adapter readiness work proves a non-live, dev/probe-only contract shape for sanitized product-photo readiness outputs. It does not prove live runtime readiness, upload classification readiness, UI display readiness, live report adapter readiness, `analyzeEvidenceFile` integration readiness, `LocalAnalysisResult` migration readiness, provider readiness, storage readiness, integration readiness, or case workflow readiness.
