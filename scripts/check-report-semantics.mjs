@@ -10,6 +10,8 @@ const filesToCheck = [
   "src/app/dev/product-photo-review-panel/render-cases.ts",
   "src/app/dev/pre-analysis-evidence-gate/page.tsx",
   "src/app/dev/pre-analysis-evidence-gate/render-cases.ts",
+  "src/app/dev/product-photo-adapter-readiness/page.tsx",
+  "src/app/dev/product-photo-adapter-readiness/render-cases.ts",
   "src/lib/analysis/analyzer.ts",
   "src/lib/analysis/analyzer-classifier.ts",
   "src/lib/analysis/analyzer-classifier.probe.ts",
@@ -1692,6 +1694,187 @@ if (
   )
 ) {
   failures.push("Pre-analysis gate host boundary check failed: host route is linked from live app files.");
+}
+
+const adapterReadinessHostPage =
+  fileContents.get("src/app/dev/product-photo-adapter-readiness/page.tsx") ?? "";
+const adapterReadinessRenderCases =
+  fileContents.get("src/app/dev/product-photo-adapter-readiness/render-cases.ts") ?? "";
+const adapterReadinessHostCorpus = `${adapterReadinessHostPage}\n${adapterReadinessRenderCases}`;
+
+const requiredAdapterReadinessHostPageSignals = [
+  {
+    label: "adapter host imports notFound production guard",
+    patterns: [/import \{ notFound \} from "next\/navigation";/],
+  },
+  {
+    label: "adapter host imports colocated render cases",
+    patterns: [/import \{ productPhotoAdapterReadinessReviewCases \} from "\.\/render-cases";/],
+  },
+  {
+    label: "adapter host production-disabled by default",
+    patterns: [/process\.env\.NODE_ENV !== "production"/],
+  },
+  {
+    label: "adapter host returns notFound when disabled",
+    patterns: [/notFound\(\)/],
+  },
+  {
+    label: "adapter host non-live banner",
+    patterns: [/Synthetic non-live developer adapter readiness review/],
+  },
+  {
+    label: "adapter host manual-review-only label",
+    patterns: [/Manual review only/],
+  },
+  {
+    label: "adapter host runtime non-live label",
+    patterns: [/Runtime live: No/],
+  },
+  {
+    label: "adapter host type-only readiness import",
+    patterns: [
+      /import type \{ ProductPhotoAdapterReadinessResult \} from "@\/lib\/analysis\/product-photo-routing-adapter";/,
+    ],
+  },
+];
+
+const requiredAdapterReadinessRenderCaseSignals = [
+  {
+    label: "render cases type-only readiness import",
+    patterns: [
+      /import type \{ ProductPhotoAdapterReadinessResult \} from "@\/lib\/analysis\/product-photo-routing-adapter";/,
+    ],
+  },
+  {
+    label: "render cases typed result field",
+    patterns: [/result: ProductPhotoAdapterReadinessResult/],
+  },
+  {
+    label: "render cases readonly review-case array",
+    patterns: [/readonly ProductPhotoAdapterReadinessReviewCase\[\]/],
+  },
+  {
+    label: "render cases accepted analysis-result kind",
+    patterns: [/inputKind: "analysis-result"/],
+  },
+  {
+    label: "render cases report-view-model kind",
+    patterns: [/inputKind: "report-view-model"/],
+  },
+  {
+    label: "render cases legacy quarantine kind",
+    patterns: [/inputKind: "legacy-quarantine"/],
+  },
+  {
+    label: "render cases unsupported kind",
+    patterns: [/inputKind: "unsupported"/],
+  },
+  {
+    label: "render cases readiness accepted field",
+    patterns: [/readinessAccepted: (?:true|false)/],
+  },
+  {
+    label: "render cases runtime non-live marker",
+    patterns: [/runtimeLive: false/],
+  },
+  {
+    label: "render cases manual-review-only marker",
+    patterns: [/manualReviewOnly: true/],
+  },
+  {
+    label: "render cases live receipt analyzer isolation marker",
+    patterns: [/analyzeEvidenceFileInvoked: false/],
+  },
+  {
+    label: "render cases provider/storage/integration/case-queue isolation marker",
+    patterns: [/providersStorageIntegrationsCaseQueuesInvoked: false/],
+  },
+];
+
+const forbiddenAdapterReadinessHostImports = [
+  "@/components/ClaimReviewWorkflow",
+  "@/components/TestEvidenceHarness",
+  "@/components/UploadPanel",
+  "@/components/AnalysisReport",
+  "@/components/AuthenticityResultCard",
+  "@/components/ProductPhotoReviewPanel",
+  "@/lib/analysis/analyzer",
+  "@/lib/analysis/analyzer-routing",
+  "@/lib/analysis/report-adapter",
+  "@/lib/analysis/scoring",
+  "@/lib/analysis/receipt-parser",
+  "@/lib/analysis/pre-analysis-evidence-gate",
+  "@/lib/test-evidence",
+  "@/lib/claim-data",
+  "next/image",
+];
+
+const forbiddenAdapterReadinessHostPatterns = [
+  /prepareProductPhotoAdapterReadinessForDevOnlyBoundary/,
+  /analyzeEvidenceFile\s*\(/,
+  /import\s+\{[^}]*\}\s+from\s+["']@\/lib\/analysis\/product-photo-routing-adapter["']/,
+  /import\s+\{[^}]*\}\s+from\s+["']@\/lib\/analysis\/product-photo-analyzer["']/,
+  /LocalAnalysisResult/,
+  /<img\b/i,
+  /createObjectURL/,
+  /\bobjectUrl\b/,
+  /\bimageUrl\b/,
+  /\bdataUrl\b/,
+  /\bBlob\b/,
+  /type=["']file["']/i,
+  /\bfetch\s*\(/,
+  /localStorage/,
+  /sessionStorage/,
+  /routeParams|searchParams/,
+  /rawExif/,
+  /rawMetadata/,
+  /originalFilename/,
+  /rawLabelValue/,
+  /providerOutput|providerHandle|storageHandle|integrationHandle|caseQueueHandle/,
+  /\b(?:case|claim|ticket|evidence|provider|storage|integration)[-_ ]?id\b/i,
+  /\border\s*(?:number|id|#)\b/i,
+  /https?:\/\//i,
+  /[A-Za-z]:\\/,
+  /\b[A-Z]{2,}-\d{3,}\b/,
+];
+
+for (const signal of requiredAdapterReadinessHostPageSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(adapterReadinessHostPage))) {
+    failures.push(`Product-photo adapter readiness host check failed: missing ${signal.label}`);
+  }
+}
+
+for (const signal of requiredAdapterReadinessRenderCaseSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(adapterReadinessRenderCases))) {
+    failures.push(`Product-photo adapter readiness render-case check failed: missing ${signal.label}`);
+  }
+}
+
+for (const importPath of forbiddenAdapterReadinessHostImports) {
+  if (adapterReadinessHostCorpus.includes(importPath)) {
+    failures.push(
+      `Product-photo adapter readiness host boundary check failed: host imports forbidden path ${importPath}`,
+    );
+  }
+}
+
+for (const pattern of forbiddenAdapterReadinessHostPatterns) {
+  if (pattern.test(adapterReadinessHostCorpus)) {
+    failures.push(
+      `Product-photo adapter readiness host privacy/import check failed: host uses forbidden pattern ${pattern}`,
+    );
+  }
+}
+
+if (
+  [appPage, appLayout, testEvidenceHarness, claimReviewWorkflow, reportAdapter].some((source) =>
+    source.includes("/dev/product-photo-adapter-readiness"),
+  )
+) {
+  failures.push(
+    "Product-photo adapter readiness host boundary check failed: host route is linked from live app files.",
+  );
 }
 
 if (failures.length > 0) {

@@ -1,6 +1,6 @@
 # Phase 2.5 Dev-Only Adapter/Gate Review Harness Scope Plan
 
-> Status: Phase 2.5.1 implemented the gate-first harness from Section 10. `src/app/dev/pre-analysis-evidence-gate/page.tsx` + `render-cases.ts` render literal synthetic `PreAnalysisEvidenceGateDecision` cases on a production-disabled, unlinked dev route with no-live markers and no builder/value imports, covered by `scripts/check-report-semantics.mjs` guards. The remaining open slice is Phase 2.5.2: the adapter-readiness review harness (`/dev/product-photo-adapter-readiness`), to be opened separately.
+> Status: Phase 2.5.1 implemented the gate-first harness and Phase 2.5.2 implemented the adapter-readiness harness from Section 10. `src/app/dev/pre-analysis-evidence-gate/*` and `src/app/dev/product-photo-adapter-readiness/*` render literal synthetic `PreAnalysisEvidenceGateDecision` / `ProductPhotoAdapterReadinessResult` cases on production-disabled, unlinked dev routes with no-live markers and no builder/value imports, covered by `scripts/check-report-semantics.mjs` guards. Both planned harness surfaces now exist; the recommended next step is a review-only Phase 2.5 closeout before any runtime-facing (Phase 2.6) work.
 
 This is the Phase 2.5.0 docs-only scope plan. It defines what Phase 2.5 is, what it must prove, what it must not touch, and what "done" means before any implementation begins.
 
