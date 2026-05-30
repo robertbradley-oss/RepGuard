@@ -35,6 +35,8 @@ const filesToCheck = [
   "src/lib/analysis/product-photo-report-view-model.probe.ts",
   "src/lib/analysis/pre-analysis-evidence-gate.ts",
   "src/lib/analysis/pre-analysis-evidence-gate.probe.ts",
+  "src/lib/analysis/pre-analysis-evidence-gate-runtime.ts",
+  "src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts",
   "src/components/ProductPhotoReviewPanel.tsx",
   "src/components/ProductPhotoReviewPanel.probe.tsx",
   "src/components/AnalysisReport.tsx",
@@ -1354,6 +1356,10 @@ if (!reportAdapter.includes("mapLocalAnalysisToReport(result: LocalAnalysisResul
 const preAnalysisEvidenceGate = fileContents.get("src/lib/analysis/pre-analysis-evidence-gate.ts") ?? "";
 const preAnalysisEvidenceGateProbe =
   fileContents.get("src/lib/analysis/pre-analysis-evidence-gate.probe.ts") ?? "";
+const preAnalysisEvidenceGateRuntime =
+  fileContents.get("src/lib/analysis/pre-analysis-evidence-gate-runtime.ts") ?? "";
+const preAnalysisEvidenceGateRuntimeProbe =
+  fileContents.get("src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts") ?? "";
 
 const requiredPreAnalysisEvidenceGateSignals = [
   {
@@ -1517,6 +1523,149 @@ for (const signal of requiredPreAnalysisEvidenceGateProbeSignals) {
   if (!signal.patterns.some((pattern) => pattern.test(preAnalysisEvidenceGateProbe))) {
     failures.push(`Pre-analysis evidence gate probe check failed: missing ${signal.label}`);
   }
+}
+
+const requiredPreAnalysisEvidenceGateRuntimeSignals = [
+  {
+    label: "runtime wrapper status marker",
+    patterns: [/PRE_ANALYSIS_EVIDENCE_GATE_RUNTIME_STATUS/],
+  },
+  {
+    label: "runtime wrapper entrypoint",
+    patterns: [/analyzeEvidenceFileWithPreAnalysisGate/],
+  },
+  {
+    label: "runtime wrapper file-to-hints adapter",
+    patterns: [/buildPreAnalysisEvidenceGateHintsFromFile/],
+  },
+  {
+    label: "runtime wrapper default-off flag",
+    patterns: [/ENABLE_PRE_ANALYSIS_EVIDENCE_GATE_RUNTIME_GUARD:\s*boolean\s*=\s*false/],
+  },
+  {
+    label: "runtime wrapper additive unsupported result",
+    patterns: [/export type UnsupportedEvidenceResult/],
+  },
+  {
+    label: "runtime wrapper local result union",
+    patterns: [/export type PreAnalysisGateRuntimeResult/],
+  },
+  {
+    label: "runtime wrapper explicit manual-review-only marker",
+    patterns: [/manualReviewOnly: true/],
+  },
+  {
+    label: "runtime wrapper explicit runtime non-live marker",
+    patterns: [/runtimeLive: false/],
+  },
+  {
+    label: "runtime wrapper explicit no OCR marker",
+    patterns: [/ocrInvoked: false/],
+  },
+  {
+    label: "runtime wrapper explicit no metadata marker",
+    patterns: [/metadataInvoked: false/],
+  },
+];
+
+for (const signal of requiredPreAnalysisEvidenceGateRuntimeSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(preAnalysisEvidenceGateRuntime))) {
+    failures.push(`Pre-analysis gate runtime wrapper check failed: missing ${signal.label}`);
+  }
+}
+
+const allowedPreAnalysisRuntimeImports = [
+  "@/lib/analysis/analyzer",
+  "@/lib/analysis/pre-analysis-evidence-gate",
+  "@/lib/analysis/types",
+];
+const forbiddenPreAnalysisRuntimeImports = [
+  "@/lib/analysis/analyzer-routing",
+  "@/lib/analysis/report-adapter",
+  "@/lib/analysis/scoring",
+  "@/lib/analysis/receipt-parser",
+  "@/lib/analysis/ocr-service",
+  "@/lib/analysis/metadata-service",
+  "@/lib/analysis/image-heuristics",
+  "@/lib/analysis/product-photo-analyzer",
+  "@/lib/analysis/product-photo-routing-adapter",
+  "@/lib/analysis/product-photo-report-view-model",
+  "@/lib/test-evidence",
+  "@/components/",
+  "@/lib/claim-data",
+];
+
+for (const importPath of forbiddenPreAnalysisRuntimeImports) {
+  if (preAnalysisEvidenceGateRuntime.includes(importPath)) {
+    failures.push(`Pre-analysis gate runtime wrapper boundary check failed: wrapper imports forbidden path ${importPath}`);
+  }
+}
+
+if (!allowedPreAnalysisRuntimeImports.every((importPath) => preAnalysisEvidenceGateRuntime.includes(importPath))) {
+  failures.push("Pre-analysis gate runtime wrapper boundary check failed: expected narrow analyzer/gate/type imports are missing.");
+}
+
+if (
+  /arrayBuffer\s*\(|stream\s*\(|createObjectURL|\bobjectUrl\b|\bimageUrl\b|\bdataUrl\b|rawExif|rawMetadata|lastModified/.test(
+    preAnalysisEvidenceGateRuntime,
+  )
+) {
+  failures.push("Pre-analysis gate runtime wrapper privacy check failed: wrapper references raw file/metadata surfaces.");
+}
+
+if (/"score"\s*:|"riskLevel"\s*:|"riskBand"\s*:|"verificationStatus"\s*:|"externalVerification"\s*:/.test(
+  preAnalysisEvidenceGateRuntime,
+)) {
+  failures.push("Pre-analysis gate runtime wrapper result check failed: unsupported result includes receipt score, risk, or verification fields.");
+}
+
+if (
+  [appPage, appLayout, testEvidenceHarness, claimReviewWorkflow, reportAdapter].some((source) =>
+    source.includes("pre-analysis-evidence-gate-runtime"),
+  )
+) {
+  failures.push("Pre-analysis gate runtime wrapper boundary check failed: wrapper is imported by live app/report files.");
+}
+
+const requiredPreAnalysisRuntimeProbeSignals = [
+  {
+    label: "runtime probe export",
+    patterns: [/PRE_ANALYSIS_EVIDENCE_GATE_RUNTIME_DEVELOPER_PROBE/],
+  },
+  {
+    label: "runtime probe default-off assertions",
+    patterns: [/assertProbeChecksPass\("default-off", defaultOffChecks\)/],
+  },
+  {
+    label: "runtime probe allow-path assertions",
+    patterns: [/assertProbeChecksPass\("allow path", allowPathChecks\)/],
+  },
+  {
+    label: "runtime probe non-allow assertions",
+    patterns: [/assertProbeChecksPass\("non-allow path", nonAllowChecks\)/],
+  },
+  {
+    label: "runtime probe unsupported-shape assertions",
+    patterns: [/assertProbeChecksPass\("unsupported shape", unsupportedShapeChecks\)/],
+  },
+  {
+    label: "runtime probe source-boundary assertions",
+    patterns: [/assertProbeChecksPass\("source boundaries", sourceBoundaryChecks\)/],
+  },
+  {
+    label: "runtime probe private sentinel check",
+    patterns: [/privateFilenameSentinel/],
+  },
+];
+
+for (const signal of requiredPreAnalysisRuntimeProbeSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(preAnalysisEvidenceGateRuntimeProbe))) {
+    failures.push(`Pre-analysis gate runtime wrapper probe check failed: missing ${signal.label}`);
+  }
+}
+
+if (!productPhotoProbeRunner.includes("pre-analysis-evidence-gate-runtime.probe.ts")) {
+  failures.push("Product-photo probe runner check failed: pre-analysis gate runtime wrapper probe is not registered.");
 }
 
 const preAnalysisGateHostPage = fileContents.get("src/app/dev/pre-analysis-evidence-gate/page.tsx") ?? "";

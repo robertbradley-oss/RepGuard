@@ -223,10 +223,12 @@ Future Phase 2.6.2 should add gate-wiring probes for non-allow behavior:
 
 Recommended future implementation slice: **Phase 2.6.2 guard-only wrapper and probes, default-off and unwired from UI**.
 
-Allowed files, if Robert explicitly opens Phase 2.6.2:
+Phase 2.6.2 implementation note: the wrapper/probe was implemented with the shorter runtime filename pair below. It remains default-off and unwired from live UI/upload/report paths.
 
-- `src/lib/analysis/pre-analysis-evidence-gate-runtime-wrapper.ts` for the thin wrapper, hints adapter, default-off flag, and additive result shape.
-- `src/lib/analysis/pre-analysis-evidence-gate-runtime-wrapper.probe.ts` for receipt-preservation and gate-wiring probes.
+Allowed files, if Robert explicitly opens follow-up maintenance on Phase 2.6.2:
+
+- `src/lib/analysis/pre-analysis-evidence-gate-runtime.ts` for the thin wrapper, hints adapter, default-off flag, and additive result shape.
+- `src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts` for receipt-preservation and gate-wiring probes.
 - `scripts/run-product-photo-probes.cjs` only to register the new probe.
 - `scripts/check-report-semantics.mjs` only to add semantic/import/privacy guards for the wrapper/probe.
 - `PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md`, `PHASE_2_6_RUNTIME_SCOPE_PLAN.md`, `NEXT_STEPS.md`, `ROADMAP.md`, `PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`, and `AGENT_LOG.md` for status updates.
@@ -297,6 +299,8 @@ Commit discipline:
 ## Recommended Phase 2.6.2
 
 Recommended next milestone: **Phase 2.6.2 default-off guard-only pre-analysis gate wrapper/probe implementation**.
+
+Phase 2.6.2 result: `src/lib/analysis/pre-analysis-evidence-gate-runtime.ts` and `src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts` now implement this default-off wrapper/probe boundary. The wrapper remains unwired from live callers and the probe is registered with `check:product-photo-probes`.
 
 Scope:
 

@@ -4,6 +4,8 @@
 
 > Phase 2.6.1 note: `PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md` keeps this unsupported-boundary rationale intact and recommends a future default-off thin wrapper, not an in-place `analyzeEvidenceFile` migration, as the safest first guard-only implementation path.
 
+> Phase 2.6.2 note: the default-off runtime wrapper now derives privacy-safe gate hints from filename, MIME/type, and optional declared/source category only. Its File-to-hints adapter gives legacy damage/product cues precedence over receipt-ish mixed hints so enabled non-allow outcomes stop before the analyzer call.
+
 This is the Phase 2.4.9 docs-only pre-OCR/pre-metadata unsupported-boundary plan.
 
 It does not implement code, probes, routes, React components, upload handling, analyzer runtime changes, live report adapter mapping, `LocalAnalysisResult` migration, receipt parser/scoring/fixture changes, providers, storage, integrations, case queues, real photos, real metadata fixtures, deployment, or product-photo runtime behavior.

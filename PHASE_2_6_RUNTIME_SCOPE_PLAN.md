@@ -6,6 +6,8 @@ It does not implement, wire, route, or enable anything. No code, routes, compone
 
 Phase 2.6.1 follow-up: `PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md` resolves the docs-only guard-wiring design. It recommends a thin default-off pre-analyzer wrapper as the safest future Phase 2.6.2 implementation path, with a privacy-safe File-to-hints adapter, additive `UnsupportedEvidenceResult`, receipt-preservation probes, and gate-wiring probes. Product-photo runtime remains non-live and no implementation is authorized by this note.
 
+Phase 2.6.2 follow-up: `src/lib/analysis/pre-analysis-evidence-gate-runtime.ts` now implements the default-off wrapper entrypoint (`analyzeEvidenceFileWithPreAnalysisGate`) and local additive unsupported result shape, and `src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts` proves default-off delegation plus enabled non-allow analyzer blocking. The wrapper is not wired into current UI/upload/report routes; `analyzeEvidenceFile` remains unchanged and receipt-shaped.
+
 Phase 2.5 is closed. Both dev-only harnesses (`/dev/pre-analysis-evidence-gate`, `/dev/product-photo-adapter-readiness`) exist as production-disabled, unlinked, synthetic-only review surfaces. Product-photo runtime remains non-live; `runtimeLive` is false, `manualReviewOnly` is true, `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior is unchanged. Latest pushed commit at planning time: `84ad4a7`.
 
 ## Live Pipeline Reference (current, unchanged)

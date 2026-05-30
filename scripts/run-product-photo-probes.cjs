@@ -88,15 +88,26 @@ const probeModules = [
     path: "src/lib/analysis/pre-analysis-evidence-gate.probe.ts",
     exportName: "PRE_ANALYSIS_EVIDENCE_GATE_DEVELOPER_PROBE",
   },
+  {
+    path: "src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts",
+    exportName: "PRE_ANALYSIS_EVIDENCE_GATE_RUNTIME_DEVELOPER_PROBE",
+  },
 ];
 
-for (const probeModule of probeModules) {
-  const loadedProbe = require(path.join(repoRoot, probeModule.path));
-  const probe = loadedProbe[probeModule.exportName];
+async function runProductPhotoProbes() {
+  for (const probeModule of probeModules) {
+    const loadedProbe = require(path.join(repoRoot, probeModule.path));
+    const probe = await loadedProbe[probeModule.exportName];
 
-  if (!probe || typeof probe !== "object") {
-    throw new Error(`Product-photo probe export missing: ${probeModule.exportName}`);
+    if (!probe || typeof probe !== "object") {
+      throw new Error(`Product-photo probe export missing: ${probeModule.exportName}`);
+    }
   }
+
+  console.log(`Product-photo probe execution passed (${probeModules.length} modules imported).`);
 }
 
-console.log(`Product-photo probe execution passed (${probeModules.length} modules imported).`);
+runProductPhotoProbes().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
