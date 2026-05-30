@@ -4,6 +4,8 @@ This is the Phase 2.6.0 docs-only runtime-facing scope plan. It defines what the
 
 It does not implement, wire, route, or enable anything. No code, routes, components, analyzer/runtime files, upload files, report adapter, `LocalAnalysisResult`, receipt parser/scoring/fixtures, providers, storage, integrations, case queues, real photos, real metadata fixtures, or deployment are touched.
 
+Phase 2.6.1 follow-up: `PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md` resolves the docs-only guard-wiring design. It recommends a thin default-off pre-analyzer wrapper as the safest future Phase 2.6.2 implementation path, with a privacy-safe File-to-hints adapter, additive `UnsupportedEvidenceResult`, receipt-preservation probes, and gate-wiring probes. Product-photo runtime remains non-live and no implementation is authorized by this note.
+
 Phase 2.5 is closed. Both dev-only harnesses (`/dev/pre-analysis-evidence-gate`, `/dev/product-photo-adapter-readiness`) exist as production-disabled, unlinked, synthetic-only review surfaces. Product-photo runtime remains non-live; `runtimeLive` is false, `manualReviewOnly` is true, `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior is unchanged. Latest pushed commit at planning time: `84ad4a7`.
 
 ## Live Pipeline Reference (current, unchanged)
@@ -134,3 +136,5 @@ Allowed files for Phase 2.6.1 (docs-only): `PHASE_2_6_RUNTIME_SCOPE_PLAN.md`, `P
 Alternative Phase 2.6.1 (if Robert prefers caution): **pause** and run a recorded GUI multi-viewport browser-QA pass on the two existing dev harnesses before any runtime-facing design spike. Either path keeps product-photo runtime, upload, UI, live report mapping, `analyzeEvidenceFile`, `LocalAnalysisResult`, receipt behavior, providers, storage, integrations, case queues, and deployment blocked.
 
 Do not begin guard-only implementation (Phase 2.6.2) until the 2.6.1 design spike is accepted and Robert explicitly opens the implementation slice with named allowed/protected files.
+
+Phase 2.6.1 result: `PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md` recommends Phase 2.6.2 as a default-off, unwired thin wrapper/probe implementation. It should add no UI/upload/report adapter routing and should preserve `analyzeEvidenceFile`, `LocalAnalysisResult`, and receipt behavior unchanged.

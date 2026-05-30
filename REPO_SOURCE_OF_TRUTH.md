@@ -17,10 +17,10 @@ The OneDrive Documents path may exist as a shell starting point, but it is not t
 ## Phase-Aware Workflow
 
 - Phase 1 Receipt Intelligence is closed, deployed, and production-smoked.
-- Phase 2 Photo Evidence remains planning/readiness-only; the latest closed slice is Phase 2.4.10.
+- Phase 2 Photo Evidence remains planning/readiness-only. Phase 2.6.0 is pushed, and Phase 2.6.1 is the docs-only guard-only gate-wiring design spike for a future default-off wrapper/probe implementation.
 - Phase 2.4 adapter-readiness and runtime-blocker planning is complete.
 - A guarded, non-live product-photo adapter contract exists and is pushed.
-- A pre-analysis evidence gate exists and is pushed, but remains decision-only and unwired. Latest pushed commit: `f5564b4` (`feat: add pre-analysis evidence gate contract`).
+- A pre-analysis evidence gate exists and is pushed, but remains decision-only and unwired. Latest pushed runtime-facing planning commit before Phase 2.6.1: `6420e82` (`docs: plan phase 2.6 runtime scope`).
 - Product-photo runtime remains non-live; no product-photo analyzer behavior is live yet.
 - `analyzeEvidenceFile` remains the live receipt analyzer entrypoint.
 - `LocalAnalysisResult` remains unchanged and receipt-shaped.
@@ -29,8 +29,8 @@ The OneDrive Documents path may exist as a shell starting point, but it is not t
 - No providers, storage, integrations, case queues, real photos, or real metadata fixtures were added.
 - `product-photo` is canonical.
 - `damage-photo` remains legacy/non-canonical and only a compatibility alias to `product-photo` / `damage-close-up`.
-- Dev-only adapter/harness work is a future no-live milestone and is not part of Phase 2.4 closeout unless Robert explicitly opens it later.
-- Phase 2.4 closeout review should be the next step.
+- Dev-only adapter/gate harness work is closed as Phase 2.5 and remains no-live, synthetic-only, unlinked, and production-disabled.
+- The next recommended implementation milestone is Phase 2.6.2 only if Robert explicitly opens it: a default-off, unwired guard-only pre-analysis gate wrapper/probe slice that preserves `analyzeEvidenceFile`, `LocalAnalysisResult`, receipt behavior, upload/UI, and live report adapter mapping.
 - Do not start product-photo runtime, UI/upload wiring, analyzer routing, live report mapping, provider, storage, integration, or case-queue work until Robert explicitly opens that slice.
 - Future-phase planning is allowed when requested.
 - Future-phase implementation requires explicit approval from Robert.
