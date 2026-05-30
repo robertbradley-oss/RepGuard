@@ -29,6 +29,8 @@ const filesToCheck = [
   "src/lib/analysis/shared-result.probe.ts",
   "src/lib/analysis/product-photo-report-view-model.ts",
   "src/lib/analysis/product-photo-report-view-model.probe.ts",
+  "src/lib/analysis/pre-analysis-evidence-gate.ts",
+  "src/lib/analysis/pre-analysis-evidence-gate.probe.ts",
   "src/components/ProductPhotoReviewPanel.tsx",
   "src/components/ProductPhotoReviewPanel.probe.tsx",
   "src/components/AnalysisReport.tsx",
@@ -1115,6 +1117,7 @@ const requiredProductPhotoProbeRunnerSignals = [
   /PRODUCT_PHOTO_ADAPTER_READINESS_DEVELOPER_PROBE/,
   /PRODUCT_PHOTO_ANALYZER_DEVELOPER_PROBE/,
   /PRODUCT_PHOTO_REPORT_VIEW_MODEL_DEVELOPER_PROBE/,
+  /PRE_ANALYSIS_EVIDENCE_GATE_DEVELOPER_PROBE/,
 ];
 
 if (!/"check:product-photo-probes"\s*:\s*"node scripts\/run-product-photo-probes\.cjs"/.test(packageJson)) {
@@ -1342,6 +1345,174 @@ if (reportAdapter.includes("product-photo-report-view-model") || reportAdapter.i
 
 if (!reportAdapter.includes("mapLocalAnalysisToReport(result: LocalAnalysisResult)")) {
   failures.push("Product-photo report mapping boundary check failed: receipt report adapter signature changed.");
+}
+
+const preAnalysisEvidenceGate = fileContents.get("src/lib/analysis/pre-analysis-evidence-gate.ts") ?? "";
+const preAnalysisEvidenceGateProbe =
+  fileContents.get("src/lib/analysis/pre-analysis-evidence-gate.probe.ts") ?? "";
+
+const requiredPreAnalysisEvidenceGateSignals = [
+  {
+    label: "gate boundary status marker",
+    patterns: [/PRE_ANALYSIS_EVIDENCE_GATE_STATUS/],
+  },
+  {
+    label: "gate decision builder",
+    patterns: [/buildPreAnalysisEvidenceGateDecision/],
+  },
+  {
+    label: "gate runtime non-live marker",
+    patterns: [/runtimeLive: false/],
+  },
+  {
+    label: "gate manual-review-only marker",
+    patterns: [/manualReviewOnly: true/],
+  },
+  {
+    label: "gate no OCR processing marker",
+    patterns: [/ocrInvoked: false/],
+  },
+  {
+    label: "gate no metadata processing marker",
+    patterns: [/metadataInvoked: false/],
+  },
+  {
+    label: "gate no analyzer/adapter coupling markers",
+    patterns: [/analyzerInvoked: false/],
+  },
+  {
+    label: "gate no adapter coupling marker",
+    patterns: [/adapterInvoked: false/],
+  },
+  {
+    label: "gate no upload/UI/report/scoring/parser/fixture coupling marker",
+    patterns: [/uiUploadReportScoringParserFixturePathsInvoked: false/],
+  },
+  {
+    label: "gate no provider/storage/integration/case-queue coupling marker",
+    patterns: [/providersStorageIntegrationsCaseQueuesInvoked: false/],
+  },
+  {
+    label: "gate product-photo runtime non-live marker",
+    patterns: [/productPhotoRuntimeLive: false/],
+  },
+  {
+    label: "gate allow-receipt-default-path outcome",
+    patterns: [/"allow-receipt-default-path"/],
+  },
+  {
+    label: "gate unsupported-evidence outcome",
+    patterns: [/"unsupported-evidence"/],
+  },
+  {
+    label: "gate legacy-damage-photo-quarantine outcome",
+    patterns: [/"legacy-damage-photo-quarantine"/],
+  },
+  {
+    label: "gate product-photo-like-unsupported outcome",
+    patterns: [/"product-photo-like-unsupported"/],
+  },
+  {
+    label: "gate unknown-inconclusive outcome",
+    patterns: [/"unknown-inconclusive"/],
+  },
+];
+
+for (const signal of requiredPreAnalysisEvidenceGateSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(preAnalysisEvidenceGate))) {
+    failures.push(`Pre-analysis evidence gate check failed: missing ${signal.label}`);
+  }
+}
+
+const forbiddenPreAnalysisEvidenceGateImports = [
+  "@/lib/analysis/analyzer",
+  "@/lib/analysis/analyzer-routing",
+  "@/lib/analysis/analyzer-classifier",
+  "@/lib/analysis/report-adapter",
+  "@/lib/analysis/scoring",
+  "@/lib/analysis/receipt-parser",
+  "@/lib/analysis/ocr-service",
+  "@/lib/analysis/metadata-service",
+  "@/lib/analysis/image-heuristics",
+  "@/lib/analysis/product-photo-analyzer",
+  "@/lib/analysis/product-photo-routing-adapter",
+  "@/lib/analysis/product-photo-report-view-model",
+  "@/lib/test-evidence",
+  "@/components/",
+  "@/lib/claim-data",
+];
+
+for (const importPath of forbiddenPreAnalysisEvidenceGateImports) {
+  const doubleQuotedImport = `from "${importPath}"`;
+  const singleQuotedImport = `from '${importPath}'`;
+
+  if (
+    preAnalysisEvidenceGate.includes(doubleQuotedImport) ||
+    preAnalysisEvidenceGate.includes(singleQuotedImport)
+  ) {
+    failures.push(`Pre-analysis evidence gate boundary check failed: gate imports forbidden path ${importPath}`);
+  }
+}
+
+if (/analyzeEvidenceFile|LocalAnalysisResult/.test(preAnalysisEvidenceGate)) {
+  failures.push(
+    "Pre-analysis evidence gate boundary check failed: gate references analyzeEvidenceFile or LocalAnalysisResult.",
+  );
+}
+
+if (
+  /createObjectURL|\bobjectUrl\b|\bimageBuffer\b|\bfileBytes\b|rawExif|rawMetadata|originalFilename(?!Hint)/.test(
+    preAnalysisEvidenceGate,
+  )
+) {
+  failures.push("Pre-analysis evidence gate privacy check failed: gate references raw file/metadata surfaces.");
+}
+
+if (/return\s+"damage-photo"|evidenceType:\s*"damage-photo"/.test(preAnalysisEvidenceGate)) {
+  failures.push(
+    "Pre-analysis evidence gate check failed: gate leaks canonical damage-photo runtime evidence type.",
+  );
+}
+
+const requiredPreAnalysisEvidenceGateProbeSignals = [
+  {
+    label: "gate probe export",
+    patterns: [/PRE_ANALYSIS_EVIDENCE_GATE_DEVELOPER_PROBE/],
+  },
+  {
+    label: "gate probe active outcome assertions",
+    patterns: [/assertProbeChecksPass\("outcomes", outcomeChecks\)/],
+  },
+  {
+    label: "gate probe active marker assertions",
+    patterns: [/assertProbeChecksPass\("markers", markerChecks\)/],
+  },
+  {
+    label: "gate probe active legacy assertions",
+    patterns: [/assertProbeChecksPass\("legacy", legacyChecks\)/],
+  },
+  {
+    label: "gate probe active privacy assertions",
+    patterns: [/assertProbeChecksPass\("privacy", privacyChecks\)/],
+  },
+  {
+    label: "gate probe active wording assertions",
+    patterns: [/assertProbeChecksPass\("wording", wordingChecks\)/],
+  },
+  {
+    label: "gate probe active source-boundary assertions",
+    patterns: [/assertProbeChecksPass\("source boundaries", sourceBoundaryChecks\)/],
+  },
+  {
+    label: "gate probe raw filename leak check",
+    patterns: [/rawFilenameSentinelNotLeaked/],
+  },
+];
+
+for (const signal of requiredPreAnalysisEvidenceGateProbeSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(preAnalysisEvidenceGateProbe))) {
+    failures.push(`Pre-analysis evidence gate probe check failed: missing ${signal.label}`);
+  }
 }
 
 if (failures.length > 0) {

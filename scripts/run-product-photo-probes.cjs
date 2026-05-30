@@ -84,6 +84,10 @@ const probeModules = [
     path: "src/lib/analysis/product-photo-report-view-model.probe.ts",
     exportName: "PRODUCT_PHOTO_REPORT_VIEW_MODEL_DEVELOPER_PROBE",
   },
+  {
+    path: "src/lib/analysis/pre-analysis-evidence-gate.probe.ts",
+    exportName: "PRE_ANALYSIS_EVIDENCE_GATE_DEVELOPER_PROBE",
+  },
 ];
 
 for (const probeModule of probeModules) {

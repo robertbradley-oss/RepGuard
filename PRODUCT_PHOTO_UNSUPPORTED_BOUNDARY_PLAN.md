@@ -1,5 +1,7 @@
 # Product-Photo Unsupported Boundary Plan
 
+> Status: Phase 2.4.10 implemented the recommended no-live `pre-analysis-evidence-gate` contract/probe from this plan. `src/lib/analysis/pre-analysis-evidence-gate.ts` exports `PRE_ANALYSIS_EVIDENCE_GATE_STATUS` and `buildPreAnalysisEvidenceGateDecision`; `src/lib/analysis/pre-analysis-evidence-gate.probe.ts` exports `PRE_ANALYSIS_EVIDENCE_GATE_DEVELOPER_PROBE` and is registered with `check:product-photo-probes`. The gate is decision-only, fully self-contained, and unwired from upload/UI/live report adapter/runtime; it adds no OCR/metadata processing. The remaining sections describe the planning rationale and remain accurate for the future runtime-integration gates.
+
 This is the Phase 2.4.9 docs-only pre-OCR/pre-metadata unsupported-boundary plan.
 
 It does not implement code, probes, routes, React components, upload handling, analyzer runtime changes, live report adapter mapping, `LocalAnalysisResult` migration, receipt parser/scoring/fixture changes, providers, storage, integrations, case queues, real photos, real metadata fixtures, deployment, or product-photo runtime behavior.
