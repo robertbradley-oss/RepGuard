@@ -10,9 +10,9 @@ ClaimGuard is post-Phase-1.
 
 Phase 1, the Receipt Intelligence module, is closed, pushed, deployed, and production-smoked. The latest production polish checkpoint is commit `19ef25e` (`polish post-phase1 evidence workspace`).
 
-Phase 2.0 scaffold work is closed. Phase 2.1 has officially started as Product Photo Local Heuristic Design: documentation/planning-only, local-only, manual-review-safe, provider-ready, and intentionally unwired. Shared evidence model types and product-photo scaffold/defaults exist, but no product-photo analyzer behavior is live yet.
+Phase 2 Photo Evidence remains planning/readiness-only. Phase 2.4 is closed as a non-live adapter/readiness/runtime-blocker phase. Product-photo runtime remains non-live. A guarded, non-live product-photo adapter contract exists, and a pre-analysis evidence gate exists but remains decision-only and unwired. Shared evidence model types and product-photo scaffold/defaults exist, but no product-photo analyzer behavior is live yet.
 
-No runtime analyzer, upload, UI, report, scoring, parser, or fixture behavior changed during Phase 2.0 or Phase 2.1 planning. `product-photo` is the canonical Phase 2 evidence type; `damage-photo` remains only a compatibility alias to `product-photo` / `damage-close-up`.
+No runtime analyzer, upload, UI, live report adapter, scoring, parser, or fixture behavior is wired to product-photo. `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior is unchanged. UI, upload, live report adapter mapping, provider, storage, integration, and case-queue work remain blocked until Robert explicitly opens a runtime slice. `product-photo` is the canonical Phase 2 evidence type; `damage-photo` remains legacy/non-canonical and only a compatibility alias to `product-photo` / `damage-close-up`. The next likely no-live milestone is the dev-only adapter review harness; main UI, product-photo upload, and live runtime work remain blocked until explicitly approved later.
 
 ClaimGuard is broader than the receipt analyzer. Receipt intelligence is one evidence module inside a larger fraud-risk screening and evidence intelligence platform. Future ClaimGuard may include photo evidence analysis, case review workflow, customer and ticket context, integrations, audit history, scoring signals, and enterprise fraud intelligence, but those areas must remain phase-gated.
 
@@ -891,7 +891,7 @@ Phase boundaries:
 Use `ROADMAP.md` for durable phase definitions. The short version:
 
 - Phase 1: Receipt Intelligence module. Closed, deployed, and production-smoked.
-- Phase 2: Photo Evidence. Phase 2.1 has officially started as documentation/planning-only, local-only, manual-review-safe, provider-ready, and intentionally unwired. No product-photo analyzer behavior is live yet.
+- Phase 2: Photo Evidence. Planning/readiness-only. Phase 2.4 is closed as a non-live adapter/readiness/runtime-blocker phase; product-photo runtime remains non-live and no product-photo analyzer behavior is live yet.
 - Phase 3: Case Review Workflow readiness and later implementation.
 - Phase 4: Stronger OCR/AI service integrations.
 - Phase 5: Ticket, email, drive, and customer-context integrations.
