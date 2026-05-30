@@ -1,5 +1,7 @@
 # Product-Photo Dev-Only Adapter Review Harness Plan
 
+> Status: Phase 2.5.0 supersedes the phase framing here. `PHASE_2_5_DEV_HARNESS_SCOPE_PLAN.md` is the canonical Phase 2.5 dev-only adapter/gate review harness scope plan and extends this doc to also cover `pre-analysis-evidence-gate` decision outputs. The adapter-readiness harness scope below remains accurate; where the two docs overlap, the stricter constraint wins.
+
 This is the Phase 2.4.3 docs-only plan for a possible future adapter review harness.
 
 Phase 2.4.2 is complete and review-only. Product-photo runtime remains non-live. `runtimeLive` remains false, `manualReviewOnly` remains true, `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior remains unchanged.
