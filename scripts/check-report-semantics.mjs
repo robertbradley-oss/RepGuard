@@ -37,6 +37,8 @@ const filesToCheck = [
   "src/lib/analysis/pre-analysis-evidence-gate.probe.ts",
   "src/lib/analysis/pre-analysis-evidence-gate-runtime.ts",
   "src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts",
+  "src/lib/analysis/unsupported-evidence-review-state.ts",
+  "src/lib/analysis/unsupported-evidence-review-state.probe.ts",
   "src/components/ProductPhotoReviewPanel.tsx",
   "src/components/ProductPhotoReviewPanel.probe.tsx",
   "src/components/AnalysisReport.tsx",
@@ -1124,6 +1126,7 @@ const requiredProductPhotoProbeRunnerSignals = [
   /PRODUCT_PHOTO_ANALYZER_DEVELOPER_PROBE/,
   /PRODUCT_PHOTO_REPORT_VIEW_MODEL_DEVELOPER_PROBE/,
   /PRE_ANALYSIS_EVIDENCE_GATE_DEVELOPER_PROBE/,
+  /UNSUPPORTED_EVIDENCE_REVIEW_STATE_DEVELOPER_PROBE/,
 ];
 
 if (!/"check:product-photo-probes"\s*:\s*"node scripts\/run-product-photo-probes\.cjs"/.test(packageJson)) {
@@ -1703,6 +1706,254 @@ for (const signal of requiredPreAnalysisRuntimeProbeSignals) {
 
 if (!productPhotoProbeRunner.includes("pre-analysis-evidence-gate-runtime.probe.ts")) {
   failures.push("Product-photo probe runner check failed: pre-analysis gate runtime wrapper probe is not registered.");
+}
+
+const unsupportedEvidenceReviewState =
+  fileContents.get("src/lib/analysis/unsupported-evidence-review-state.ts") ?? "";
+const unsupportedEvidenceReviewStateProbe =
+  fileContents.get("src/lib/analysis/unsupported-evidence-review-state.probe.ts") ?? "";
+
+const requiredUnsupportedEvidenceReviewSignals = [
+  {
+    label: "unsupported review state status marker",
+    patterns: [/UNSUPPORTED_EVIDENCE_REVIEW_STATE_STATUS/],
+  },
+  {
+    label: "unsupported review mapper entrypoint",
+    patterns: [/mapUnsupportedEvidenceReviewState/],
+  },
+  {
+    label: "unsupported review state name",
+    patterns: [/state:\s*"unsupportedEvidenceReview"/],
+  },
+  {
+    label: "unsupported review result kind",
+    patterns: [/resultKind:\s*"unsupported-evidence-review"/],
+  },
+  {
+    label: "unsupported review manual-review marker",
+    patterns: [/manualReviewOnly: true/],
+  },
+  {
+    label: "unsupported review runtime non-live marker",
+    patterns: [/runtimeLive: false/],
+  },
+  {
+    label: "unsupported review product-photo runtime non-live marker",
+    patterns: [/productPhotoRuntimeLive: false/],
+  },
+  {
+    label: "unsupported review external verification not performed",
+    patterns: [/externalVerification:\s*"Not performed"/],
+  },
+  {
+    label: "unsupported review not externally verified",
+    patterns: [/verificationStatus:\s*"Not externally verified"/],
+  },
+  {
+    label: "unsupported review no receipt score shown marker",
+    patterns: [/receiptScoreShown: false/],
+  },
+  {
+    label: "unsupported review no receipt report shown marker",
+    patterns: [/receiptReportShown: false/],
+  },
+  {
+    label: "unsupported review no product-photo report shown marker",
+    patterns: [/productPhotoReportShown: false/],
+  },
+  {
+    label: "unsupported review no product-photo panel route marker",
+    patterns: [/productPhotoReviewPanelRouted: false/],
+  },
+  {
+    label: "unsupported review no OCR marker",
+    patterns: [/ocrInvoked: false/],
+  },
+  {
+    label: "unsupported review no metadata marker",
+    patterns: [/metadataInvoked: false/],
+  },
+  {
+    label: "unsupported review no provider/storage/integration/case-queue marker",
+    patterns: [/providersStorageIntegrationsCaseQueuesInvoked: false/],
+  },
+];
+
+for (const signal of requiredUnsupportedEvidenceReviewSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(unsupportedEvidenceReviewState))) {
+    failures.push(`Unsupported evidence review-state check failed: missing ${signal.label}`);
+  }
+}
+
+const forbiddenUnsupportedEvidenceReviewImports = [
+  "@/lib/analysis/analyzer",
+  "@/lib/analysis/analyzer-routing",
+  "@/lib/analysis/report-adapter",
+  "@/lib/analysis/scoring",
+  "@/lib/analysis/receipt-parser",
+  "@/lib/analysis/ocr-service",
+  "@/lib/analysis/metadata-service",
+  "@/lib/analysis/image-heuristics",
+  "@/lib/analysis/product-photo-analyzer",
+  "@/lib/analysis/product-photo-routing-adapter",
+  "@/lib/analysis/product-photo-report-view-model",
+  "@/lib/test-evidence",
+  "@/components/",
+  "@/lib/claim-data",
+];
+
+for (const importPath of forbiddenUnsupportedEvidenceReviewImports) {
+  const doubleQuotedImport = `from "${importPath}"`;
+  const singleQuotedImport = `from '${importPath}'`;
+
+  if (
+    unsupportedEvidenceReviewState.includes(doubleQuotedImport) ||
+    unsupportedEvidenceReviewState.includes(singleQuotedImport)
+  ) {
+    failures.push(
+      `Unsupported evidence review-state boundary check failed: mapper imports forbidden path ${importPath}`,
+    );
+  }
+}
+
+if (/^import\s/m.test(unsupportedEvidenceReviewState)) {
+  failures.push("Unsupported evidence review-state boundary check failed: mapper should remain import-free.");
+}
+
+if (/analyzeEvidenceFile|LocalAnalysisResult|MockAnalysisReport|mapLocalAnalysisToReport/.test(unsupportedEvidenceReviewState)) {
+  failures.push(
+    "Unsupported evidence review-state boundary check failed: mapper references live analyzer or receipt report types.",
+  );
+}
+
+if (
+  /createObjectURL|\bobjectUrl\b|\bimageUrl\b|\bdataUrl\b|\bBlob\b|\bFile\b|rawOcr|ocrText|rawExif|rawMetadata|originalFilename|providerOutput|storageHandle|integrationHandle|caseQueueHandle/.test(
+    unsupportedEvidenceReviewState,
+  )
+) {
+  failures.push("Unsupported evidence review-state privacy check failed: mapper references raw file/private surfaces.");
+}
+
+const requiredUnsupportedEvidenceReviewProbeSignals = [
+  {
+    label: "unsupported review probe export",
+    patterns: [/UNSUPPORTED_EVIDENCE_REVIEW_STATE_DEVELOPER_PROBE/],
+  },
+  {
+    label: "unsupported review active type assertions",
+    patterns: [/assertProbeChecksPass\("types", typeChecks\)/],
+  },
+  {
+    label: "unsupported review active case coverage assertions",
+    patterns: [/assertProbeChecksPass\("case coverage", caseCoverageChecks\)/],
+  },
+  {
+    label: "unsupported review active shape assertions",
+    patterns: [/assertProbeChecksPass\("shape", shapeChecks\)/],
+  },
+  {
+    label: "unsupported review active no-live assertions",
+    patterns: [/assertProbeChecksPass\("no-live boundaries", noLiveBoundaryChecks\)/],
+  },
+  {
+    label: "unsupported review active wording assertions",
+    patterns: [/assertProbeChecksPass\("wording", wordingChecks\)/],
+  },
+  {
+    label: "unsupported review active source-boundary assertions",
+    patterns: [/assertProbeChecksPass\("source boundaries", sourceBoundaryChecks\)/],
+  },
+  {
+    label: "unsupported review product-photo case",
+    patterns: [/productPhotoCovered/],
+  },
+  {
+    label: "unsupported review order screenshot case",
+    patterns: [/orderScreenshotCovered/],
+  },
+  {
+    label: "unsupported review ambiguous PDF case",
+    patterns: [/ambiguousPdfCovered/],
+  },
+  {
+    label: "unsupported review unknown evidence case",
+    patterns: [/unknownEvidenceCovered/],
+  },
+  {
+    label: "unsupported review mixed evidence case",
+    patterns: [/mixedEvidenceCovered/],
+  },
+  {
+    label: "unsupported review unsupported image case",
+    patterns: [/unsupportedImageCovered/],
+  },
+  {
+    label: "unsupported review receipt-like not parseable case",
+    patterns: [/receiptLikeNotParseableCovered/],
+  },
+  {
+    label: "unsupported review forbidden visible phrase helper",
+    patterns: [/visibleOutputOmitsForbiddenPhrases/],
+  },
+  {
+    label: "unsupported review safe concept helper",
+    patterns: [/displayHasRequiredSafeConcepts/],
+  },
+  {
+    label: "unsupported review private sentinel omission",
+    patterns: [/hostilePrivateSentinel/],
+  },
+];
+
+for (const signal of requiredUnsupportedEvidenceReviewProbeSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(unsupportedEvidenceReviewStateProbe))) {
+    failures.push(`Unsupported evidence review-state probe check failed: missing ${signal.label}`);
+  }
+}
+
+const forbiddenUnsupportedEvidenceReviewProbeImports = [
+  "@/lib/analysis/analyzer",
+  "@/lib/analysis/analyzer-routing",
+  "@/lib/analysis/report-adapter",
+  "@/lib/analysis/scoring",
+  "@/lib/analysis/receipt-parser",
+  "@/lib/analysis/ocr-service",
+  "@/lib/analysis/metadata-service",
+  "@/lib/analysis/image-heuristics",
+  "@/lib/analysis/product-photo-analyzer",
+  "@/lib/analysis/product-photo-routing-adapter",
+  "@/lib/analysis/product-photo-report-view-model",
+  "@/lib/test-evidence",
+  "@/components/ClaimReviewWorkflow",
+  "@/components/UploadPanel",
+  "@/components/ProductPhotoReviewPanel",
+];
+
+for (const importPath of forbiddenUnsupportedEvidenceReviewProbeImports) {
+  const doubleQuotedImport = `from "${importPath}"`;
+  const singleQuotedImport = `from '${importPath}'`;
+
+  if (
+    unsupportedEvidenceReviewStateProbe.includes(doubleQuotedImport) ||
+    unsupportedEvidenceReviewStateProbe.includes(singleQuotedImport)
+  ) {
+    failures.push(
+      `Unsupported evidence review-state probe boundary check failed: probe imports forbidden path ${importPath}`,
+    );
+  }
+}
+
+if (!productPhotoProbeRunner.includes("unsupported-evidence-review-state.probe.ts")) {
+  failures.push("Product-photo probe runner check failed: unsupported evidence review-state probe is not registered.");
+}
+
+if (
+  [appPage, appLayout, testEvidenceHarness, claimReviewWorkflow, reportAdapter, productPhotoReviewPanel].some((source) =>
+    source.includes("unsupported-evidence-review-state"),
+  )
+) {
+  failures.push("Unsupported evidence review-state boundary check failed: mapper is imported by live app/report/UI files.");
 }
 
 const preAnalysisGateHostPage = fileContents.get("src/app/dev/pre-analysis-evidence-gate/page.tsx") ?? "";

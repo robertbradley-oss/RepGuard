@@ -92,6 +92,10 @@ const probeModules = [
     path: "src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts",
     exportName: "PRE_ANALYSIS_EVIDENCE_GATE_RUNTIME_DEVELOPER_PROBE",
   },
+  {
+    path: "src/lib/analysis/unsupported-evidence-review-state.probe.ts",
+    exportName: "UNSUPPORTED_EVIDENCE_REVIEW_STATE_DEVELOPER_PROBE",
+  },
 ];
 
 async function runProductPhotoProbes() {
