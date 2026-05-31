@@ -116,6 +116,9 @@ const phase413MockProviderSafetyCheckpoint = readRequiredFile(
 const phase414MockProviderDeveloperUsage = readRequiredFile(
   "PHASE_4_14_MOCK_PROVIDER_ADAPTER_DEVELOPER_USAGE.md",
 );
+const phase415MockAdapterRouteIntegrationPlan = readRequiredFile(
+  "PHASE_4_15_MOCK_ADAPTER_ROUTE_INTEGRATION_PLAN.md",
+);
 
 const requiredSemanticSignals = [
   {
@@ -830,6 +833,70 @@ const forbiddenPhase414MockProviderDeveloperUsagePatterns = [
   /uncertainty value (?:proves|confirms|verifies)/i,
 ];
 
+const requiredPhase415MockAdapterRouteIntegrationSignals = [
+  {
+    label: "Phase 4.15 planning-only marker",
+    patterns: [/Phase 4\.15 is a planning-only milestone for possible future mock adapter route integration/],
+  },
+  {
+    label: "current route unchanged",
+    patterns: [/does not implement route integration/, /existing OCR route still accepts an exact JSON body containing only `fixtureKey`/],
+  },
+  {
+    label: "future integration purpose",
+    patterns: [/Test provider abstraction behavior through an API boundary/, /Simulate mock OCR provider results/, /Simulate mock vision provider results/],
+  },
+  {
+    label: "request shape options",
+    patterns: [/Option A: Keep `\/api\/analysis\/ocr` Unchanged And Add A Separate Mock Route/, /Option B: Extend `\/api\/analysis\/ocr` With An Explicit Synthetic Mode/, /Option C: Keep Mock Adapter Tests Probe-Only And Route-Free/],
+  },
+  {
+    label: "safest future recommendation",
+    patterns: [/Recommendation: safest future option if a route integration skeleton is approved/, /use a separate route such as `\/api\/analysis\/mock-provider`/],
+  },
+  {
+    label: "future accepted and rejected inputs",
+    patterns: [/Provider type: `mock-ocr` or `mock-vision`/, /Non-synthetic provider modes/, /Multipart uploads/, /Binary uploads/],
+  },
+  {
+    label: "future response behavior",
+    patterns: [/Return provider-like mock result summaries/, /Include OCR extraction contract output only for mock OCR when appropriate/, /Include mock vision uncertainty signals separately/, /must never return.*`LocalAnalysisResult`/],
+  },
+  {
+    label: "route isolation requirements",
+    patterns: [/Future integration must not touch:/, /`ClaimReviewWorkflow`/, /`ProductPhotoReviewPanel`/, /`analyzeEvidenceFile`/, /`LocalAnalysisResult`/],
+  },
+  {
+    label: "future probe requirements",
+    patterns: [/Mock OCR route success/, /Mock vision route success/, /Exact body validation/, /No existing `\/api\/analysis\/ocr` behavior regression if a separate route is chosen/],
+  },
+  {
+    label: "safety and privacy rules",
+    patterns: [/OCR confidence is a review signal only/, /Altered\/AI-generated-image uncertainty is a review signal only/, /No single fraud score/, /No external network calls/],
+  },
+  {
+    label: "Phase 4.16 safe options",
+    patterns: [/Option A: Phase 4\.16 mock adapter route integration skeleton implementation/, /Option B: Phase 4\.16 OpenAI Vision sandbox planning only/, /Option C: Phase 4\.16 provider abstraction interface skeleton planning only/],
+  },
+];
+
+const forbiddenPhase415MockAdapterRouteIntegrationPatterns = [
+  /npm\s+(?:install|add)\s+(?:openai|@aws-sdk|@google-cloud)/i,
+  /OPENAI_API_KEY|GOOGLE_APPLICATION_CREDENTIALS|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/,
+  /process\.env\.(?:OPENAI|GOOGLE|AWS|OCR|VISION)/i,
+  /import\s+.*\s+from\s+["'](?:openai|@aws-sdk|@google-cloud)/i,
+  /multipart\/form-data\s+is\s+accepted/i,
+  /raw provider payloads? (?:will|should) be logged/i,
+  /raw real OCR (?:will|should) be retained/i,
+  /real evidence processing (?:is|will be) enabled/i,
+  /(?:This milestone|Phase 4\.15) (?:wires|wired|will wire|implements|implemented) .*mock adapter/i,
+  /existing OCR route behavior (?:changes|changed|will change)/i,
+  /live OpenAI Vision implementation (?:is|was|will be) added/i,
+  /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
+  /confidence (?:proves|confirms|verifies)/i,
+  /uncertainty (?:proves|confirms|verifies)/i,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -938,6 +1005,12 @@ for (const signal of requiredPhase414MockProviderDeveloperUsageSignals) {
   }
 }
 
+for (const signal of requiredPhase415MockAdapterRouteIntegrationSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase415MockAdapterRouteIntegrationPlan))) {
+    failures.push(`Missing Phase 4.15 mock-adapter route integration planning signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -1025,6 +1098,12 @@ for (const pattern of forbiddenPhase413MockProviderSafetyPatterns) {
 for (const pattern of forbiddenPhase414MockProviderDeveloperUsagePatterns) {
   if (pattern.test(phase414MockProviderDeveloperUsage)) {
     failures.push(`Phase 4.14 mock-provider developer usage failed: forbidden implementation/privacy pattern ${pattern}`);
+  }
+}
+
+for (const pattern of forbiddenPhase415MockAdapterRouteIntegrationPatterns) {
+  if (pattern.test(phase415MockAdapterRouteIntegrationPlan)) {
+    failures.push(`Phase 4.15 mock-adapter route integration plan failed: forbidden implementation/privacy pattern ${pattern}`);
   }
 }
 
