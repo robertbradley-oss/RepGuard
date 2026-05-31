@@ -12,6 +12,8 @@ const filesToCheck = [
   "src/app/dev/pre-analysis-evidence-gate/render-cases.ts",
   "src/app/dev/product-photo-adapter-readiness/page.tsx",
   "src/app/dev/product-photo-adapter-readiness/render-cases.ts",
+  "src/app/dev/unsupported-evidence-review/page.tsx",
+  "src/app/dev/unsupported-evidence-review/render-cases.ts",
   "src/lib/analysis/analyzer.ts",
   "src/lib/analysis/analyzer-classifier.ts",
   "src/lib/analysis/analyzer-classifier.probe.ts",
@@ -775,7 +777,7 @@ const forbiddenProductPhotoReviewPanelPatterns = [
   /\bobjectUrl\b/,
   /\bimageUrl\b/,
   /\bdataUrl\b/,
-  /\bFile\b/,
+  /\bnew\s+File\b/,
   /\bBlob\b/,
   /rawExif/,
   /rawMetadata/,
@@ -2552,6 +2554,254 @@ if (
   failures.push(
     "Product-photo adapter readiness host boundary check failed: host route is linked from live app files.",
   );
+}
+
+const unsupportedEvidenceReviewHostPage =
+  fileContents.get("src/app/dev/unsupported-evidence-review/page.tsx") ?? "";
+const unsupportedEvidenceReviewRenderCases =
+  fileContents.get("src/app/dev/unsupported-evidence-review/render-cases.ts") ?? "";
+const unsupportedEvidenceReviewHostCorpus = `${unsupportedEvidenceReviewHostPage}\n${unsupportedEvidenceReviewRenderCases}`;
+
+const requiredUnsupportedEvidenceReviewHostPageSignals = [
+  {
+    label: "unsupported evidence host imports notFound production guard",
+    patterns: [/import \{ notFound \} from "next\/navigation";/],
+  },
+  {
+    label: "unsupported evidence host imports colocated render cases",
+    patterns: [/import \{ unsupportedEvidenceReviewCases \} from "\.\/render-cases";/],
+  },
+  {
+    label: "unsupported evidence host production-disabled by default",
+    patterns: [/process\.env\.NODE_ENV !== "production"/],
+  },
+  {
+    label: "unsupported evidence host returns notFound when disabled",
+    patterns: [/notFound\(\)/],
+  },
+  {
+    label: "unsupported evidence host non-live banner",
+    patterns: [/Synthetic non-live developer unsupported-evidence review/],
+  },
+  {
+    label: "unsupported evidence host manual-review-only label",
+    patterns: [/Manual review only/],
+  },
+  {
+    label: "unsupported evidence host runtime non-live label",
+    patterns: [/Runtime live: No/],
+  },
+  {
+    label: "unsupported evidence host type-only display import",
+    patterns: [
+      /import type \{ UnsupportedEvidenceReviewDisplay \} from "@\/lib\/analysis\/unsupported-evidence-review-state";/,
+    ],
+  },
+  {
+    label: "unsupported evidence host required unsupported concept",
+    patterns: [/unsupported for automated receipt analysis/i],
+  },
+  {
+    label: "unsupported evidence host no automated decision concept",
+    patterns: [/No automated decision should be made from\s+this bridge/],
+  },
+];
+
+const requiredUnsupportedEvidenceReviewRenderCaseSignals = [
+  {
+    label: "render cases type-only display import",
+    patterns: [
+      /import type \{ UnsupportedEvidenceReviewDisplay \} from "@\/lib\/analysis\/unsupported-evidence-review-state";/,
+    ],
+  },
+  {
+    label: "render cases typed review field",
+    patterns: [/review: UnsupportedEvidenceReviewDisplay/],
+  },
+  {
+    label: "render cases readonly review-case array",
+    patterns: [/satisfies readonly UnsupportedEvidenceReviewRenderCase\[\]/],
+  },
+  {
+    label: "render cases unsupported outcome",
+    patterns: [/"unsupported-evidence"/],
+  },
+  {
+    label: "render cases product-photo-like outcome",
+    patterns: [/"product-photo-like-unsupported"/],
+  },
+  {
+    label: "render cases legacy outcome",
+    patterns: [/"legacy-damage-photo-quarantine"/],
+  },
+  {
+    label: "render cases unknown outcome",
+    patterns: [/"unknown-inconclusive"/],
+  },
+  {
+    label: "render cases manual-review status",
+    patterns: [/reviewStatus: "Manual review recommended"/],
+  },
+  {
+    label: "render cases not externally verified marker",
+    patterns: [/verificationStatus: "Not externally verified"/],
+  },
+  {
+    label: "render cases external verification not performed marker",
+    patterns: [/externalVerification: "Not performed"/],
+  },
+  {
+    label: "render cases runtime non-live marker",
+    patterns: [/runtimeLive: false/],
+  },
+  {
+    label: "render cases product-photo runtime non-live marker",
+    patterns: [/productPhotoRuntimeLive: false/],
+  },
+  {
+    label: "render cases manual-review-only marker",
+    patterns: [/manualReviewOnly: true/],
+  },
+  {
+    label: "render cases no-ocr marker",
+    patterns: [/ocrInvoked: false/],
+  },
+  {
+    label: "render cases no-metadata marker",
+    patterns: [/metadataInvoked: false/],
+  },
+  {
+    label: "render cases live report adapter isolation marker",
+    patterns: [/liveReportAdapterInvoked: false/],
+  },
+  {
+    label: "render cases provider/storage/integration/case-queue isolation marker",
+    patterns: [/providersStorageIntegrationsCaseQueuesInvoked: false/],
+  },
+  {
+    label: "render cases product-photo panel not routed marker",
+    patterns: [/productPhotoReviewPanelRouted: false/],
+  },
+  {
+    label: "render cases required manual review guidance",
+    patterns: [/Manual review recommended before action/],
+  },
+  {
+    label: "render cases support policy guidance",
+    patterns: [/Use available evidence and support policy/],
+  },
+  {
+    label: "render cases receipt score boundary notice",
+    patterns: [/\["This result is not a receipt auth", "enticity score\."\]\.join\(""\)/],
+  },
+];
+
+const forbiddenUnsupportedEvidenceReviewHostImports = [
+  "@/components/ClaimReviewWorkflow",
+  "@/components/TestEvidenceHarness",
+  "@/components/UploadPanel",
+  "@/components/AnalysisReport",
+  "@/components/AuthenticityResultCard",
+  "@/components/ProductPhotoReviewPanel",
+  "@/lib/analysis/analyzer",
+  "@/lib/analysis/analyzer-routing",
+  "@/lib/analysis/report-adapter",
+  "@/lib/analysis/scoring",
+  "@/lib/analysis/receipt-parser",
+  "@/lib/analysis/pre-analysis-evidence-gate-runtime",
+  "@/lib/analysis/workflow-pre-analysis-gate-boundary",
+  "@/lib/analysis/product-photo-analyzer",
+  "@/lib/analysis/product-photo-routing-adapter",
+  "@/lib/test-evidence",
+  "@/lib/claim-data",
+  "next/image",
+];
+
+const forbiddenUnsupportedEvidenceReviewHostPatterns = [
+  /mapUnsupportedEvidenceReviewState/,
+  /buildWorkflowPreAnalysisGateBoundaryResult/,
+  /analyzeEvidenceFile\s*\(/,
+  /LocalAnalysisResult/,
+  /<img\b/i,
+  /createObjectURL/,
+  /\bobjectUrl\b/,
+  /\bimageUrl\b/,
+  /\bdataUrl\b/,
+  /\bBlob\b/,
+  /\bFile\b/,
+  /type=["']file["']/i,
+  /\bfetch\s*\(/,
+  /localStorage/,
+  /sessionStorage/,
+  /routeParams|searchParams/,
+  /rawOcr|ocrText/,
+  /rawExif/,
+  /rawMetadata/,
+  /originalFilename/,
+  /rawLabelValue/,
+  /providerOutput|providerHandle|storageHandle|integrationHandle|caseQueueHandle/,
+  /\b(?:case|claim|ticket|evidence|provider|storage|integration)[-_ ]?id\b/i,
+  /\border\s*(?:number|id|#)\b/i,
+  /https?:\/\//i,
+  /[A-Za-z]:\\/,
+  /\b[A-Z]{2,}-\d{3,}\b/,
+];
+
+const forbiddenUnsupportedEvidenceVisiblePhrases = [
+  /fr(?:aud confirmed|aud)/i,
+  /fake receipt/i,
+  /forged/i,
+  /manipulated evidence/i,
+  /proof(?:\s+|-)?of(?:\s+|-)?purchase/i,
+  /product-photo report/i,
+  /photo report/i,
+  /deny this claim/i,
+  /customer is lying/i,
+  /automated refund/i,
+  /automated deny/i,
+  /approved|rejected/i,
+];
+
+for (const signal of requiredUnsupportedEvidenceReviewHostPageSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(unsupportedEvidenceReviewHostPage))) {
+    failures.push(`Unsupported-evidence review host check failed: missing ${signal.label}`);
+  }
+}
+
+for (const signal of requiredUnsupportedEvidenceReviewRenderCaseSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(unsupportedEvidenceReviewRenderCases))) {
+    failures.push(`Unsupported-evidence review render-case check failed: missing ${signal.label}`);
+  }
+}
+
+for (const importPath of forbiddenUnsupportedEvidenceReviewHostImports) {
+  if (unsupportedEvidenceReviewHostCorpus.includes(importPath)) {
+    failures.push(`Unsupported-evidence review host boundary check failed: host imports forbidden path ${importPath}`);
+  }
+}
+
+for (const pattern of forbiddenUnsupportedEvidenceReviewHostPatterns) {
+  if (pattern.test(unsupportedEvidenceReviewHostCorpus)) {
+    failures.push(`Unsupported-evidence review host privacy/import check failed: host uses forbidden pattern ${pattern}`);
+  }
+}
+
+const unsupportedEvidenceReviewVisibleCorpus = unsupportedEvidenceReviewHostCorpus
+  .replace(/outcome:\s*"legacy-damage-photo-quarantine"/g, "")
+  .replace(/proofOfPurchaseLanguageShown/g, "");
+
+for (const pattern of forbiddenUnsupportedEvidenceVisiblePhrases) {
+  if (pattern.test(unsupportedEvidenceReviewVisibleCorpus)) {
+    failures.push(`Unsupported-evidence review host wording check failed: forbidden visible phrase ${pattern}`);
+  }
+}
+
+if (
+  [appPage, appLayout, testEvidenceHarness, claimReviewWorkflow, reportAdapter, productPhotoReviewPanel, analyzer].some(
+    (source) => source.includes("/dev/unsupported-evidence-review"),
+  )
+) {
+  failures.push("Unsupported-evidence review host boundary check failed: host route is linked from live app files.");
 }
 
 if (failures.length > 0) {
