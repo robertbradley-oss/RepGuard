@@ -41,12 +41,6 @@ const attentionTone: Record<CaseAttentionLevel, string> = {
   "Manual review recommended": "border-[rgba(154,87,52,0.36)] bg-[rgba(154,87,52,0.10)] text-[var(--cg-copper)]",
 };
 
-const darkAttentionTone: Record<CaseAttentionLevel, string> = {
-  "Low attention": "border-[rgba(95,143,100,0.42)] bg-[rgba(95,143,100,0.12)] text-[#d9f0d8]",
-  "Review signals": "border-[rgba(184,133,24,0.44)] bg-[rgba(184,133,24,0.14)] text-[#f5d796]",
-  "Manual review recommended": "border-[rgba(251,191,36,0.42)] bg-[rgba(251,191,36,0.14)] text-[#ffe0a8]",
-};
-
 const evidenceIcon: Record<CaseEvidenceItem["type"], LucideIcon> = {
   Receipt: FileSearch,
   "Order screenshot": ScanLine,
@@ -845,6 +839,116 @@ function SelectedEvidencePanel({ item }: { item: CaseEvidenceItem }) {
   );
 }
 
+function ReviewSummaryIntelligencePanel({ selectedEvidence }: { selectedEvidence: CaseEvidenceItem }) {
+  const summary = phase32MockCase.reviewSummary;
+  const selectedConnection =
+    summary.selectedEvidenceConnection[selectedEvidence.key] ??
+    "Selected evidence should be interpreted as local reviewer context only.";
+
+  return (
+    <section className="rounded-lg border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.72)] p-4 shadow-[0_18px_42px_rgba(77,62,36,0.10),inset_0_1px_0_rgba(255,255,255,0.70)]">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <SectionLabel icon={ClipboardList} label="Case review synthesis" />
+          <h2 className="mt-2 text-xl font-semibold tracking-normal text-[var(--cg-text)]">
+            Static case-level intelligence layout
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--cg-text-muted)]">{summary.synthesisNarrative}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <StatusBadge label="Phase 3.9 review summary layout" tone="bronze" />
+          <StatusBadge label={summary.status} tone="green" />
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-md border border-[rgba(184,133,24,0.30)] bg-[rgba(184,133,24,0.09)] p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--cg-amber)]">{summary.synthesisLabel}</p>
+        <p className="mt-2 text-sm leading-6 text-[var(--cg-text-muted)]">{summary.synthesisBoundary}</p>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        {summary.evidenceReviewedGroups.map((group) => (
+          <div
+            className="rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(246,241,232,0.62)] p-3"
+            key={group.label}
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--cg-text-subtle)]">{group.label}</p>
+            <p className="mt-1 text-sm font-semibold text-[var(--cg-text)]">{group.value}</p>
+            <p className="mt-2 text-xs leading-5 text-[var(--cg-text-muted)]">{group.detail}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <section className="rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.70)] p-3">
+          <SectionLabel icon={AlertTriangle} label="Missing information checklist" />
+          <ul className="mt-3 space-y-2">
+            {summary.missingInformation.map((item) => (
+              <li key={item} className="text-sm leading-6 text-[var(--cg-text-muted)]">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.70)] p-3">
+          <SectionLabel icon={ListChecks} label="Manual-review drivers" />
+          <ul className="mt-3 space-y-2">
+            {summary.manualReviewDrivers.map((driver) => (
+              <li key={driver} className="text-sm leading-6 text-[var(--cg-text-muted)]">
+                {driver}
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <section className="rounded-lg border border-[rgba(26,31,39,0.28)] bg-[var(--cg-bg-panel)] p-4 shadow-[0_14px_34px_rgba(77,62,36,0.12),inset_0_1px_0_rgba(255,255,255,0.06)]">
+          <SectionLabel icon={FileSearch} label="Selected-evidence synthesis link" tone="dark" />
+          <p className="mt-3 text-sm font-semibold text-[var(--cg-dark-text)]">{selectedEvidence.title}</p>
+          <p className="mt-2 text-sm leading-6 text-[var(--cg-dark-muted)]">{selectedConnection}</p>
+        </section>
+
+        <section className="rounded-lg border border-[rgba(95,143,100,0.30)] bg-[rgba(95,143,100,0.08)] p-4">
+          <SectionLabel icon={ShieldCheck} label="Safe reviewer posture" />
+          <p className="mt-3 text-sm leading-6 text-[var(--cg-text)]">{summary.safeReviewerPosture}</p>
+        </section>
+      </div>
+
+      <section className="mt-4 rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(246,241,232,0.58)] p-3">
+        <SectionLabel icon={AlertTriangle} label="Review limitations" />
+        <ul className="mt-3 space-y-2">
+          {summary.limitations.map((limitation) => (
+            <li key={limitation} className="text-sm leading-6 text-[var(--cg-text-muted)]">
+              {limitation}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <div className="rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.70)] p-3">
+          <SectionLabel icon={History} label="Timeline link" />
+          <p className="mt-2 text-xs leading-5 text-[var(--cg-text-muted)]">{summary.timelineConnection}</p>
+        </div>
+        <div className="rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.70)] p-3">
+          <SectionLabel icon={NotebookText} label="Manual decision link" />
+          <p className="mt-2 text-xs leading-5 text-[var(--cg-text-muted)]">{summary.manualDecisionConnection}</p>
+        </div>
+        <div className="rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.70)] p-3">
+          <SectionLabel icon={MessageSquareText} label="Customer-safe wording link" />
+          <p className="mt-2 text-xs leading-5 text-[var(--cg-text-muted)]">{summary.customerSafeWordingConnection}</p>
+        </div>
+      </div>
+
+      <p className="mt-4 rounded-md border border-[rgba(95,143,100,0.30)] bg-[rgba(95,143,100,0.09)] p-3 text-sm leading-6 text-[var(--cg-text)]">
+        {summary.recommendedSupportAction}
+      </p>
+    </section>
+  );
+}
+
 export function CaseReviewCommandCenter() {
   const [selectedKey, setSelectedKey] = useState(phase32MockCase.evidenceItems[0]?.key ?? "");
 
@@ -864,40 +968,7 @@ export function CaseReviewCommandCenter() {
           <SelectedEvidencePanel item={selectedEvidence} />
 
           <aside className="space-y-4">
-            <section className="rounded-lg border border-[rgba(26,31,39,0.28)] bg-[var(--cg-bg-panel)] p-4 shadow-[0_18px_42px_rgba(77,62,36,0.14),inset_0_1px_0_rgba(255,255,255,0.06)]">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <SectionLabel icon={ClipboardList} label="Case review summary" tone="dark" />
-                <span className={`rounded-md border px-2.5 py-1 text-xs font-medium ${darkAttentionTone[phase32MockCase.attentionLevel]}`}>
-                  {phase32MockCase.attentionLevel}
-                </span>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-[var(--cg-dark-muted)]">{phase32MockCase.reviewSummary.evidenceReviewed}</p>
-              <div className="mt-4 space-y-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--cg-dark-subtle)]">Manual-review drivers</p>
-                  <ul className="mt-2 space-y-2">
-                    {phase32MockCase.reviewSummary.manualReviewDrivers.map((driver) => (
-                      <li key={driver} className="text-sm leading-6 text-[var(--cg-dark-muted)]">
-                        {driver}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--cg-dark-subtle)]">Missing information</p>
-                  <ul className="mt-2 space-y-2">
-                    {phase32MockCase.reviewSummary.missingInformation.map((item) => (
-                      <li key={item} className="text-sm leading-6 text-[var(--cg-dark-muted)]">
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              <p className="mt-4 rounded-md border border-[rgba(95,143,100,0.30)] bg-[rgba(95,143,100,0.12)] p-3 text-sm leading-6 text-[#d9f0d8]">
-                {phase32MockCase.reviewSummary.recommendedSupportAction}
-              </p>
-            </section>
+            <ReviewSummaryIntelligencePanel selectedEvidence={selectedEvidence} />
 
             <ManualReviewWorkspace selectedEvidence={selectedEvidence} />
 

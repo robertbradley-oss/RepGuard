@@ -136,10 +136,27 @@ export type CaseCustomerSafeWordingModule = {
 };
 
 export type CaseReviewSummary = {
+  status: string;
+  synthesisLabel: string;
+  synthesisNarrative: string;
   evidenceReviewed: string;
+  evidenceReviewedGroups: readonly CaseReviewSummarySection[];
   missingInformation: readonly string[];
   manualReviewDrivers: readonly string[];
+  limitations: readonly string[];
+  safeReviewerPosture: string;
+  selectedEvidenceConnection: Record<string, string>;
+  timelineConnection: string;
+  manualDecisionConnection: string;
+  customerSafeWordingConnection: string;
+  synthesisBoundary: string;
   recommendedSupportAction: string;
+};
+
+export type CaseReviewSummarySection = {
+  label: string;
+  value: string;
+  detail: string;
 };
 
 export type CaseHeaderSummaryChip = {
@@ -471,7 +488,28 @@ export const phase32MockCase: ClaimGuardLocalCase = {
     },
   ],
   reviewSummary: {
+    status: "Static case synthesis",
+    synthesisLabel: "Manual-review synthesis only",
+    synthesisNarrative:
+      "This static synthesis summarizes what the local shell has staged for reviewer orientation. It does not score the case, decide the claim, or replace support policy review.",
     evidenceReviewed: "Four synthetic evidence items are staged for local case review.",
+    evidenceReviewedGroups: [
+      {
+        label: "Eligible receipt context",
+        value: "1 item",
+        detail: "Receipt summary is available for local evidence-quality comparison only.",
+      },
+      {
+        label: "Order and customer context",
+        value: "2 items",
+        detail: "Redacted screenshot and message context can guide a narrower follow-up question.",
+      },
+      {
+        label: "Unsupported evidence",
+        value: "1 item",
+        detail: "Product-photo-like evidence remains manual-review-only and outside automated analysis.",
+      },
+    ],
     missingInformation: [
       "Clearer eligible receipt copy may be needed if support policy requires it",
       "External order verification is not connected",
@@ -482,6 +520,31 @@ export const phase32MockCase: ClaimGuardLocalCase = {
       "Unsupported product-photo-like evidence is not live-analyzed",
       "Support action should remain separate from local review signals",
     ],
+    limitations: [
+      "External Verification: Not performed",
+      "No live case queue, ticket record, storage, provider lookup, OCR expansion, or metadata lookup is connected",
+      "Static synthesis is based only on synthetic local summaries in this shell",
+    ],
+    safeReviewerPosture:
+      "Keep the case in manual review, compare eligible receipt context with support policy, and ask for clearer eligible evidence only if the policy review needs it.",
+    selectedEvidenceConnection: {
+      "receipt-summary":
+        "Selected receipt summary is the strongest eligible purchase-context signal, but it remains not externally verified.",
+      "order-context":
+        "Selected order context may explain timing or item context, but readability limits should stay separate from conclusions.",
+      "photo-unsupported":
+        "Selected product-photo-like evidence keeps the synthesis in manual-review posture because no automated product-photo result exists.",
+      "customer-message":
+        "Selected customer context can shape a courteous follow-up without copying internal rationale into customer-facing wording.",
+    },
+    timelineConnection:
+      "Timeline events show when evidence, notes, wording, and escalation markers were staged as synthetic audit context only.",
+    manualDecisionConnection:
+      "Manual decision states remain reviewer-entered placeholders and do not save, submit, or update a case record.",
+    customerSafeWordingConnection:
+      "Customer-safe wording can request clearer eligible evidence or context, but it must not present the synthesis as a final outcome.",
+    synthesisBoundary:
+      "Internal-only static synthesis. Not a scoring result, not an automated decision, not persisted, not sent, not exported, and not copied to a ticket.",
     recommendedSupportAction:
       "Continue manual review, compare eligible receipt context with policy, and request clearer evidence if needed.",
   },

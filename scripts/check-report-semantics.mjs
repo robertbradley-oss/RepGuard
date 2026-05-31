@@ -350,6 +350,34 @@ const requiredCaseCommandCenterSignals = [
     patterns: [/Local shell/, /Synthetic case/, /Not persisted/, /No live actions/],
   },
   {
+    label: "phase 3.9 review summary layout label",
+    patterns: [/Phase 3\.9 review summary layout/],
+  },
+  {
+    label: "phase 3.9 case review synthesis",
+    patterns: [/Case review synthesis/, /Static case-level intelligence layout/],
+  },
+  {
+    label: "phase 3.9 evidence reviewed groups",
+    patterns: [/Eligible receipt context/, /Order and customer context/, /Unsupported evidence/],
+  },
+  {
+    label: "phase 3.9 missing information and manual drivers",
+    patterns: [/Missing information checklist/, /Manual-review drivers/],
+  },
+  {
+    label: "phase 3.9 safe posture and limitations",
+    patterns: [/Safe reviewer posture/, /Review limitations/],
+  },
+  {
+    label: "phase 3.9 relationship links",
+    patterns: [/Timeline link/, /Manual decision link/, /Customer-safe wording link/],
+  },
+  {
+    label: "phase 3.9 no live scoring decision boundary",
+    patterns: [/Internal-only static synthesis/, /Not a scoring result, not an automated decision/],
+  },
+  {
     label: "selected evidence bench structure",
     patterns: [/Selected evidence bench/],
   },
