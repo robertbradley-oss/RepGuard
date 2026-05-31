@@ -102,6 +102,7 @@ const ocrRoute = fileContents.get("src/app/api/analysis/ocr/route.ts") ?? "";
 const ocrRouteProbe = fileContents.get("src/app/api/analysis/ocr/route.probe.ts") ?? "";
 const ocrRouteCorpus = `${ocrRoute}\n${ocrRouteProbe}`;
 const phase49ProviderSelectionPlan = readRequiredFile("PHASE_4_9_OCR_PROVIDER_SELECTION_PLAN.md");
+const phase410ProviderAbstractionPlan = readRequiredFile("PHASE_4_10_PROVIDER_ABSTRACTION_PLAN.md");
 
 const requiredSemanticSignals = [
   {
@@ -510,6 +511,63 @@ const forbiddenPhase49ProviderSelectionPatterns = [
   /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
 ];
 
+const requiredPhase410ProviderAbstractionSignals = [
+  {
+    label: "Phase 4.10 planning-only marker",
+    patterns: [/Phase 4\.10 is a provider abstraction planning-only milestone/],
+  },
+  {
+    label: "no implementation scope",
+    patterns: [/does not add OCR providers, OpenAI Vision implementation, Google\/AWS\/Tesseract implementation, SDKs, environment variables, provider abstraction code/],
+  },
+  {
+    label: "abstraction goals",
+    patterns: [/Stay provider-neutral/, /Normalize provider failures into safe operational limitations/, /compatible with the existing `ocr-extraction-contract`/],
+  },
+  {
+    label: "future provider categories",
+    patterns: [/OCR text\/field extraction provider/, /Multimodal vision reasoning provider/, /Synthetic\/mock provider for tests and route hardening/],
+  },
+  {
+    label: "future adapter planning fields",
+    patterns: [/Provider name and provider type/, /Provider mode: synthetic, local, sandbox, or live/, /Timeout budget and timeout status/, /Cost estimate fields/],
+  },
+  {
+    label: "OCR and vision result planning",
+    patterns: [/Planned OCR result fields/, /Planned vision result fields/, /Altered-image or AI-generated-image uncertainty signal/],
+  },
+  {
+    label: "failure normalization",
+    patterns: [/Common failure categories/, /Provider malformed response/, /Redaction failure/, /Failures must be operational limitations or manual-review drivers/],
+  },
+  {
+    label: "privacy and retention",
+    patterns: [/Never log:/, /Raw provider request bodies/, /Retention defaults:/, /Raw provider payload retained: false/],
+  },
+  {
+    label: "mock-before-live",
+    patterns: [/Phase 4\.11 should be mock provider adapter planning only/, /Mock provider work should come before live provider SDKs/],
+  },
+  {
+    label: "route and contract relationship",
+    patterns: [/The existing `POST \/api\/analysis\/ocr` route remains synthetic fixture-key only/, /Future provider adapters should feed the contract, not replace it/],
+  },
+];
+
+const forbiddenPhase410ProviderAbstractionPatterns = [
+  /npm\s+(?:install|add)\s+(?:openai|@aws-sdk|@google-cloud)/i,
+  /OPENAI_API_KEY|GOOGLE_APPLICATION_CREDENTIALS|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/,
+  /process\.env\.(?:OPENAI|GOOGLE|AWS|OCR|VISION)/i,
+  /import\s+.*\s+from\s+["'](?:openai|@aws-sdk|@google-cloud)/i,
+  /type\s+\w*Provider\w*\s*=/,
+  /interface\s+\w*Provider\w*/,
+  /multipart\/form-data\s+is\s+accepted/i,
+  /raw provider payloads? (?:will|should) be logged/i,
+  /raw real OCR (?:will|should) be retained/i,
+  /real evidence processing (?:is|will be) enabled/i,
+  /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -588,6 +646,12 @@ for (const signal of requiredPhase49ProviderSelectionSignals) {
   }
 }
 
+for (const signal of requiredPhase410ProviderAbstractionSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase410ProviderAbstractionPlan))) {
+    failures.push(`Missing Phase 4.10 provider-abstraction planning signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -639,6 +703,12 @@ for (const pattern of forbiddenOcrRouteBehaviorPatterns) {
 for (const pattern of forbiddenPhase49ProviderSelectionPatterns) {
   if (pattern.test(phase49ProviderSelectionPlan)) {
     failures.push(`Phase 4.9 provider-selection planning check failed: forbidden implementation/privacy pattern ${pattern}`);
+  }
+}
+
+for (const pattern of forbiddenPhase410ProviderAbstractionPatterns) {
+  if (pattern.test(phase410ProviderAbstractionPlan)) {
+    failures.push(`Phase 4.10 provider-abstraction planning check failed: forbidden implementation/privacy pattern ${pattern}`);
   }
 }
 
