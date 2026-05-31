@@ -1360,6 +1360,10 @@ const preAnalysisEvidenceGateRuntime =
   fileContents.get("src/lib/analysis/pre-analysis-evidence-gate-runtime.ts") ?? "";
 const preAnalysisEvidenceGateRuntimeProbe =
   fileContents.get("src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts") ?? "";
+const unsupportedEvidenceRuntimeResultBuilder =
+  preAnalysisEvidenceGateRuntime.match(
+    /function unsupportedEvidenceResultFor[\s\S]*?\n}\r?\n\r?\nexport async function analyzeEvidenceFileWithPreAnalysisGate/,
+  )?.[0] ?? "";
 
 const requiredPreAnalysisEvidenceGateSignals = [
   {
@@ -1616,7 +1620,32 @@ if (
 if (/"score"\s*:|"riskLevel"\s*:|"riskBand"\s*:|"verificationStatus"\s*:|"externalVerification"\s*:/.test(
   preAnalysisEvidenceGateRuntime,
 )) {
-  failures.push("Pre-analysis gate runtime wrapper result check failed: unsupported result includes receipt score, risk, or verification fields.");
+  failures.push("Pre-analysis gate runtime wrapper result check failed: unsupported result includes blocked scoring, risk, or status fields.");
+}
+
+if (unsupportedEvidenceRuntimeResultBuilder.length === 0) {
+  failures.push("Pre-analysis gate runtime wrapper wording check failed: unsupported result builder was not found.");
+}
+
+const forbiddenUnsupportedRuntimeOutputProsePatterns = [
+  new RegExp(["pr", "oof"].join(""), "i"),
+  new RegExp(["ver", "ification"].join(""), "i"),
+  phrasePattern("receipt", "score"),
+  /product-photo\s+report/i,
+  new RegExp(["product", "Photo", "Report"].join(""), "i"),
+  phrasePattern("final", "outcome"),
+  new RegExp(["app", "roved"].join(""), "i"),
+  new RegExp(["rej", "ected"].join(""), "i"),
+  new RegExp(["fa", "ke"].join(""), "i"),
+  phrasePattern("fraud", "confirmed"),
+  phrasePattern("manipulation", "confirmed"),
+  phrasePattern("confirmed", "fraud"),
+];
+
+for (const pattern of forbiddenUnsupportedRuntimeOutputProsePatterns) {
+  if (pattern.test(unsupportedEvidenceRuntimeResultBuilder)) {
+    failures.push(`Pre-analysis gate runtime wrapper wording check failed: forbidden unsupported-output prose found: ${pattern}`);
+  }
 }
 
 if (
@@ -1647,6 +1676,14 @@ const requiredPreAnalysisRuntimeProbeSignals = [
   {
     label: "runtime probe unsupported-shape assertions",
     patterns: [/assertProbeChecksPass\("unsupported shape", unsupportedShapeChecks\)/],
+  },
+  {
+    label: "runtime probe unsupported-output prose assertions",
+    patterns: [/assertProbeChecksPass\("unsupported prose", unsupportedProseChecks\)/],
+  },
+  {
+    label: "runtime probe forbidden unsupported-output prose helper",
+    patterns: [/unsupportedOutputOmitsForbiddenOutputProse/],
   },
   {
     label: "runtime probe source-boundary assertions",

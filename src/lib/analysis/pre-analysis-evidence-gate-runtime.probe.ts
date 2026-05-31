@@ -239,9 +239,44 @@ const unsafeTerms = [
   ["automatic ", "denial"].join(""),
 ];
 
+const forbiddenUnsupportedOutputProseTerms = [
+  ["pr", "oof"].join(""),
+  ["ver", "ification"].join(""),
+  ["receipt", " score"].join(""),
+  ["product-photo", " report"].join(""),
+  ["product", "Photo", "Report"].join("").toLowerCase(),
+  ["final ", "outcome"].join(""),
+  ["app", "roved"].join(""),
+  ["rej", "ected"].join(""),
+  ["fa", "ke"].join(""),
+  ["fr", "aud confirmed"].join(""),
+  ["manipulation", " confirmed"].join(""),
+  ["confirmed ", "fraud"].join(""),
+];
+
 function outputOmitsUnsafeWording(result: PreAnalysisGateRuntimeResult) {
   const serialized = stringifyForProbe(result).toLowerCase();
   return unsafeTerms.every((term) => !serialized.includes(term));
+}
+
+function unsupportedOutputOmitsForbiddenOutputProse(
+  result: Extract<PreAnalysisGateRuntimeResult, { kind: "unsupported-evidence" }>,
+) {
+  const outputProse = [
+    result.result.evidenceLabel,
+    result.result.reviewSummary,
+    result.result.recommendedSupportAction,
+    result.result.customerSafeWording,
+    ...result.result.reasons,
+    ...result.result.limitations,
+  ]
+    .join(" ")
+    .toLowerCase();
+  const serialized = stringifyForProbe(result).toLowerCase();
+
+  return forbiddenUnsupportedOutputProseTerms.every(
+    (term) => !outputProse.includes(term) && !serialized.includes(term),
+  );
 }
 
 const typeChecks = {
@@ -339,6 +374,12 @@ const unsupportedShapeChecks = {
   everyUnsupportedResultOmitsUnsafeWording: allWrapperResults.every(outputOmitsUnsafeWording),
 };
 
+const unsupportedProseChecks = {
+  everyUnsupportedResultOmitsForbiddenOutputProse: unsupportedResults.every(
+    unsupportedOutputOmitsForbiddenOutputProse,
+  ),
+};
+
 const sourceBoundaryChecks = {
   wrapperImportsGateDecisionBuilder: wrapperSource.includes("buildPreAnalysisEvidenceGateDecision"),
   wrapperImportsAnalyzerOnlyForDelegation: wrapperSource.includes('import("@/lib/analysis/analyzer")'),
@@ -381,6 +422,7 @@ assertProbeChecksPass("default-off", defaultOffChecks);
 assertProbeChecksPass("allow path", allowPathChecks);
 assertProbeChecksPass("non-allow path", nonAllowChecks);
 assertProbeChecksPass("unsupported shape", unsupportedShapeChecks);
+assertProbeChecksPass("unsupported prose", unsupportedProseChecks);
 assertProbeChecksPass("source boundaries", sourceBoundaryChecks);
 
 return {
@@ -402,6 +444,7 @@ return {
     allowPath: allowPathChecks,
     nonAllowPath: nonAllowChecks,
     unsupportedShape: unsupportedShapeChecks,
+    unsupportedProse: unsupportedProseChecks,
     sourceBoundaries: sourceBoundaryChecks,
   },
 } as const;

@@ -47,7 +47,7 @@ export type UnsupportedEvidenceResult = {
   providersStorageIntegrationsCaseQueuesInvoked: false;
   liveReceiptAnalyzerInvoked: false;
   productPhotoAnalysisInvoked: false;
-  productPhotoReportProduced: false;
+  futureReviewOutputProduced: false;
   productPhotoReviewPanelRouted: false;
   reviewSummary: string;
   recommendedSupportAction: string;
@@ -305,16 +305,16 @@ function unsupportedEvidenceResultFor(gateDecision: PreAnalysisEvidenceGateDecis
     providersStorageIntegrationsCaseQueuesInvoked: false,
     liveReceiptAnalyzerInvoked: false,
     productPhotoAnalysisInvoked: false,
-    productPhotoReportProduced: false,
+    futureReviewOutputProduced: false,
     productPhotoReviewPanelRouted: false,
     reviewSummary: reviewSummaryFor(outcome),
-    recommendedSupportAction: "Manual review only. Request eligible receipt evidence or route the case to a reviewer.",
+    recommendedSupportAction: "Manual review only. Request an eligible receipt document or send the file to a reviewer.",
     customerSafeWording:
-      "We could not process this file with the current receipt-only analyzer. A clearer or eligible proof-of-purchase document may be needed for review.",
+      "This file is not supported by the current receipt-only analysis flow. A clearer eligible receipt document may be needed, or the file can be reviewed manually.",
     reasons: gateDecision.reasons,
     limitations: [
       ...gateDecision.limitations,
-      "No receipt score, product-photo analysis, product-photo report, or product-photo review panel route was produced.",
+      "No automated analysis output or live review route was produced.",
     ],
   };
 }
