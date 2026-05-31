@@ -24,6 +24,7 @@ import {
   phase32MockCase,
   type CaseAttentionLevel,
   type CaseEvidenceItem,
+  type CaseManualDecisionTone,
   type CaseTimelineCategory,
   type CaseTimelineSeverity,
 } from "@/lib/case-command-center/mock-case";
@@ -72,13 +73,12 @@ const timelineDotTone: Record<CaseTimelineSeverity, string> = {
   Escalation: "border-[rgba(154,87,52,0.48)] bg-[rgba(154,87,52,0.16)] text-[var(--cg-copper)]",
 };
 
-const manualDecisionOptions = [
-  "Pending reviewer action",
-  "Needs more information",
-  "Escalate for senior review",
-  "Ready for support decision",
-  "Resolved by reviewer",
-] as const;
+const manualDecisionTone: Record<CaseManualDecisionTone, string> = {
+  "Active review": "border-[rgba(184,133,24,0.38)] bg-[rgba(184,133,24,0.11)] text-[var(--cg-amber)]",
+  "Escalation path": "border-[rgba(154,87,52,0.40)] bg-[rgba(154,87,52,0.12)] text-[var(--cg-copper)]",
+  "Info needed": "border-[rgba(111,120,134,0.34)] bg-[rgba(111,120,134,0.10)] text-[var(--cg-blue)]",
+  "Safety hold": "border-[rgba(95,143,100,0.34)] bg-[rgba(95,143,100,0.10)] text-[var(--cg-green)]",
+};
 
 function StatusBadge({
   label,
@@ -297,6 +297,85 @@ function TimelineAuditTrail({ selectedEvidence }: { selectedEvidence: CaseEviden
   );
 }
 
+function ManualReviewWorkspace({ selectedEvidence }: { selectedEvidence: CaseEvidenceItem }) {
+  const workspace = phase32MockCase.manualReviewWorkspace;
+  const selectedRationale = workspace.selectedEvidenceRationale[selectedEvidence.key] ?? [];
+
+  return (
+    <section className="rounded-lg border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.68)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.70)]">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <SectionLabel icon={NotebookText} label="Manual review workspace" />
+          <p className="mt-2 text-sm leading-6 text-[var(--cg-text-muted)]">{workspace.summary}</p>
+        </div>
+        <StatusBadge label="Mock local review plan" tone="bronze" />
+      </div>
+
+      <div className="mt-4 rounded-md border border-[rgba(95,143,100,0.30)] bg-[rgba(95,143,100,0.08)] p-3 text-sm leading-6 text-[var(--cg-text)]">
+        {workspace.notSavedBoundary}
+      </div>
+
+      <div className="mt-4 grid gap-2">
+        {workspace.decisionStates.map((state) => (
+          <article
+            className="rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.72)] p-3"
+            key={state.key}
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-[var(--cg-text)]">{state.label}</span>
+              <span className={`rounded-md border px-2 py-0.5 text-[11px] font-medium ${manualDecisionTone[state.tone]}`}>
+                {state.tone}
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-[var(--cg-text-muted)]">{state.detail}</p>
+          </article>
+        ))}
+      </div>
+
+      <div className="mt-4 rounded-lg border border-[rgba(26,31,39,0.28)] bg-[var(--cg-bg-panel)] p-4 shadow-[0_14px_34px_rgba(77,62,36,0.12),inset_0_1px_0_rgba(255,255,255,0.06)]">
+        <SectionLabel icon={FileSearch} label="Selected evidence rationale" tone="dark" />
+        <p className="mt-3 text-sm font-semibold text-[var(--cg-dark-text)]">{selectedEvidence.title}</p>
+        <ul className="mt-3 space-y-2">
+          {selectedRationale.map((item) => (
+            <li key={item} className="rounded-md border border-white/10 bg-white/[0.045] px-3 py-2 text-sm leading-6 text-[var(--cg-dark-muted)]">
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <section className="rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(246,241,232,0.58)] p-3">
+          <SectionLabel icon={PenLine} label="Internal note structure" />
+          <ul className="mt-3 space-y-2">
+            {workspace.internalNotes.map((note) => (
+              <li key={note} className="text-sm leading-6 text-[var(--cg-text-muted)]">
+                {note}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(246,241,232,0.58)] p-3">
+          <SectionLabel icon={ShieldCheck} label="Policy and safety reminders" />
+          <ul className="mt-3 space-y-2">
+            {workspace.policyConsiderations.map((item) => (
+              <li key={item} className="text-sm leading-6 text-[var(--cg-text-muted)]">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      <div className="mt-4 space-y-2 rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.70)] p-3">
+        <p className="text-sm leading-6 text-[var(--cg-text-muted)]">{workspace.customerSafeHandoff}</p>
+        <p className="text-xs leading-5 text-[var(--cg-text-subtle)]">{workspace.timelineConnection}</p>
+      </div>
+    </section>
+  );
+}
+
 function SelectedEvidencePanel({ item }: { item: CaseEvidenceItem }) {
   return (
     <section className="cg-forensic-panel min-h-[560px] rounded-lg">
@@ -322,8 +401,9 @@ function SelectedEvidencePanel({ item }: { item: CaseEvidenceItem }) {
               <div className="max-w-2xl">
                 <p className="text-xs font-semibold uppercase tracking-wide text-[var(--cg-amber)]">Privacy-safe inspection shell</p>
                 <p className="mt-3 text-sm leading-6 text-[var(--cg-text-muted)]">
-                  Phase 3.3 renders structured local summaries only. No raw evidence preview, file bytes, object URL,
-                  OCR text, metadata payload, provider response, storage handle, or integration handle is represented.
+                  Phase 3.5 renders structured local summaries and mock review planning only. No raw evidence preview,
+                  file bytes, object URL, OCR text, metadata payload, provider response, storage handle, or integration
+                  handle is represented.
                 </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
@@ -394,8 +474,6 @@ function SelectedEvidencePanel({ item }: { item: CaseEvidenceItem }) {
 
 export function CaseReviewCommandCenter() {
   const [selectedKey, setSelectedKey] = useState(phase32MockCase.evidenceItems[0]?.key ?? "");
-  const [manualDecision, setManualDecision] = useState<(typeof manualDecisionOptions)[number]>("Pending reviewer action");
-  const [internalNote, setInternalNote] = useState("");
 
   const selectedEvidence = useMemo(
     () => phase32MockCase.evidenceItems.find((item) => item.key === selectedKey) ?? phase32MockCase.evidenceItems[0],
@@ -409,7 +487,7 @@ export function CaseReviewCommandCenter() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <StatusBadge label="Phase 3.4 timeline polish" tone="bronze" />
+                <StatusBadge label="Phase 3.5 manual review polish" tone="bronze" />
                 <StatusBadge label={phase32MockCase.workflowStatus} tone="amber" />
                 <StatusBadge label="Mock/local data only" />
               </div>
@@ -490,45 +568,13 @@ export function CaseReviewCommandCenter() {
               </p>
             </section>
 
-            <section className="rounded-lg border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.68)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.70)]">
-              <SectionLabel icon={NotebookText} label="Notes and manual decision" />
-              <label className="mt-3 block text-xs font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]" htmlFor="manual-decision">
-                Reviewer-entered decision state
-              </label>
-              <select
-                className="mt-2 w-full rounded-md border border-[rgba(125,103,64,0.24)] bg-[var(--cg-bg-paper)] px-3 py-2 text-sm text-[var(--cg-text)]"
-                id="manual-decision"
-                onChange={(event) => setManualDecision(event.target.value as (typeof manualDecisionOptions)[number])}
-                value={manualDecision}
-              >
-                {manualDecisionOptions.map((option) => (
-                  <option key={option}>{option}</option>
-                ))}
-              </select>
-              <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-[var(--cg-text-muted)]" htmlFor="internal-note">
-                Internal note placeholder
-              </label>
-              <textarea
-                className="mt-2 min-h-24 w-full resize-y rounded-md border border-[rgba(125,103,64,0.24)] bg-[var(--cg-bg-paper)] px-3 py-2 text-sm leading-6 text-[var(--cg-text)]"
-                id="internal-note"
-                onChange={(event) => setInternalNote(event.target.value)}
-                placeholder="Add local reviewer notes here. Do not paste raw evidence, private customer details, or raw OCR."
-                value={internalNote}
-              />
-              <ul className="mt-3 space-y-2">
-                {phase32MockCase.internalNotesPlaceholder.map((note) => (
-                  <li key={note} className="text-xs leading-5 text-[var(--cg-text-muted)]">
-                    {note}
-                  </li>
-                ))}
-              </ul>
-            </section>
+            <ManualReviewWorkspace selectedEvidence={selectedEvidence} />
 
             <section className="rounded-lg border border-[rgba(95,143,100,0.30)] bg-[rgba(95,143,100,0.08)] p-4">
               <SectionLabel icon={MessageSquareText} label="Customer-safe wording" />
               <p className="mt-3 text-sm leading-6 text-[var(--cg-text)]">{phase32MockCase.customerSafeWordingDraft}</p>
               <p className="mt-3 text-xs leading-5 text-[var(--cg-text-muted)]">
-                Customer-safe wording is separate from internal notes and does not state a final automated outcome.
+                Customer-safe wording is separate from internal notes and does not present a support outcome.
               </p>
             </section>
           </aside>

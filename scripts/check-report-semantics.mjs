@@ -314,8 +314,8 @@ const requiredCaseCommandCenterSignals = [
     patterns: [/import \{ CaseReviewCommandCenter \} from "@\/components\/CaseReviewCommandCenter";/],
   },
   {
-    label: "phase 3.4 timeline polish shell label",
-    patterns: [/Phase 3\.4 timeline polish/],
+    label: "phase 3.5 manual review polish shell label",
+    patterns: [/Phase 3\.5 manual review polish/],
   },
   {
     label: "mock local data only label",
@@ -382,6 +382,26 @@ const requiredCaseCommandCenterSignals = [
     patterns: [/Selected evidence trail/],
   },
   {
+    label: "phase 3.5 manual review workspace label",
+    patterns: [/Manual review workspace/],
+  },
+  {
+    label: "phase 3.5 mock local review plan marker",
+    patterns: [/Mock local review plan/],
+  },
+  {
+    label: "phase 3.5 not-saved boundary",
+    patterns: [/not saved, submitted, or sent to any external system/],
+  },
+  {
+    label: "phase 3.5 selected evidence rationale",
+    patterns: [/Selected evidence rationale/],
+  },
+  {
+    label: "phase 3.5 policy safety reminders",
+    patterns: [/Policy and safety reminders/],
+  },
+  {
     label: "external verification not performed",
     patterns: [/External Verification: Not performed/, /externalVerification: "Not performed"/],
   },
@@ -434,6 +454,8 @@ const forbiddenCaseCommandCenterPatterns = [
   /LocalAnalysisResult/,
   /MockAnalysisReport/,
   /<input[^>]*type=["']file["']/i,
+  /<textarea\b/i,
+  /<select\b/i,
   /createObjectURL/,
   /\bobjectUrl\b/,
   /\bimageUrl\b/,

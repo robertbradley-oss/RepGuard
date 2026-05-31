@@ -65,6 +65,26 @@ export type CaseTimelineEvent = {
   reviewerImpact: string;
 };
 
+export type CaseManualDecisionTone = "Active review" | "Escalation path" | "Info needed" | "Safety hold";
+
+export type CaseManualDecisionState = {
+  key: string;
+  label: string;
+  tone: CaseManualDecisionTone;
+  detail: string;
+};
+
+export type CaseManualReviewWorkspace = {
+  summary: string;
+  notSavedBoundary: string;
+  decisionStates: readonly CaseManualDecisionState[];
+  internalNotes: readonly string[];
+  policyConsiderations: readonly string[];
+  selectedEvidenceRationale: Record<string, readonly string[]>;
+  customerSafeHandoff: string;
+  timelineConnection: string;
+};
+
 export type CaseReviewSummary = {
   evidenceReviewed: string;
   missingInformation: readonly string[];
@@ -80,7 +100,7 @@ export type ClaimGuardLocalCase = {
   customerClaimSummary: string;
   evidenceItems: readonly CaseEvidenceItem[];
   reviewSummary: CaseReviewSummary;
-  internalNotesPlaceholder: readonly string[];
+  manualReviewWorkspace: CaseManualReviewWorkspace;
   customerSafeWordingDraft: string;
   timeline: readonly CaseTimelineEvent[];
 };
@@ -203,10 +223,71 @@ export const phase32MockCase: ClaimGuardLocalCase = {
     recommendedSupportAction:
       "Continue manual review, compare eligible receipt context with policy, and request clearer evidence if needed.",
   },
-  internalNotesPlaceholder: [
-    "Internal note placeholder: summarize reviewer observations without raw evidence details.",
-    "Manual decision placeholder: keep human-entered status separate from automated review signals.",
-  ],
+  manualReviewWorkspace: {
+    summary:
+      "Manual review is still required because the case combines eligible receipt context, screenshot context, and unsupported product-photo-like evidence.",
+    notSavedBoundary:
+      "Static mock review plan only. These notes and decision states are not saved, submitted, or sent to any external system.",
+    decisionStates: [
+      {
+        key: "needs-review",
+        label: "Needs review",
+        tone: "Active review",
+        detail: "Reviewer should compare available evidence with support policy before choosing a customer response.",
+      },
+      {
+        key: "request-more-information",
+        label: "Request more information",
+        tone: "Info needed",
+        detail: "A clearer eligible receipt copy may be useful if policy requires stronger purchase context.",
+      },
+      {
+        key: "escalate",
+        label: "Escalate",
+        tone: "Escalation path",
+        detail: "Senior review may be useful when mixed evidence types need a second policy check.",
+      },
+      {
+        key: "reviewer-required",
+        label: "Reviewer decision required",
+        tone: "Safety hold",
+        detail: "The shell does not decide the claim, send a message, or update a case record.",
+      },
+    ],
+    internalNotes: [
+      "Compare receipt summary with screenshot context before requesting more information.",
+      "Keep unsupported product-photo-like evidence in manual review; no automated analysis result is available.",
+      "Use customer-safe wording if asking for a clearer receipt or additional context.",
+    ],
+    policyConsiderations: [
+      "External Verification: Not performed",
+      "Verification Status: Not externally verified",
+      "Support action should remain reviewer-entered",
+      "Do not copy internal notes into customer-facing wording",
+    ],
+    selectedEvidenceRationale: {
+      "receipt-summary": [
+        "Receipt summary can support policy comparison, but it is not externally verified.",
+        "Review local evidence-quality signals alongside other case context.",
+      ],
+      "order-context": [
+        "Screenshot context may help align dates and item context.",
+        "A clearer copy may be needed if the submitted context is not readable enough.",
+      ],
+      "photo-unsupported": [
+        "Product-photo-like evidence remains unsupported and manual-review-only.",
+        "No OCR, metadata processing, or product-photo runtime analysis was performed.",
+      ],
+      "customer-message": [
+        "Customer context can guide the next support question.",
+        "Keep internal rationale separate from customer-safe response wording.",
+      ],
+    },
+    customerSafeHandoff:
+      "Use the customer-safe wording panel when asking for clearer evidence or additional context; do not include internal review rationale.",
+    timelineConnection:
+      "Timeline entries show when notes, wording, manual review, and escalation markers were staged as mock events.",
+  },
   customerSafeWordingDraft:
     "Thanks for sending the information. We are reviewing the available evidence and may ask for a clearer receipt or additional context if it is needed to complete the support review.",
   timeline: [
@@ -286,7 +367,7 @@ export const phase32MockCase: ClaimGuardLocalCase = {
       detail: "Case status reflects mixed evidence and unsupported manual-review-only evidence.",
       caseStatusAfter: "Manual review",
       relatedEvidenceKeys: ["receipt-summary", "order-context", "photo-unsupported"],
-      reviewerImpact: "Keeps the workflow human-entered and avoids automated support disposition.",
+      reviewerImpact: "Keeps the workflow human-entered and avoids a system-made support recommendation.",
     },
     {
       key: "rep-note-drafted",
@@ -309,7 +390,7 @@ export const phase32MockCase: ClaimGuardLocalCase = {
       timestamp: "Today 09:46",
       relativeTime: "8 minutes ago",
       actor: "Reviewer",
-      detail: "Draft wording asks for clearer receipt context if needed and avoids final automated disposition.",
+      detail: "Draft wording asks for clearer receipt context if needed and avoids presenting a support outcome.",
       caseStatusAfter: "Manual review",
       relatedEvidenceKeys: ["customer-message"],
       reviewerImpact: "Gives the rep a careful response draft while the case remains under manual review.",
