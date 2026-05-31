@@ -104,6 +104,10 @@ const probeModules = [
     path: "src/lib/analysis/ocr-fixture-harness.probe.ts",
     exportName: "OCR_FIXTURE_HARNESS_DEVELOPER_PROBE",
   },
+  {
+    path: "src/lib/analysis/ocr-extraction-contract.probe.ts",
+    exportName: "OCR_EXTRACTION_CONTRACT_DEVELOPER_PROBE",
+  },
 ];
 
 async function runProductPhotoProbes() {

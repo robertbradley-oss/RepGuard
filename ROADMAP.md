@@ -130,7 +130,7 @@ Deferred after Phase 3 closure until explicitly reopened or approved in a future
 
 ## Phase 4: Stronger OCR and AI Integrations
 
-Status: Phase 4.0 planning-only real AI/OCR/photo intelligence readiness is documented in `PHASE_4_0_AI_OCR_PHOTO_INTELLIGENCE_READINESS.md`. Phase 4.1 docs-only OCR/provider architecture planning is documented in `PHASE_4_1_OCR_PROVIDER_ARCHITECTURE_PLAN.md`. Phase 4.2 adds a non-live synthetic OCR fixture harness in `src/lib/analysis/ocr-fixture-harness.ts` with probe coverage in `src/lib/analysis/ocr-fixture-harness.probe.ts`. Real AI/OCR/photo analysis has not started, and no real provider-backed analysis should be implemented until a later explicitly approved implementation slice.
+Status: Phase 4.0 planning-only real AI/OCR/photo intelligence readiness is documented in `PHASE_4_0_AI_OCR_PHOTO_INTELLIGENCE_READINESS.md`. Phase 4.1 docs-only OCR/provider architecture planning is documented in `PHASE_4_1_OCR_PROVIDER_ARCHITECTURE_PLAN.md`. Phase 4.2 adds a non-live synthetic OCR fixture harness in `src/lib/analysis/ocr-fixture-harness.ts` with probe coverage in `src/lib/analysis/ocr-fixture-harness.probe.ts`. Phase 4.3 adds a non-live provider-neutral OCR extraction contract in `src/lib/analysis/ocr-extraction-contract.ts` with probe coverage in `src/lib/analysis/ocr-extraction-contract.probe.ts`. Real AI/OCR/photo analysis has not started, and no real provider-backed analysis should be implemented until a later explicitly approved implementation slice.
 
 Meaning:
 
@@ -165,7 +165,15 @@ Phase 4.2 synthetic OCR fixture harness decision:
 - Fixture coverage includes clean receipt OCR, Amazon-like order OCR, missing total, missing merchant, conflicting date/total cues, noisy OCR text, receipt-like incomplete text, unsupported non-receipt text, ambiguous marketplace/order-screen text, synthetic provider timeout, and empty OCR output.
 - The probe proves the harness remains isolated from `analyzeEvidenceFile`, live report mapping, `ClaimReviewWorkflow`, `ProductPhotoReviewPanel`, upload, providers, storage, integrations, case queues, and real evidence.
 - Phase 4.2 does not change receipt behavior, does not migrate `LocalAnalysisResult`, does not add OCR providers/SDKs/env vars/routes/components, and does not process real evidence.
-- The next safe task is Phase 4.3 provider-neutral OCR extraction contract implementation, non-live and unwired, only after the synthetic fixture harness remains green.
+- Phase 4.3 provider-neutral OCR extraction contract decision:
+
+- The provider-neutral OCR extraction contract is non-live, synthetic-only, provider-free, route-free, UI-free, upload-free, storage-free, and real-evidence-free.
+- The contract normalizes Phase 4.2 synthetic fixture outputs into extracted text blocks, structured receipt fields, field-level confidence, extraction confidence, manual-review drivers, limitations, unsupported outcome details, synthetic provider-failure details, safe summary wording, review signal levels, and manual-review requirements.
+- OCR confidence remains a review signal, not proof. Missing, conflicting, low-confidence, unsupported, ambiguous, empty, and provider-unavailable states drive manual review or operational limitation wording rather than any final outcome.
+- Amazon-like receipt/order-screen structure remains readiness and manual-comparison context only. It does not become a source verdict or external verification claim.
+- The probe proves the contract remains isolated from `analyzeEvidenceFile`, live report mapping, `ClaimReviewWorkflow`, `ProductPhotoReviewPanel`, upload, providers, storage, integrations, case queues, and real evidence.
+- Phase 4.3 does not change receipt behavior, does not migrate `LocalAnalysisResult`, does not add OCR providers/SDKs/env vars/routes/components, and does not process real evidence.
+- The next safe task is Phase 4.4 server-side OCR route and data-flow planning only, with no route implementation, provider calls, SDKs, credentials, uploads, storage, persistence, real evidence, or live workflow wiring.
 
 Deferred until a later Phase 4 implementation slice is explicitly opened:
 

@@ -46,6 +46,8 @@ const filesToCheck = [
   "src/lib/analysis/workflow-pre-analysis-gate-boundary.probe.ts",
   "src/lib/analysis/ocr-fixture-harness.ts",
   "src/lib/analysis/ocr-fixture-harness.probe.ts",
+  "src/lib/analysis/ocr-extraction-contract.ts",
+  "src/lib/analysis/ocr-extraction-contract.probe.ts",
   "src/components/ProductPhotoReviewPanel.tsx",
   "src/components/ProductPhotoReviewPanel.probe.tsx",
   "src/components/CaseReviewCommandCenter.tsx",
@@ -91,6 +93,9 @@ const productPhotoCorpus = [...fileContents]
 const ocrFixtureHarness = fileContents.get("src/lib/analysis/ocr-fixture-harness.ts") ?? "";
 const ocrFixtureProbe = fileContents.get("src/lib/analysis/ocr-fixture-harness.probe.ts") ?? "";
 const ocrFixtureCorpus = `${ocrFixtureHarness}\n${ocrFixtureProbe}`;
+const ocrExtractionContract = fileContents.get("src/lib/analysis/ocr-extraction-contract.ts") ?? "";
+const ocrExtractionContractProbe = fileContents.get("src/lib/analysis/ocr-extraction-contract.probe.ts") ?? "";
+const ocrExtractionContractCorpus = `${ocrExtractionContract}\n${ocrExtractionContractProbe}`;
 
 const requiredSemanticSignals = [
   {
@@ -301,6 +306,100 @@ const forbiddenOcrFixtureHarnessPatterns = [
   /claimOutcome|automaticDisposition|externalDecision/,
 ];
 
+const requiredOcrExtractionContractSignals = [
+  {
+    label: "Phase 4.3 OCR extraction contract marker",
+    patterns: [/phase-4\.3-provider-neutral-ocr-extraction-contract/],
+  },
+  {
+    label: "provider-neutral OCR input contract",
+    patterns: [/ProviderNeutralOcrInputContract/],
+  },
+  {
+    label: "normalized OCR receipt extraction result",
+    patterns: [/NormalizedOcrReceiptExtractionResult/],
+  },
+  {
+    label: "structured receipt fields",
+    patterns: [/structuredFields/],
+  },
+  {
+    label: "field confidence model",
+    patterns: [/NormalizedOcrFieldConfidence/],
+  },
+  {
+    label: "extraction confidence model",
+    patterns: [/NormalizedOcrExtractionConfidence/],
+  },
+  {
+    label: "manual review driver model",
+    patterns: [/NormalizedOcrManualReviewDriver/],
+  },
+  {
+    label: "limitations model",
+    patterns: [/NormalizedOcrLimitation/],
+  },
+  {
+    label: "unsupported outcome model",
+    patterns: [/NormalizedOcrUnsupportedOutcome/],
+  },
+  {
+    label: "provider failure outcome model",
+    patterns: [/NormalizedOcrProviderFailureOutcome/],
+  },
+  {
+    label: "safe summary model",
+    patterns: [/NormalizedOcrSafeSummary/],
+  },
+  {
+    label: "confidence as review signal",
+    patterns: [/Confidence is a review signal, not proof or a final decision/],
+  },
+  {
+    label: "provider failure operational only",
+    patterns: [/operationalOnly: true/],
+  },
+  {
+    label: "non-live contract flags",
+    patterns: [/runtimeLive: false/, /providerFree: true/, /routeFree: true/, /uploadFree: true/, /storageFree: true/],
+  },
+  {
+    label: "OCR extraction contract probe export",
+    patterns: [/OCR_EXTRACTION_CONTRACT_DEVELOPER_PROBE/],
+  },
+];
+
+const forbiddenOcrExtractionContractImports = [
+  "@/lib/analysis/analyzer",
+  "@/lib/analysis/ocr-service",
+  "@/lib/analysis/receipt-parser",
+  "@/lib/analysis/report-adapter",
+  "@/lib/analysis/scoring",
+  "@/lib/analysis/types",
+  "@/components/ClaimReviewWorkflow",
+  "@/components/ProductPhotoReviewPanel",
+  "@/components/UploadPanel",
+  "@/lib/test-evidence",
+];
+
+const forbiddenOcrExtractionContractPatterns = [
+  /\bFile\b/,
+  /\bBlob\b/,
+  /createObjectURL/,
+  /\bobjectUrl\b/,
+  /\bimageUrl\b/,
+  /\bdataUrl\b/,
+  /\bfetch\s*\(/,
+  /localStorage/,
+  /sessionStorage/,
+  /process\.env/,
+  /api\/|route\.ts|page\.tsx/,
+  /providerPayload|providerResponse|providerRequestId/,
+  /storageHandle|integrationHandle|caseQueueHandle/,
+  /customerId|ticketId|claimId|caseId|evidenceId/,
+  /claimOutcome|automaticDisposition|externalDecision/,
+];
+
 const unsafeHighScoreProofPattern = /High score(?![^.]*does not prove)[^.]*\b(?:proves?|confirms?|verifies?|authentic|real)\b/i;
 const unsafeExternalVerificationPatterns = [
   /externalVerification\s*:\s*["'`](?!Not performed)/i,
@@ -331,6 +430,12 @@ for (const signal of requiredOcrFixtureHarnessSignals) {
   }
 }
 
+for (const signal of requiredOcrExtractionContractSignals) {
+  if (!signal.patterns.some((pattern) => pattern.test(ocrExtractionContractCorpus))) {
+    failures.push(`Missing provider-neutral OCR extraction contract signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -352,6 +457,18 @@ for (const importPath of forbiddenOcrFixtureHarnessImports) {
 for (const pattern of forbiddenOcrFixtureHarnessPatterns) {
   if (pattern.test(ocrFixtureHarness)) {
     failures.push(`Synthetic OCR fixture harness privacy/import check failed: harness uses forbidden pattern ${pattern}`);
+  }
+}
+
+for (const importPath of forbiddenOcrExtractionContractImports) {
+  if (ocrExtractionContract.includes(importPath)) {
+    failures.push(`OCR extraction contract boundary check failed: contract imports forbidden path ${importPath}`);
+  }
+}
+
+for (const pattern of forbiddenOcrExtractionContractPatterns) {
+  if (pattern.test(ocrExtractionContract)) {
+    failures.push(`OCR extraction contract privacy/import check failed: contract uses forbidden pattern ${pattern}`);
   }
 }
 
