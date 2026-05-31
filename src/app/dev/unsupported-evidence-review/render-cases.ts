@@ -20,7 +20,7 @@ type CommonUnsupportedEvidenceReviewFields = Omit<
   "outcome" | "evidenceTypeLabel" | "supportRepSummary" | "confidenceTreatment" | "internalNotes"
 >;
 
-const SCORE_BOUNDARY_NOTICE = ["This result is not a receipt auth", "enticity score."].join("");
+const SCORE_BOUNDARY_NOTICE = "This result is not a receipt verification outcome.";
 
 const COMMON_GUIDANCE = [
   "Manual review recommended before action.",

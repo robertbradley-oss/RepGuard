@@ -2691,8 +2691,8 @@ const requiredUnsupportedEvidenceReviewRenderCaseSignals = [
     patterns: [/Use available evidence and support policy/],
   },
   {
-    label: "render cases receipt score boundary notice",
-    patterns: [/\["This result is not a receipt auth", "enticity score\."\]\.join\(""\)/],
+    label: "render cases receipt verification outcome boundary notice",
+    patterns: [/This result is not a receipt verification outcome\./],
   },
 ];
 
@@ -2748,6 +2748,8 @@ const forbiddenUnsupportedEvidenceReviewHostPatterns = [
 ];
 
 const forbiddenUnsupportedEvidenceVisiblePhrases = [
+  /receipt score/i,
+  /authenticity score/i,
   /fr(?:aud confirmed|aud)/i,
   /fake receipt/i,
   /forged/i,
@@ -2761,6 +2763,22 @@ const forbiddenUnsupportedEvidenceVisiblePhrases = [
   /automated deny/i,
   /approved|rejected/i,
 ];
+
+const materializeSimpleJoinedStringLiterals = (source) =>
+  source.replace(/\[\s*((?:"(?:[^"\\]|\\.)*"\s*,\s*)+"(?:[^"\\]|\\.)*")\s*\]\.join\(""\)/g, (_match, list) => {
+    const values = [...list.matchAll(/"((?:[^"\\]|\\.)*)"/g)].map(([, value]) =>
+      value.replace(/\\(["\\/bfnrt])/g, (_escape, char) => {
+        if (char === "b") return "\b";
+        if (char === "f") return "\f";
+        if (char === "n") return "\n";
+        if (char === "r") return "\r";
+        if (char === "t") return "\t";
+        return char;
+      }),
+    );
+
+    return `${_match}\n${values.join("")}`;
+  });
 
 for (const signal of requiredUnsupportedEvidenceReviewHostPageSignals) {
   if (!signal.patterns.some((pattern) => pattern.test(unsupportedEvidenceReviewHostPage))) {
@@ -2786,7 +2804,7 @@ for (const pattern of forbiddenUnsupportedEvidenceReviewHostPatterns) {
   }
 }
 
-const unsupportedEvidenceReviewVisibleCorpus = unsupportedEvidenceReviewHostCorpus
+const unsupportedEvidenceReviewVisibleCorpus = materializeSimpleJoinedStringLiterals(unsupportedEvidenceReviewHostCorpus)
   .replace(/outcome:\s*"legacy-damage-photo-quarantine"/g, "")
   .replace(/proofOfPurchaseLanguageShown/g, "");
 
