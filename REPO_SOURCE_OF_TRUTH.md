@@ -17,7 +17,7 @@ The OneDrive Documents path may exist as a shell starting point, but it is not t
 ## Phase-Aware Workflow
 
 - Phase 1 Receipt Intelligence is closed, deployed, and production-smoked.
-- Phase 2 Photo Evidence is closed as non-live unsupported/product-photo readiness after the Phase 2.9.1 review-only closeout. Phase 2.6 is closed after pushed commit `6f3170a` (`fix: tighten unsupported evidence wording guards`), and Phase 2.9.0 is pushed at `095fd18` (`docs: plan phase 2.9 live opt-in readiness`).
+- Phase 2 Photo Evidence is closed as non-live unsupported/product-photo readiness after the Phase 2.9.1 review-only closeout and final closure alignment pushed at `3779ab0` (`docs: close phase 2 non-live readiness`). Phase 2.6 is closed after pushed commit `6f3170a` (`fix: tighten unsupported evidence wording guards`), and Phase 2.9.0 is pushed at `095fd18` (`docs: plan phase 2.9 live opt-in readiness`).
 - Phase 2.4 adapter-readiness and runtime-blocker planning is complete.
 - A guarded, non-live product-photo adapter contract exists and is pushed.
 - A pre-analysis evidence gate exists and is pushed, but remains decision-only and unwired. A default-off pre-analysis gate runtime wrapper/probe also exists and is pushed, but remains unwired from live callers.
@@ -45,7 +45,8 @@ The OneDrive Documents path may exist as a shell starting point, but it is not t
 - No deployment occurred for Phase 2.8.3. Product-photo/unsupported-evidence runtime remains non-live, unsupported-evidence live UI does not exist, `ClaimReviewWorkflow` remains unwired, and receipt behavior remains unchanged.
 - Phase 2.9.0 is docs-only planning in `PHASE_2_9_0_UNSUPPORTED_EVIDENCE_LIVE_OPT_IN_READINESS_PLAN.md`. It decides unsupported evidence is not ready for live opt-in implementation yet.
 - Phase 2.9.1 review-only closeout passed. Phase 2 is closed as non-live unsupported/product-photo readiness. Product-photo/unsupported-evidence runtime remains non-live; live opt-in remains blocked; the pre-analysis wrapper remains default-off and unwired; the workflow boundary helper remains probe-only/default-off/unwired; the dev-only unsupported-evidence bridge remains synthetic-only and production-blocked with 404 under `next start`; `ClaimReviewWorkflow` remains unwired; unsupported-evidence live UI does not exist; `ProductPhotoReviewPanel` remains unrouted; `analyzeEvidenceFile` remains the receipt analyzer entrypoint; `LocalAnalysisResult` remains receipt-shaped; upload/report/parser/scoring/fixtures/provider/storage/integration/case-queue/OCR/metadata paths remain protected; receipt behavior remains unchanged; no deployment occurred; and Phase 3 has not started.
-- The next safe task is Phase 3.0 planning-only case workflow readiness. Do not start Phase 3 implementation from this checkpoint.
+- Phase 3.0 planning-only case workflow readiness is documented in `PHASE_3_0_CASE_WORKFLOW_READINESS_PLAN.md`. It defines the case object concept, evidence model, UX architecture, safety boundaries, technical boundaries, Phase 1/2 inheritance, and recommended Phase 3 sequence without implementing routes, components, runtime wiring, persistence, integrations, or receipt behavior changes.
+- The next safe task is Phase 3.1 design system/case workflow concept planning. Do not start Phase 3 implementation from this checkpoint.
 - Do not start product-photo runtime, UI/upload wiring, analyzer routing, live report mapping, provider, storage, integration, or case-queue work until Robert explicitly opens that slice.
 - Future-phase planning is allowed when requested.
 - Future-phase implementation requires explicit approval from Robert.

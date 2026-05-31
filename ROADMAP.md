@@ -51,7 +51,7 @@ Explicitly deferred from Phase 1:
 
 ## Phase 2: Photo Evidence
 
-Status: Closed as non-live unsupported/product-photo readiness after the Phase 2.9.1 review-only closeout. Product-photo and unsupported-evidence runtime remain non-live; unsupported evidence is not ready for live opt-in implementation; and any future runtime/UI/upload/report/provider/storage/integration/case-queue/OCR/metadata work requires a separate explicit approval.
+Status: Closed as non-live unsupported/product-photo readiness after the Phase 2.9.1 review-only closeout and final closure alignment pushed at `3779ab0` (`docs: close phase 2 non-live readiness`). Product-photo and unsupported-evidence runtime remain non-live; unsupported evidence is not ready for live opt-in implementation; and any future runtime/UI/upload/report/provider/storage/integration/case-queue/OCR/metadata work requires a separate explicit approval.
 
 Meaning:
 
@@ -88,7 +88,7 @@ Deferred until Robert explicitly opens a later Phase 2 runtime slice:
 
 ## Phase 3: Case Review Workflow
 
-Status: Future phase. Phase 3 may begin as planning-only case workflow readiness; implementation is not approved until Robert explicitly opens a named implementation slice.
+Status: Phase 3.0 planning-only case workflow readiness is documented in `PHASE_3_0_CASE_WORKFLOW_READINESS_PLAN.md`. Phase 3 implementation is not approved until Robert explicitly opens a named implementation slice.
 
 Meaning:
 
@@ -99,12 +99,24 @@ Meaning:
 - Evidence grouping across receipts, photos, and context.
 - Safe support workflows that keep humans in the decision loop.
 
+Current planning boundary:
+
+- Phase 3 should build case-review workflow foundations before live unsupported-evidence opt-in, product-photo runtime, integrations, storage, auth, or dashboards.
+- The recommended first build target is a non-persistent local case review shell, but only after Phase 3.1 defines the case workflow concept and Robert approves implementation.
+- Phase 3 should inherit Phase 1 receipt behavior unchanged: `analyzeEvidenceFile` remains the receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt scores remain local evidence-quality/internal-consistency signals.
+- Phase 3 should inherit Phase 2 unsupported/product-photo readiness as non-live stopped/manual-review state planning only. Unsupported evidence remains outside receipt reports and `ProductPhotoReviewPanel`; product-photo runtime remains non-live.
+- The planned case concept includes case id, status, customer claim summary, evidence items, review notes, manual decision, recommended support action, customer-safe wording, and timeline/audit trail.
+- Planned evidence categories include receipt evidence, unsupported/product-photo evidence, order screenshots, shipping confirmations, and customer message/context.
+- Planned UX architecture includes a case review shell, evidence list/sidebar, selected evidence panel, review summary panel, notes/manual decision panel, customer-safe wording panel, and timeline/history area.
+
 Deferred until Phase 3 is explicitly opened:
 
 - Persistent case database.
 - Authenticated reviewer accounts.
 - Production case queues.
 - Ticket-system writebacks.
+- Live unsupported-evidence opt-in.
+- Product-photo runtime.
 
 ## Phase 4: Stronger OCR and AI Integrations
 
