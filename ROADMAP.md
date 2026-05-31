@@ -130,7 +130,7 @@ Deferred after Phase 3 closure until explicitly reopened or approved in a future
 
 ## Phase 4: Stronger OCR and AI Integrations
 
-Status: Phase 4.0 planning-only real AI/OCR/photo intelligence readiness is documented in `PHASE_4_0_AI_OCR_PHOTO_INTELLIGENCE_READINESS.md`. Phase 4.1 docs-only OCR/provider architecture planning is documented in `PHASE_4_1_OCR_PROVIDER_ARCHITECTURE_PLAN.md`. Phase 4.2 adds a non-live synthetic OCR fixture harness in `src/lib/analysis/ocr-fixture-harness.ts` with probe coverage in `src/lib/analysis/ocr-fixture-harness.probe.ts`. Phase 4.3 adds a non-live provider-neutral OCR extraction contract in `src/lib/analysis/ocr-extraction-contract.ts` with probe coverage in `src/lib/analysis/ocr-extraction-contract.probe.ts`. Phase 4.4 adds planning-only server-side OCR route and data-flow design in `PHASE_4_4_SERVER_SIDE_OCR_ROUTE_DATA_FLOW_PLAN.md`. Real AI/OCR/photo analysis has not started, and no real provider-backed analysis should be implemented until a later explicitly approved implementation slice.
+Status: Phase 4.0 planning-only real AI/OCR/photo intelligence readiness is documented in `PHASE_4_0_AI_OCR_PHOTO_INTELLIGENCE_READINESS.md`. Phase 4.1 docs-only OCR/provider architecture planning is documented in `PHASE_4_1_OCR_PROVIDER_ARCHITECTURE_PLAN.md`. Phase 4.2 adds a non-live synthetic OCR fixture harness in `src/lib/analysis/ocr-fixture-harness.ts` with probe coverage in `src/lib/analysis/ocr-fixture-harness.probe.ts`. Phase 4.3 adds a non-live provider-neutral OCR extraction contract in `src/lib/analysis/ocr-extraction-contract.ts` with probe coverage in `src/lib/analysis/ocr-extraction-contract.probe.ts`. Phase 4.4 adds planning-only server-side OCR route and data-flow design in `PHASE_4_4_SERVER_SIDE_OCR_ROUTE_DATA_FLOW_PLAN.md`. Phase 4.5 adds planning-only server-side OCR route skeleton implementation planning in `PHASE_4_5_SERVER_SIDE_OCR_ROUTE_SKELETON_PLAN.md`. Real AI/OCR/photo analysis has not started, and no real provider-backed analysis should be implemented until a later explicitly approved implementation slice.
 
 Meaning:
 
@@ -183,6 +183,17 @@ Phase 4.2 synthetic OCR fixture harness decision:
 - The Phase 4.3 OCR extraction contract remains the provider-neutral normalization boundary. `ocr-fixture-harness.ts` remains synthetic test input only.
 - Phase 4.4 does not change receipt behavior, does not migrate `LocalAnalysisResult`, does not add OCR providers/SDKs/env vars/routes/components/uploads/storage/persistence, and does not process real evidence.
 - The next safe task is Phase 4.5 server-side OCR route skeleton implementation planning only, or a separately approved synthetic-only/mock-provider route skeleton; no live route, provider call, SDK, credential, upload, storage, persistence, real evidence, or live workflow wiring should start without explicit approval.
+
+- Phase 4.5 server-side OCR route skeleton planning decision:
+
+- Phase 4.5 is planning-only and does not create `POST /api/analysis/ocr`.
+- The future Phase 4.6 skeleton route should be `POST /api/analysis/ocr`, but it must remain JSON-only, synthetic-only, mock-only, provider-free, SDK-free, env-free, upload-free, storage-free, persistence-free, UI-free, live-analyzer-free, and receipt-behavior-free.
+- Future accepted input should be limited to allowlisted synthetic fixture keys or approved synthetic OCR fixture-like JSON payloads. Phase 4.6 must reject real files, binary uploads, multipart form data, object URLs, storage handles, provider payloads, and customer identifiers.
+- The future output should use the Phase 4.2 OCR fixture harness and Phase 4.3 extraction contract to return review-support-only extracted text block summaries, structured fields, field confidence, extraction confidence, manual-review drivers, limitations, safe summaries, unsupported/provider-failure reasons, review signal level, and manual-review requirements.
+- The future skeleton must not return a fraud score, a fabricated/altered/forged evidence conclusion, a final claim decision, automatic deny/refund wording, live receipt report output, `LocalAnalysisResult`, customer-facing accusation language, or external verification claims.
+- Phase 4.6 must stay isolated from `ClaimReviewWorkflow`, `ProductPhotoReviewPanel`, `analyzeEvidenceFile`, `LocalAnalysisResult`, `report-adapter`, upload flow, receipt parser/scoring/report behavior, case command center route, and production UI paths.
+- Required Phase 4.6 probes should cover route import/isolation, accepted synthetic fixtures, rejected inputs, timeout/failure fixtures, unsafe wording, provider/env/package absence, protected runtime imports, upload/storage/object URL absence, no `LocalAnalysisResult` migration, and no `analyzeEvidenceFile` change.
+- The next safe task is an explicitly requested Phase 4.6 synthetic-only/mock-provider route skeleton implementation. Live OCR/provider work remains blocked.
 
 Deferred until a later Phase 4 implementation slice is explicitly opened:
 
