@@ -101,6 +101,7 @@ const ocrExtractionContractCorpus = `${ocrExtractionContract}\n${ocrExtractionCo
 const ocrRoute = fileContents.get("src/app/api/analysis/ocr/route.ts") ?? "";
 const ocrRouteProbe = fileContents.get("src/app/api/analysis/ocr/route.probe.ts") ?? "";
 const ocrRouteCorpus = `${ocrRoute}\n${ocrRouteProbe}`;
+const phase49ProviderSelectionPlan = readRequiredFile("PHASE_4_9_OCR_PROVIDER_SELECTION_PLAN.md");
 
 const requiredSemanticSignals = [
   {
@@ -456,6 +457,59 @@ const requiredOcrRouteSignals = [
   },
 ];
 
+const requiredPhase49ProviderSelectionSignals = [
+  {
+    label: "Phase 4.9 planning-only marker",
+    patterns: [/Phase 4\.9 is a provider selection planning-only milestone/],
+  },
+  {
+    label: "no implementation scope",
+    patterns: [/does not add OCR providers, SDKs, environment variables, provider abstraction code, uploads/],
+  },
+  {
+    label: "required provider comparison set",
+    patterns: [
+      /OpenAI Vision-style multimodal analysis/,
+      /Google Cloud Vision \/ Document AI/,
+      /AWS Textract/,
+      /Tesseract\/local OCR/,
+      /Hybrid pipeline/,
+    ],
+  },
+  {
+    label: "hybrid staged strategy",
+    patterns: [/OCR-specialized extraction first/, /OpenAI Vision-style reasoning later/, /internal OCR extraction contract as (?:the )?source of truth/],
+  },
+  {
+    label: "review-signal-only safety posture",
+    patterns: [/OCR confidence is a review signal only/, /Vision confidence is a review signal only/],
+  },
+  {
+    label: "external verification not performed",
+    patterns: [/External Verification: Not performed|No external verification was performed/],
+  },
+  {
+    label: "provider payload privacy",
+    patterns: [/No raw provider payload logging/, /No raw real OCR retention without approved policy/],
+  },
+  {
+    label: "Phase 4.10 planning-only next step",
+    patterns: [/Phase 4\.10 should be provider abstraction planning only/],
+  },
+];
+
+const forbiddenPhase49ProviderSelectionPatterns = [
+  /npm\s+(?:install|add)\s+(?:openai|@aws-sdk|@google-cloud)/i,
+  /OPENAI_API_KEY|GOOGLE_APPLICATION_CREDENTIALS|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/,
+  /process\.env\.(?:OPENAI|GOOGLE|AWS|OCR|VISION)/i,
+  /import\s+.*\s+from\s+["'](?:openai|@aws-sdk|@google-cloud)/i,
+  /multipart\/form-data\s+is\s+accepted/i,
+  /raw provider payloads? (?:will|should) be logged/i,
+  /raw real OCR (?:will|should) be retained/i,
+  /real evidence processing (?:is|will be) enabled/i,
+  /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -528,6 +582,12 @@ for (const signal of requiredOcrRouteSignals) {
   }
 }
 
+for (const signal of requiredPhase49ProviderSelectionSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase49ProviderSelectionPlan))) {
+    failures.push(`Missing Phase 4.9 provider-selection planning signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -573,6 +633,12 @@ for (const importPath of forbiddenOcrRouteImports) {
 for (const pattern of forbiddenOcrRouteBehaviorPatterns) {
   if (pattern.test(ocrRoute)) {
     failures.push(`Synthetic OCR route behavior check failed: route uses forbidden pattern ${pattern}`);
+  }
+}
+
+for (const pattern of forbiddenPhase49ProviderSelectionPatterns) {
+  if (pattern.test(phase49ProviderSelectionPlan)) {
+    failures.push(`Phase 4.9 provider-selection planning check failed: forbidden implementation/privacy pattern ${pattern}`);
   }
 }
 
