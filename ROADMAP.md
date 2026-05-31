@@ -88,7 +88,7 @@ Deferred until Robert explicitly opens a later Phase 2 runtime slice:
 
 ## Phase 3: Case Review Workflow
 
-Status: Phase 3.0 planning-only case workflow readiness is documented in `PHASE_3_0_CASE_WORKFLOW_READINESS_PLAN.md`. Phase 3.1 design system/case workflow concept planning is documented in `PHASE_3_1_CASE_WORKFLOW_DESIGN_CONCEPT.md`. Phase 3.2 is pushed and reviewed at `a169de4` (`feat: add phase 3.2 local case command center shell`) as a non-persistent Case Review Command Center shell at `/case-command-center` with mock/local case data only. Phase 3.3 polishes the local shell visual hierarchy and selected-evidence structure while preserving the current warm off-white ClaimGuard evidence workspace direction. Phase 3.4 polishes the local shell timeline/audit trail structure with synthetic mock events only. Phase 3.5 polishes the local shell notes/manual decision workflow structure with static synthetic review-planning data only. Phase 3.6 polishes the local shell customer-safe wording module with static synthetic response-prep variants only. Phase 3.7 polishes the evidence sidebar and selected-evidence detail depth with synthetic/local evidence bench structure only. Phase 3.8 polishes the case header and command/status orientation layer with synthetic/local case context only. Phase 3.9 polishes the review summary intelligence layout with synthetic/local case synthesis only. Phase 3.10 polishes the final responsive/static shell layout across mobile, mid-desktop, and wide desktop only.
+Status: Closed as a static/local Case Review Command Center shell after the Phase 3 closeout readiness checkpoint passed. Latest Phase 3 shell commit: `11aba49` (`feat: polish phase 3.10 case command center shell`). Phase 3.0 planning-only case workflow readiness is documented in `PHASE_3_0_CASE_WORKFLOW_READINESS_PLAN.md`. Phase 3.1 design system/case workflow concept planning is documented in `PHASE_3_1_CASE_WORKFLOW_DESIGN_CONCEPT.md`. Phase 3.2 is pushed and reviewed at `a169de4` (`feat: add phase 3.2 local case command center shell`) as a non-persistent Case Review Command Center shell at `/case-command-center` with mock/local case data only. Phase 3.3 polishes the local shell visual hierarchy and selected-evidence structure while preserving the current warm off-white ClaimGuard evidence workspace direction. Phase 3.4 polishes the local shell timeline/audit trail structure with synthetic mock events only. Phase 3.5 polishes the local shell notes/manual decision workflow structure with static synthetic review-planning data only. Phase 3.6 polishes the local shell customer-safe wording module with static synthetic response-prep variants only. Phase 3.7 polishes the evidence sidebar and selected-evidence detail depth with synthetic/local evidence bench structure only. Phase 3.8 polishes the case header and command/status orientation layer with synthetic/local case context only. Phase 3.9 polishes the review summary intelligence layout with synthetic/local case synthesis only. Phase 3.10 polishes the final responsive/static shell layout across mobile, mid-desktop, and wide desktop only. `/case-command-center` remains static/local, synthetic-only, unlinked, non-persistent, and not deployed; `/` remains the Phase 1 receipt workflow and does not link to `/case-command-center`; receipt behavior is unchanged; `ClaimReviewWorkflow` remains unchanged; `ProductPhotoReviewPanel` remains unrouted; and no persistence, upload behavior, integrations, OCR/metadata, storage/providers, auth/billing, real evidence, live actions, saved state, or deployment was added.
 
 Meaning:
 
@@ -99,7 +99,7 @@ Meaning:
 - Evidence grouping across receipts, photos, and context.
 - Safe support workflows that keep humans in the decision loop.
 
-Current planning boundary:
+Closure boundary:
 
 - Phase 3 should build case-review workflow foundations before live unsupported-evidence opt-in, product-photo runtime, integrations, storage, auth, or dashboards.
 - The first build target is now a non-persistent local case review shell at `/case-command-center`. It is unlinked, browser-local, synthetic-only, and does not add persistence or integrations.
@@ -119,7 +119,7 @@ Current planning boundary:
 - Phase 3.9 improves the `/case-command-center` review summary into a static case-level intelligence layout with reviewed-evidence groups, missing-information checklist, manual-review drivers, review limitations, safe reviewer posture, selected-evidence synthesis linkage, timeline linkage, manual-decision linkage, customer-safe wording linkage, and an internal-only not-a-scoring-result/not-an-automated-decision boundary. It remains static/local, synthetic-only, unlinked, and does not add real scoring, automated decisions, real actions, upload behavior, file inputs, editable saved state, form submission, persistence, deeper live workflow behavior, integrations, OCR/metadata, storage/providers, auth/billing, real evidence, receipt behavior changes, `ClaimReviewWorkflow` wiring, or `ProductPhotoReviewPanel` routing.
 - Phase 3.10 improves the `/case-command-center` final shell responsiveness and visual cohesion with tighter mobile spacing, safer wrapping, better mid-desktop grid behavior, sticky wide-screen scan rails, and reduced right-rail density while preserving the warm off-white ClaimGuard evidence workspace direction. It remains static/local, synthetic-only, unlinked, and does not add real scoring, automated decisions, real actions, upload behavior, file inputs, editable saved state, form submission, persistence, deeper live workflow behavior, integrations, OCR/metadata, storage/providers, auth/billing, real evidence, receipt behavior changes, `ClaimReviewWorkflow` wiring, or `ProductPhotoReviewPanel` routing.
 
-Deferred until Phase 3 is explicitly opened:
+Deferred after Phase 3 closure until explicitly reopened or approved in a future phase:
 
 - Persistent case database.
 - Authenticated reviewer accounts.
@@ -130,7 +130,7 @@ Deferred until Phase 3 is explicitly opened:
 
 ## Phase 4: Stronger OCR and AI Integrations
 
-Status: Future phase.
+Status: Next recommended milestone is Phase 4.0 planning-only real AI/OCR/photo intelligence readiness. Phase 4 implementation has not started, and no real AI/OCR/photo analysis should be implemented until Phase 4 planning explicitly approves scope.
 
 Meaning:
 
