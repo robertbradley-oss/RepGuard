@@ -8,7 +8,9 @@ Phase 2.6.1 follow-up: `PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md` resolves the docs
 
 Phase 2.6.2 follow-up: `src/lib/analysis/pre-analysis-evidence-gate-runtime.ts` now implements the default-off wrapper entrypoint (`analyzeEvidenceFileWithPreAnalysisGate`) and local additive unsupported result shape, and `src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts` proves default-off delegation plus enabled non-allow analyzer blocking. The wrapper is not wired into current UI/upload/report routes; `analyzeEvidenceFile` remains unchanged and receipt-shaped.
 
-Phase 2.5 is closed. Both dev-only harnesses (`/dev/pre-analysis-evidence-gate`, `/dev/product-photo-adapter-readiness`) exist as production-disabled, unlinked, synthetic-only review surfaces. Product-photo runtime remains non-live; `runtimeLive` is false, `manualReviewOnly` is true, `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior is unchanged. Latest pushed commit at planning time: `84ad4a7`.
+Phase 2.6 closeout: Phase 2.6 is closed after pushed commit `6f3170a` (`fix: tighten unsupported evidence wording guards`). Closeout review confirmed `main` clean and synced with `origin/main`; product-photo runtime non-live; the wrapper default-off and unwired from live callers; `analyzeEvidenceFile` unchanged; `LocalAnalysisResult` unchanged; receipt behavior unchanged; UI/upload/report/scoring/parser/fixtures untouched; no ProductPhotoReviewPanel routing added by `6f3170a`; no providers/storage/integrations/case queues; no OCR/metadata processing; and no deployment.
+
+Phase 2.5 is closed. Both dev-only harnesses (`/dev/pre-analysis-evidence-gate`, `/dev/product-photo-adapter-readiness`) exist as production-disabled, unlinked, synthetic-only review surfaces. Product-photo runtime remains non-live; `runtimeLive` is false, `manualReviewOnly` is true, `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior is unchanged.
 
 ## Live Pipeline Reference (current, unchanged)
 

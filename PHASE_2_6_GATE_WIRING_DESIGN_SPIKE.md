@@ -298,7 +298,7 @@ Commit discipline:
 
 ## Recommended Phase 2.6.2
 
-Recommended next milestone: **Phase 2.6.2 default-off guard-only pre-analysis gate wrapper/probe implementation**.
+Recommended milestone result: **Phase 2.6.2 default-off guard-only pre-analysis gate wrapper/probe implementation is complete and pushed**.
 
 Phase 2.6.2 result: `src/lib/analysis/pre-analysis-evidence-gate-runtime.ts` and `src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts` now implement this default-off wrapper/probe boundary. The wrapper remains unwired from live callers and the probe is registered with `check:product-photo-probes`.
 
@@ -309,10 +309,10 @@ Scope:
 - Prove allow-path receipt results are unchanged.
 - Prove non-allow outcomes stop before OCR/metadata and never call product-photo analyzer/report/UI paths.
 
-Do not use Phase 2.6.2 to enable live UI behavior. A later, separately approved Phase 2.6.3 would be needed to decide whether any caller should opt into the wrapper and how unsupported results should surface to reviewers.
+Do not use the completed Phase 2.6 wrapper to enable live UI behavior. A later, separately approved scope decision is needed before any caller can opt into the wrapper or any unsupported result can surface to reviewers.
 
-Suggested next prompt:
+Closeout note:
 
 ```text
-/claimguardagent implement Phase 2.6.2 as a default-off guard-only pre-analysis gate wrapper/probe slice: add only src/lib/analysis/pre-analysis-evidence-gate-runtime-wrapper.ts, src/lib/analysis/pre-analysis-evidence-gate-runtime-wrapper.probe.ts, probe registration, semantic/import/privacy guards, and status docs; keep the wrapper unwired from ClaimReviewWorkflow, UploadPanel, routes, upload, live report adapter mapping, ProductPhotoReviewPanel, product-photo analyzer/routing adapter, providers, storage, integrations, case queues, real photos, and real metadata fixtures; preserve analyzeEvidenceFile and LocalAnalysisResult unchanged; prove receipt allow path returns the existing LocalAnalysisResult unchanged and non-allow product-photo-like/legacy damage-photo/unsupported cases stop before OCR/metadata; run lint, build, report-semantics, product-photo-probes, diff-check, final status, commit if safe, and do not push.
+Phase 2.6 closed after pushed commit 6f3170a. Product-photo runtime remains non-live; the wrapper remains default-off and unwired; analyzeEvidenceFile, LocalAnalysisResult, receipt behavior, UI/upload/report/scoring/parser/fixtures, providers/storage/integrations/case queues, OCR/metadata, deployment, and ProductPhotoReviewPanel routing were not changed by the closeout patch.
 ```
