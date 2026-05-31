@@ -108,6 +108,10 @@ const probeModules = [
     path: "src/lib/analysis/ocr-extraction-contract.probe.ts",
     exportName: "OCR_EXTRACTION_CONTRACT_DEVELOPER_PROBE",
   },
+  {
+    path: "src/app/api/analysis/ocr/route.probe.ts",
+    exportName: "OCR_ROUTE_DEVELOPER_PROBE",
+  },
 ];
 
 async function runProductPhotoProbes() {
