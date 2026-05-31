@@ -103,6 +103,7 @@ const ocrRouteProbe = fileContents.get("src/app/api/analysis/ocr/route.probe.ts"
 const ocrRouteCorpus = `${ocrRoute}\n${ocrRouteProbe}`;
 const phase49ProviderSelectionPlan = readRequiredFile("PHASE_4_9_OCR_PROVIDER_SELECTION_PLAN.md");
 const phase410ProviderAbstractionPlan = readRequiredFile("PHASE_4_10_PROVIDER_ABSTRACTION_PLAN.md");
+const phase411MockProviderAdapterPlan = readRequiredFile("PHASE_4_11_MOCK_PROVIDER_ADAPTER_PLAN.md");
 
 const requiredSemanticSignals = [
   {
@@ -568,6 +569,71 @@ const forbiddenPhase410ProviderAbstractionPatterns = [
   /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
 ];
 
+const requiredPhase411MockProviderAdapterSignals = [
+  {
+    label: "Phase 4.11 planning-only marker",
+    patterns: [/Phase 4\.11 is a mock provider adapter planning-only milestone/],
+  },
+  {
+    label: "no implementation scope",
+    patterns: [/does not add OCR providers, OpenAI Vision implementation, Google\/AWS\/Tesseract implementation, SDKs, environment variables, provider abstraction code, mock provider adapter code/],
+  },
+  {
+    label: "mock-before-live rationale",
+    patterns: [/Provider interface shape/, /Result normalization/, /Timeout and failure modeling/, /Privacy and retention flags/],
+  },
+  {
+    label: "future mock adapter categories",
+    patterns: [/Mock OCR provider/, /Mock multimodal vision reasoning provider/, /Mock provider failure source/, /Mock timeout source/],
+  },
+  {
+    label: "future module boundary",
+    patterns: [/src\/lib\/analysis\/providers\/mock-provider-adapter\.ts/, /src\/lib\/analysis\/providers\/mock-provider-adapter\.probe\.ts/],
+  },
+  {
+    label: "future input rejection boundary",
+    patterns: [/Real files/, /Base64 images/, /Object URLs/, /Customer identifiers/, /Provider payloads/],
+  },
+  {
+    label: "future OCR and vision output planning",
+    patterns: [/Future Mock OCR Output Shape/, /Future Mock Vision Output Shape/, /Confidence-style 1-100 uncertainty value only as a synthetic placeholder/],
+  },
+  {
+    label: "failure and timeout simulation",
+    patterns: [/Provider unavailable/, /Malformed provider response/, /Redaction failure/, /Internal normalization error/],
+  },
+  {
+    label: "privacy and retention flags",
+    patterns: [/File retained: false/, /Raw OCR retained: false/, /External network called: false/, /Environment used: false/],
+  },
+  {
+    label: "route and contract relationship",
+    patterns: [/The existing `POST \/api\/analysis\/ocr` route remains exact fixture-key only/, /Future mock OCR adapter output should feed that contract/],
+  },
+  {
+    label: "Phase 4.12 probe requirements",
+    patterns: [/Mock adapter import\/isolation/, /No provider SDK\/package scan/, /No `LocalAnalysisResult` migration scan/, /No `analyzeEvidenceFile` change scan/],
+  },
+  {
+    label: "safety language rules",
+    patterns: [/OCR confidence is review signal only/, /Altered\/AI-generated-image confidence is uncertainty signal only/, /No single fraud score/],
+  },
+];
+
+const forbiddenPhase411MockProviderAdapterPatterns = [
+  /npm\s+(?:install|add)\s+(?:openai|@aws-sdk|@google-cloud)/i,
+  /OPENAI_API_KEY|GOOGLE_APPLICATION_CREDENTIALS|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/,
+  /process\.env\.(?:OPENAI|GOOGLE|AWS|OCR|VISION)/i,
+  /import\s+.*\s+from\s+["'](?:openai|@aws-sdk|@google-cloud)/i,
+  /type\s+\w*Provider\w*\s*=/,
+  /interface\s+\w*Provider\w*/,
+  /multipart\/form-data\s+is\s+accepted/i,
+  /raw provider payloads? (?:will|should) be logged/i,
+  /raw real OCR (?:will|should) be retained/i,
+  /real evidence processing (?:is|will be) enabled/i,
+  /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -652,6 +718,12 @@ for (const signal of requiredPhase410ProviderAbstractionSignals) {
   }
 }
 
+for (const signal of requiredPhase411MockProviderAdapterSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase411MockProviderAdapterPlan))) {
+    failures.push(`Missing Phase 4.11 mock-provider-adapter planning signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -709,6 +781,12 @@ for (const pattern of forbiddenPhase49ProviderSelectionPatterns) {
 for (const pattern of forbiddenPhase410ProviderAbstractionPatterns) {
   if (pattern.test(phase410ProviderAbstractionPlan)) {
     failures.push(`Phase 4.10 provider-abstraction planning check failed: forbidden implementation/privacy pattern ${pattern}`);
+  }
+}
+
+for (const pattern of forbiddenPhase411MockProviderAdapterPatterns) {
+  if (pattern.test(phase411MockProviderAdapterPlan)) {
+    failures.push(`Phase 4.11 mock-provider-adapter planning check failed: forbidden implementation/privacy pattern ${pattern}`);
   }
 }
 
