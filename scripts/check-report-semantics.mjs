@@ -427,6 +427,10 @@ const requiredOcrRouteSignals = [
     patterns: [/allowedRequestKeys/, /fixtureKey/],
   },
   {
+    label: "OCR route developer warning",
+    patterns: [/Synthetic fixture route skeleton only/, /separately approved milestone/],
+  },
+  {
     label: "OCR route rejects unexpected fields",
     patterns: [/unexpectedFieldFails/],
   },

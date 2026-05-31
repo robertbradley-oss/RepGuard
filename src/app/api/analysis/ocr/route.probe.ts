@@ -259,6 +259,9 @@ async function runOcrRouteProbe() {
 
   const isolationChecks = {
     routeModuleImported: typeof POST === "function" && typeof GET === "function",
+    routeHasDeveloperWarning:
+      routeSource.includes("Synthetic fixture route skeleton only") &&
+      routeSource.includes("separately approved milestone"),
     routeImportsFixtureHarness: routeSource.includes("@/lib/analysis/ocr-fixture-harness"),
     routeImportsExtractionContract: routeSource.includes("@/lib/analysis/ocr-extraction-contract"),
     routeHasNoForbiddenImports: forbiddenRouteImports.every((fragment) => !routeSourceHasForbiddenImport(fragment)),

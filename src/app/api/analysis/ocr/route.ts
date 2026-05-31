@@ -4,6 +4,8 @@ import {
 } from "@/lib/analysis/ocr-extraction-contract";
 import { SYNTHETIC_OCR_FIXTURE_CASES, type SyntheticOcrFixtureCase } from "@/lib/analysis/ocr-fixture-harness";
 
+// Synthetic fixture route skeleton only. Do not wire this route to uploads,
+// UI, providers, storage, or real evidence without a separately approved milestone.
 const ROUTE_MODE = "synthetic-ocr-route-skeleton" as const;
 const ROUTE_SOURCE = "synthetic-fixture" as const;
 const MAX_SYNTHETIC_JSON_BYTES = 4096;
