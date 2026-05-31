@@ -40,12 +40,29 @@ export type CaseEvidenceItem = {
   };
 };
 
+export type CaseTimelineCategory =
+  | "Evidence added"
+  | "Analysis completed"
+  | "Manual review needed"
+  | "Rep note drafted"
+  | "Customer-safe wording prepared"
+  | "Case status changed"
+  | "Escalation marker";
+
+export type CaseTimelineSeverity = "Informational" | "Complete" | "Needs review" | "Escalation";
+
 export type CaseTimelineEvent = {
   key: string;
-  label: string;
+  category: CaseTimelineCategory;
+  statusLabel: string;
+  severity: CaseTimelineSeverity;
   timestamp: string;
+  relativeTime: string;
   actor: string;
   detail: string;
+  caseStatusAfter: CaseWorkflowStatus;
+  relatedEvidenceKeys: readonly string[];
+  reviewerImpact: string;
 };
 
 export type CaseReviewSummary = {
@@ -195,31 +212,120 @@ export const phase32MockCase: ClaimGuardLocalCase = {
   timeline: [
     {
       key: "case-opened",
-      label: "Case opened",
-      timestamp: "Local mock time",
+      category: "Case status changed",
+      statusLabel: "Case opened",
+      severity: "Informational",
+      timestamp: "Today 09:12",
+      relativeTime: "42 minutes ago",
       actor: "Reviewer",
-      detail: "Synthetic case shell loaded with redacted summary fields.",
+      detail: "Synthetic case shell loaded with redacted summary fields and no stored customer evidence.",
+      caseStatusAfter: "Evidence review",
+      relatedEvidenceKeys: [],
+      reviewerImpact: "Creates a local review workspace before any support action is considered.",
     },
     {
-      key: "receipt-summarized",
-      label: "Receipt summary staged",
-      timestamp: "Local mock time",
+      key: "receipt-evidence-added",
+      category: "Evidence added",
+      statusLabel: "Receipt summary added",
+      severity: "Informational",
+      timestamp: "Today 09:18",
+      relativeTime: "36 minutes ago",
       actor: "Reviewer",
-      detail: "Receipt evidence represented as a privacy-safe local summary.",
+      detail: "Receipt evidence was represented as a privacy-safe local summary, without raw OCR or file details.",
+      caseStatusAfter: "Evidence review",
+      relatedEvidenceKeys: ["receipt-summary"],
+      reviewerImpact: "Adds eligible receipt context for comparison with support policy.",
+    },
+    {
+      key: "receipt-analysis-completed",
+      category: "Analysis completed",
+      statusLabel: "Receipt review summary complete",
+      severity: "Complete",
+      timestamp: "Today 09:21",
+      relativeTime: "33 minutes ago",
+      actor: "ClaimGuard shell",
+      detail: "Local receipt review summary is staged as an evidence item; external verification was not performed.",
+      caseStatusAfter: "Evidence review",
+      relatedEvidenceKeys: ["receipt-summary"],
+      reviewerImpact: "Gives the rep local evidence-quality signals without changing receipt analyzer behavior.",
+    },
+    {
+      key: "order-context-added",
+      category: "Evidence added",
+      statusLabel: "Order context added",
+      severity: "Informational",
+      timestamp: "Today 09:28",
+      relativeTime: "26 minutes ago",
+      actor: "Reviewer",
+      detail: "Order screenshot context was summarized for manual comparison only.",
+      caseStatusAfter: "Evidence review",
+      relatedEvidenceKeys: ["order-context"],
+      reviewerImpact: "May help the rep decide whether a clearer copy is needed.",
     },
     {
       key: "unsupported-stopped",
-      label: "Unsupported evidence marked",
-      timestamp: "Local mock time",
+      category: "Manual review needed",
+      statusLabel: "Unsupported evidence marked",
+      severity: "Needs review",
+      timestamp: "Today 09:34",
+      relativeTime: "20 minutes ago",
       actor: "ClaimGuard shell",
-      detail: "Product-photo-like evidence remains manual-review-only and not live-analyzed.",
+      detail: "Product-photo-like evidence remains manual-review-only and no automated analysis result was produced.",
+      caseStatusAfter: "Manual review",
+      relatedEvidenceKeys: ["photo-unsupported"],
+      reviewerImpact: "Prompts the rep to use support policy or request eligible receipt evidence if needed.",
+    },
+    {
+      key: "status-manual-review",
+      category: "Case status changed",
+      statusLabel: "Status moved to manual review",
+      severity: "Needs review",
+      timestamp: "Today 09:35",
+      relativeTime: "19 minutes ago",
+      actor: "Reviewer",
+      detail: "Case status reflects mixed evidence and unsupported manual-review-only evidence.",
+      caseStatusAfter: "Manual review",
+      relatedEvidenceKeys: ["receipt-summary", "order-context", "photo-unsupported"],
+      reviewerImpact: "Keeps the workflow human-entered and avoids automated support disposition.",
+    },
+    {
+      key: "rep-note-drafted",
+      category: "Rep note drafted",
+      statusLabel: "Internal note drafted",
+      severity: "Informational",
+      timestamp: "Today 09:41",
+      relativeTime: "13 minutes ago",
+      actor: "Reviewer",
+      detail: "Internal note placeholder records what to compare next without private evidence details.",
+      caseStatusAfter: "Manual review",
+      relatedEvidenceKeys: ["customer-message", "order-context"],
+      reviewerImpact: "Separates internal review context from language that may be sent to the customer.",
     },
     {
       key: "wording-drafted",
-      label: "Customer-safe wording drafted",
-      timestamp: "Local mock time",
+      category: "Customer-safe wording prepared",
+      statusLabel: "Customer-safe wording ready",
+      severity: "Complete",
+      timestamp: "Today 09:46",
+      relativeTime: "8 minutes ago",
       actor: "Reviewer",
-      detail: "Draft wording is separated from internal notes and avoids final automated disposition.",
+      detail: "Draft wording asks for clearer receipt context if needed and avoids final automated disposition.",
+      caseStatusAfter: "Manual review",
+      relatedEvidenceKeys: ["customer-message"],
+      reviewerImpact: "Gives the rep a careful response draft while the case remains under manual review.",
+    },
+    {
+      key: "escalation-marker",
+      category: "Escalation marker",
+      statusLabel: "Senior review may be needed",
+      severity: "Escalation",
+      timestamp: "Today 09:51",
+      relativeTime: "3 minutes ago",
+      actor: "Reviewer",
+      detail: "Escalation marker is available if policy requires a second reviewer for mixed evidence.",
+      caseStatusAfter: "Manual review",
+      relatedEvidenceKeys: ["photo-unsupported", "receipt-summary"],
+      reviewerImpact: "Flags a review pathway, not a conclusion about the customer or evidence.",
     },
   ],
 };

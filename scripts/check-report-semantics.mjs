@@ -314,8 +314,8 @@ const requiredCaseCommandCenterSignals = [
     patterns: [/import \{ CaseReviewCommandCenter \} from "@\/components\/CaseReviewCommandCenter";/],
   },
   {
-    label: "phase 3.3 local polish shell label",
-    patterns: [/Phase 3\.3 local shell polish/],
+    label: "phase 3.4 timeline polish shell label",
+    patterns: [/Phase 3\.4 timeline polish/],
   },
   {
     label: "mock local data only label",
@@ -340,6 +340,46 @@ const requiredCaseCommandCenterSignals = [
   {
     label: "customer-safe wording separation",
     patterns: [/Customer-safe wording is separate from internal notes/],
+  },
+  {
+    label: "phase 3.4 timeline and audit trail label",
+    patterns: [/Timeline and audit trail/],
+  },
+  {
+    label: "phase 3.4 synthetic audit structure marker",
+    patterns: [/Synthetic audit structure/],
+  },
+  {
+    label: "phase 3.4 evidence-added timeline category",
+    patterns: [/"Evidence added"/],
+  },
+  {
+    label: "phase 3.4 analysis-completed timeline category",
+    patterns: [/"Analysis completed"/],
+  },
+  {
+    label: "phase 3.4 manual-review-needed timeline category",
+    patterns: [/"Manual review needed"/],
+  },
+  {
+    label: "phase 3.4 rep-note-drafted timeline category",
+    patterns: [/"Rep note drafted"/],
+  },
+  {
+    label: "phase 3.4 customer-safe-wording timeline category",
+    patterns: [/"Customer-safe wording prepared"/],
+  },
+  {
+    label: "phase 3.4 case-status-changed timeline category",
+    patterns: [/"Case status changed"/],
+  },
+  {
+    label: "phase 3.4 escalation-marker timeline category",
+    patterns: [/"Escalation marker"/],
+  },
+  {
+    label: "phase 3.4 selected evidence trail",
+    patterns: [/Selected evidence trail/],
   },
   {
     label: "external verification not performed",

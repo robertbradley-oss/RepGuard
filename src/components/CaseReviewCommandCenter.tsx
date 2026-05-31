@@ -5,18 +5,28 @@ import {
   Activity,
   AlertTriangle,
   CheckCircle2,
+  CircleDot,
+  Clock3,
   ClipboardList,
+  FilePlus2,
   FileSearch,
   History,
   MessageSquareText,
   NotebookText,
   PanelLeft,
+  PenLine,
   ScanLine,
   ShieldCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { phase32MockCase, type CaseAttentionLevel, type CaseEvidenceItem } from "@/lib/case-command-center/mock-case";
+import {
+  phase32MockCase,
+  type CaseAttentionLevel,
+  type CaseEvidenceItem,
+  type CaseTimelineCategory,
+  type CaseTimelineSeverity,
+} from "@/lib/case-command-center/mock-case";
 
 const attentionTone: Record<CaseAttentionLevel, string> = {
   "Low attention": "border-[rgba(95,143,100,0.34)] bg-[rgba(95,143,100,0.10)] text-[var(--cg-green)]",
@@ -36,6 +46,30 @@ const evidenceIcon: Record<CaseEvidenceItem["type"], LucideIcon> = {
   "Shipping confirmation": ClipboardList,
   "Customer message": MessageSquareText,
   "Product-photo-like unsupported": AlertTriangle,
+};
+
+const timelineCategoryIcon: Record<CaseTimelineCategory, LucideIcon> = {
+  "Evidence added": FilePlus2,
+  "Analysis completed": CheckCircle2,
+  "Manual review needed": AlertTriangle,
+  "Rep note drafted": PenLine,
+  "Customer-safe wording prepared": MessageSquareText,
+  "Case status changed": ClipboardList,
+  "Escalation marker": AlertTriangle,
+};
+
+const timelineSeverityTone: Record<CaseTimelineSeverity, string> = {
+  Informational: "border-[rgba(125,103,64,0.20)] bg-[rgba(255,253,247,0.76)] text-[var(--cg-text-muted)]",
+  Complete: "border-[rgba(95,143,100,0.34)] bg-[rgba(95,143,100,0.10)] text-[var(--cg-green)]",
+  "Needs review": "border-[rgba(184,133,24,0.38)] bg-[rgba(184,133,24,0.12)] text-[var(--cg-amber)]",
+  Escalation: "border-[rgba(154,87,52,0.40)] bg-[rgba(154,87,52,0.12)] text-[var(--cg-copper)]",
+};
+
+const timelineDotTone: Record<CaseTimelineSeverity, string> = {
+  Informational: "border-[rgba(125,103,64,0.28)] bg-[var(--cg-bg-paper)] text-[var(--cg-text-muted)]",
+  Complete: "border-[rgba(95,143,100,0.42)] bg-[rgba(95,143,100,0.14)] text-[var(--cg-green)]",
+  "Needs review": "border-[rgba(184,133,24,0.48)] bg-[rgba(184,133,24,0.15)] text-[var(--cg-amber)]",
+  Escalation: "border-[rgba(154,87,52,0.48)] bg-[rgba(154,87,52,0.16)] text-[var(--cg-copper)]",
 };
 
 const manualDecisionOptions = [
@@ -134,6 +168,132 @@ function FieldTile({ label, value }: { label: string; value: string }) {
       <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--cg-text-subtle)]">{label}</p>
       <p className="mt-1 text-sm font-semibold text-[var(--cg-text)]">{value}</p>
     </div>
+  );
+}
+
+function TimelineAuditTrail({ selectedEvidence }: { selectedEvidence: CaseEvidenceItem }) {
+  const selectedEvidenceEvents = phase32MockCase.timeline.filter((event) =>
+    event.relatedEvidenceKeys.includes(selectedEvidence.key),
+  );
+
+  return (
+    <section className="rounded-lg border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.62)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.70)]">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <SectionLabel icon={History} label="Timeline and audit trail" />
+          <p className="mt-2 max-w-4xl text-sm leading-6 text-[var(--cg-text-muted)]">
+            Synthetic audit events show how the case moved through evidence intake, local review, manual-review
+            routing, notes, customer-safe wording, and escalation readiness without persistence or live integrations.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <StatusBadge label="Synthetic audit structure" />
+          <StatusBadge label={phase32MockCase.workflowStatus} tone="amber" />
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <FieldTile label="Audit events" value={String(phase32MockCase.timeline.length)} />
+        <FieldTile label="Selected evidence links" value={String(selectedEvidenceEvents.length)} />
+        <FieldTile label="Current case status" value={phase32MockCase.workflowStatus} />
+      </div>
+
+      <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-3">
+          {phase32MockCase.timeline.map((event) => {
+            const Icon = timelineCategoryIcon[event.category];
+            const isSelectedEvidenceEvent = event.relatedEvidenceKeys.includes(selectedEvidence.key);
+
+            return (
+              <article
+                className={`relative rounded-md border p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.70)] ${
+                  isSelectedEvidenceEvent
+                    ? "border-[rgba(184,133,24,0.50)] bg-[rgba(255,253,247,0.86)]"
+                    : "border-[rgba(125,103,64,0.16)] bg-[rgba(255,253,247,0.64)]"
+                }`}
+                key={event.key}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <div
+                      className={`grid size-9 shrink-0 place-items-center rounded-md border ${timelineDotTone[event.severity]}`}
+                    >
+                      <Icon className="size-4" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-semibold text-[var(--cg-text)]">{event.statusLabel}</span>
+                        {isSelectedEvidenceEvent ? <StatusBadge label="Selected evidence" tone="bronze" /> : null}
+                      </div>
+                      <p className="mt-1 text-xs font-medium text-[var(--cg-text-subtle)]">
+                        {event.category} / {event.actor}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    <span className={`rounded-md border px-2 py-1 font-medium ${timelineSeverityTone[event.severity]}`}>
+                      {event.severity}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(246,241,232,0.72)] px-2 py-1 font-medium text-[var(--cg-text-muted)]">
+                      <Clock3 className="size-3" aria-hidden="true" />
+                      {event.relativeTime}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="mt-3 text-sm leading-6 text-[var(--cg-text-muted)]">{event.detail}</p>
+                <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+                  <div className="rounded-md border border-[rgba(125,103,64,0.16)] bg-[rgba(246,241,232,0.64)] px-3 py-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--cg-text-subtle)]">
+                      Static mock time
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-[var(--cg-text)]">{event.timestamp}</p>
+                  </div>
+                  <div className="rounded-md border border-[rgba(125,103,64,0.16)] bg-[rgba(246,241,232,0.64)] px-3 py-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--cg-text-subtle)]">
+                      Reviewer impact
+                    </p>
+                    <p className="mt-1 text-sm leading-5 text-[var(--cg-text-muted)]">{event.reviewerImpact}</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1 rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.70)] px-2 py-1 text-xs font-medium text-[var(--cg-text-muted)]">
+                    <CircleDot className="size-3" aria-hidden="true" />
+                    Status after event: {event.caseStatusAfter}
+                  </span>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        <aside className="space-y-3">
+          <section className="rounded-lg border border-[rgba(26,31,39,0.28)] bg-[var(--cg-bg-panel)] p-4 shadow-[0_18px_42px_rgba(77,62,36,0.14),inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <SectionLabel icon={FileSearch} label="Selected evidence trail" tone="dark" />
+            <p className="mt-3 text-sm leading-6 text-[var(--cg-dark-muted)]">
+              {selectedEvidence.title} has {selectedEvidenceEvents.length} linked mock audit event
+              {selectedEvidenceEvents.length === 1 ? "" : "s"}.
+            </p>
+            <div className="mt-3 space-y-2">
+              {selectedEvidenceEvents.map((event) => (
+                <div key={event.key} className="rounded-md border border-white/10 bg-white/[0.045] px-3 py-2">
+                  <p className="text-xs font-semibold text-[var(--cg-dark-text)]">{event.statusLabel}</p>
+                  <p className="mt-1 text-xs leading-5 text-[var(--cg-dark-subtle)]">{event.relativeTime}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.70)] p-4">
+            <SectionLabel icon={ShieldCheck} label="Audit boundary" />
+            <p className="mt-3 text-sm leading-6 text-[var(--cg-text-muted)]">
+              Events are static mock values from local case data. They do not imply a saved audit record, ticket
+              writeback, external verification, storage, provider activity, or a final support outcome.
+            </p>
+          </section>
+        </aside>
+      </div>
+    </section>
   );
 }
 
@@ -249,7 +409,7 @@ export function CaseReviewCommandCenter() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <StatusBadge label="Phase 3.3 local shell polish" tone="bronze" />
+                <StatusBadge label="Phase 3.4 timeline polish" tone="bronze" />
                 <StatusBadge label={phase32MockCase.workflowStatus} tone="amber" />
                 <StatusBadge label="Mock/local data only" />
               </div>
@@ -374,26 +534,7 @@ export function CaseReviewCommandCenter() {
           </aside>
         </div>
 
-        <section className="rounded-lg border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.62)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.70)]">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <SectionLabel icon={History} label="Timeline and audit history placeholder" />
-            <StatusBadge label="Browser-local mock events" />
-          </div>
-          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {phase32MockCase.timeline.map((event) => (
-              <article key={event.key} className="rounded-md border border-[rgba(125,103,64,0.18)] bg-[rgba(255,253,247,0.70)] p-3">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[var(--cg-text)]">
-                  <CheckCircle2 className="size-3.5 text-[var(--cg-green)]" aria-hidden="true" />
-                  {event.label}
-                </div>
-                <p className="mt-2 text-xs text-[var(--cg-text-subtle)]">
-                  {event.timestamp} / {event.actor}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-[var(--cg-text-muted)]">{event.detail}</p>
-              </article>
-            ))}
-          </div>
-        </section>
+        <TimelineAuditTrail selectedEvidence={selectedEvidence} />
       </div>
     </main>
   );
