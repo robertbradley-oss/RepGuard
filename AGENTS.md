@@ -6,13 +6,15 @@ For quick routing, read `ROUTING.md`. For durable product direction, read `ROADM
 
 ## Current Product State
 
-ClaimGuard is post-Phase-1.
+ClaimGuard is post-Phase-2 and is in Phase 3 local case workflow shell polish.
 
 Phase 1, the Receipt Intelligence module, is closed, pushed, deployed, and production-smoked. The latest production polish checkpoint is commit `19ef25e` (`polish post-phase1 evidence workspace`).
 
-Phase 2 Photo Evidence remains planning/readiness-only. Phase 2.4 is closed as a non-live adapter/readiness/runtime-blocker phase. Product-photo runtime remains non-live. A guarded, non-live product-photo adapter contract exists, and a pre-analysis evidence gate exists but remains decision-only and unwired. Shared evidence model types and product-photo scaffold/defaults exist, but no product-photo analyzer behavior is live yet.
+Phase 2 Photo Evidence is closed as non-live unsupported/product-photo readiness. Product-photo runtime remains non-live. A guarded, non-live product-photo adapter contract exists, a pre-analysis evidence gate exists but remains decision-only and unwired, a default-off runtime wrapper exists but remains unwired from live callers, and unsupported-evidence display/workflow helper surfaces remain non-live or probe/dev-only. Shared evidence model types and product-photo scaffold/defaults exist, but no product-photo analyzer behavior is live yet.
 
-No runtime analyzer, upload, UI, live report adapter, scoring, parser, or fixture behavior is wired to product-photo. `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior is unchanged. UI, upload, live report adapter mapping, provider, storage, integration, and case-queue work remain blocked until Robert explicitly opens a runtime slice. `product-photo` is the canonical Phase 2 evidence type; `damage-photo` remains legacy/non-canonical and only a compatibility alias to `product-photo` / `damage-close-up`. The next likely no-live milestone is the dev-only adapter review harness; main UI, product-photo upload, and live runtime work remain blocked until explicitly approved later.
+No runtime analyzer, upload, UI, live report adapter, scoring, parser, or fixture behavior is wired to product-photo. `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior is unchanged. UI, upload, live report adapter mapping, provider, storage, integration, and case-queue work remain blocked until Robert explicitly opens a runtime slice. `product-photo` is the canonical Phase 2 evidence type; `damage-photo` remains legacy/non-canonical and only a compatibility alias to `product-photo` / `damage-close-up`.
+
+Phase 3 has started as a non-persistent, static/local, synthetic-only Case Review Command Center shell at `/case-command-center`. Phase 3.5 is pushed and reviewed at commit `d234968` (`feat: add phase 3.5 manual review workflow structure`): the route remains unlinked, off-white/parchment, and local-only; `/` remains the Phase 1 receipt workflow and does not link to `/case-command-center`; `ClaimReviewWorkflow` remains unchanged; `ProductPhotoReviewPanel` remains unrouted; no editable saved notes, form submission, persistence, upload behavior, integrations, OCR/metadata, storage/providers, auth/billing, real evidence, receipt behavior changes, deployment, or Phase 3.6 implementation has been added. The next intended milestone is Phase 3.6 customer-safe wording module polish for the static/local shell only, with no send action, persistence, integrations, or real workflow behavior.
 
 ClaimGuard is broader than the receipt analyzer. Receipt intelligence is one evidence module inside a larger fraud-risk screening and evidence intelligence platform. Future ClaimGuard may include photo evidence analysis, case review workflow, customer and ticket context, integrations, audit history, scoring signals, and enterprise fraud intelligence, but those areas must remain phase-gated.
 
@@ -108,8 +110,8 @@ Specialized agents should operate as senior/expert reviewers and builders, not n
 - Scoring & Safety Reviewer Agent should prevent overclaiming, unsafe wrongdoing language, and score semantics drift.
 - Privacy & Evidence Safety Agent should prevent evidence leakage across prompts, logs, exports, fixtures, screenshots, commits, and integrations.
 - Receipt Intelligence Agent should maintain receipt module quality while preserving its role as one evidence module in the larger platform.
-- Photo Evidence / Phase 2 Readiness Agent should keep Phase 2.1 documentation/planning-only, local-only, manual-review-safe, provider-ready, and intentionally unwired until Robert explicitly opens a Phase 2.2 runtime slice.
-- Case Workflow / Phase 3 Readiness Agent should remain planning-only until Phase 3 is explicitly opened.
+- Photo Evidence / Phase 2 Readiness Agent should keep Phase 2 closed as non-live unsupported/product-photo readiness until Robert explicitly opens a later runtime slice.
+- Case Workflow / Phase 3 Readiness Agent should keep current Phase 3 work static/local, synthetic-only, unlinked, non-persistent, and manual-review-safe unless Robert explicitly opens a live workflow, persistence, or integration slice.
 - QA Harness Agent should catch shallow verification and keep fixture/manual QA discipline privacy-safe.
 - Deployment & Release Agent should enforce clean commits, checks, deployment discipline, smoke testing, and no unapproved deploys.
 - Integration Readiness Agent should prevent premature real connections and require privacy/data-flow review first.
@@ -669,9 +671,9 @@ Files to inspect first:
 
 Hard constraints:
 
-- Phase 3 has not started.
-- Do not add persistence, auth, dashboards, or ticket integrations without approval.
-- Keep all decisions auditable and support-safe.
+- Phase 3 has started only as a static/local, synthetic-only `/case-command-center` shell.
+- Do not add persistence, auth, dashboards, ticket integrations, real evidence, upload behavior, saved notes, form submission, live unsupported-evidence opt-in, or product-photo runtime without approval.
+- Keep all decisions reviewer-entered, auditable, and support-safe.
 
 Required checks:
 
@@ -686,7 +688,7 @@ Handoff expectations:
 
 Phase boundaries:
 
-- Planning-only until Robert opens Phase 3.
+- Static/local shell polish only until Robert opens a live workflow, persistence, or integration slice.
 
 ### 9. QA Harness Agent
 
@@ -891,8 +893,8 @@ Phase boundaries:
 Use `ROADMAP.md` for durable phase definitions. The short version:
 
 - Phase 1: Receipt Intelligence module. Closed, deployed, and production-smoked.
-- Phase 2: Photo Evidence. Planning/readiness-only. Phase 2.4 is closed as a non-live adapter/readiness/runtime-blocker phase; product-photo runtime remains non-live and no product-photo analyzer behavior is live yet.
-- Phase 3: Case Review Workflow readiness and later implementation.
+- Phase 2: Photo Evidence. Closed as non-live unsupported/product-photo readiness; product-photo runtime remains non-live and no product-photo analyzer behavior is live yet.
+- Phase 3: Case Review Workflow. Started as a static/local, synthetic-only, unlinked `/case-command-center` shell; Phase 3.5 is pushed and reviewed, and Phase 3.6 is intended as customer-safe wording module polish only.
 - Phase 4: Stronger OCR/AI service integrations.
 - Phase 5: Ticket, email, drive, and customer-context integrations.
 - Phase 6: SaaS platform foundations.
