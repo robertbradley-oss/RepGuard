@@ -112,6 +112,10 @@ const probeModules = [
     path: "src/app/api/analysis/ocr/route.probe.ts",
     exportName: "OCR_ROUTE_DEVELOPER_PROBE",
   },
+  {
+    path: "src/lib/analysis/providers/mock-provider-adapter.probe.ts",
+    exportName: "MOCK_PROVIDER_ADAPTER_DEVELOPER_PROBE",
+  },
 ];
 
 async function runProductPhotoProbes() {

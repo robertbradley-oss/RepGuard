@@ -50,6 +50,8 @@ const filesToCheck = [
   "src/lib/analysis/ocr-extraction-contract.probe.ts",
   "src/app/api/analysis/ocr/route.ts",
   "src/app/api/analysis/ocr/route.probe.ts",
+  "src/lib/analysis/providers/mock-provider-adapter.ts",
+  "src/lib/analysis/providers/mock-provider-adapter.probe.ts",
   "src/components/ProductPhotoReviewPanel.tsx",
   "src/components/ProductPhotoReviewPanel.probe.tsx",
   "src/components/CaseReviewCommandCenter.tsx",
@@ -101,6 +103,10 @@ const ocrExtractionContractCorpus = `${ocrExtractionContract}\n${ocrExtractionCo
 const ocrRoute = fileContents.get("src/app/api/analysis/ocr/route.ts") ?? "";
 const ocrRouteProbe = fileContents.get("src/app/api/analysis/ocr/route.probe.ts") ?? "";
 const ocrRouteCorpus = `${ocrRoute}\n${ocrRouteProbe}`;
+const mockProviderAdapter = fileContents.get("src/lib/analysis/providers/mock-provider-adapter.ts") ?? "";
+const mockProviderAdapterProbe =
+  fileContents.get("src/lib/analysis/providers/mock-provider-adapter.probe.ts") ?? "";
+const mockProviderAdapterCorpus = `${mockProviderAdapter}\n${mockProviderAdapterProbe}`;
 const phase49ProviderSelectionPlan = readRequiredFile("PHASE_4_9_OCR_PROVIDER_SELECTION_PLAN.md");
 const phase410ProviderAbstractionPlan = readRequiredFile("PHASE_4_10_PROVIDER_ABSTRACTION_PLAN.md");
 const phase411MockProviderAdapterPlan = readRequiredFile("PHASE_4_11_MOCK_PROVIDER_ADAPTER_PLAN.md");
@@ -620,6 +626,70 @@ const requiredPhase411MockProviderAdapterSignals = [
   },
 ];
 
+const requiredMockProviderAdapterSignals = [
+  {
+    label: "Phase 4.12 mock provider mode marker",
+    patterns: [/MOCK_PROVIDER_MODE/, /mock-synthetic/],
+  },
+  {
+    label: "mock provider adapter functions",
+    patterns: [/runMockOcrProvider/, /runMockVisionProvider/, /validateMockProviderAdapterInput/],
+  },
+  {
+    label: "mock OCR success shape",
+    patterns: [/mock-ocr-success/, /extractedTextBlockCandidates/, /structuredFieldCandidates/, /contractCompatibility/],
+  },
+  {
+    label: "mock vision success shape",
+    patterns: [/mock-vision-success/, /visualContextSummary/, /imageConsistencyUncertainty/, /uncertaintyOnly/],
+  },
+  {
+    label: "mock failure modes",
+    patterns: [/timeout/, /unavailable/, /malformed-response/, /unsupported-evidence/, /empty-output/, /rate-cost-limit/, /redaction-failure/, /safety-refusal/, /internal-normalization-error/],
+  },
+  {
+    label: "mock privacy markers",
+    patterns: [/fileRetained: false/, /rawOcrRetained: false/, /providerPayloadRetained: false/, /providerPayloadLogged: false/, /externalNetworkCalled: false/, /storageUsed: false/, /envUsed: false/],
+  },
+  {
+    label: "mock input rejection",
+    patterns: [/unsupportedKeyNames/, /urlLikeValuePattern/, /base64LikeValuePattern/, /privateIdentifierValuePatterns/],
+  },
+  {
+    label: "mock provider probe export",
+    patterns: [/MOCK_PROVIDER_ADAPTER_DEVELOPER_PROBE/],
+  },
+];
+
+const forbiddenMockProviderAdapterImports = [
+  "@/lib/analysis/analyzer",
+  "@/lib/analysis/types",
+  "@/lib/analysis/report-adapter",
+  "@/lib/analysis/receipt-parser",
+  "@/lib/analysis/scoring",
+  "@/components/ClaimReviewWorkflow",
+  "@/components/ProductPhotoReviewPanel",
+  "@/components/UploadPanel",
+  "openai",
+  "@aws-sdk",
+  "@google-cloud",
+  "tesseract.js",
+  "pdfjs-dist",
+];
+
+const forbiddenMockProviderAdapterBehaviorPatterns = [
+  /\bfetch\s*\(/,
+  /console\.(?:log|warn|error|info)/,
+  /process\.env/,
+  /createObjectURL\s*\(/,
+  /revokeObjectURL\s*\(/,
+  /new\s+File\b/,
+  /new\s+Blob\b/,
+  /localStorage/,
+  /sessionStorage/,
+  /type=["']file["']/i,
+];
+
 const forbiddenPhase411MockProviderAdapterPatterns = [
   /npm\s+(?:install|add)\s+(?:openai|@aws-sdk|@google-cloud)/i,
   /OPENAI_API_KEY|GOOGLE_APPLICATION_CREDENTIALS|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/,
@@ -724,6 +794,12 @@ for (const signal of requiredPhase411MockProviderAdapterSignals) {
   }
 }
 
+for (const signal of requiredMockProviderAdapterSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(mockProviderAdapterCorpus))) {
+    failures.push(`Missing Phase 4.12 mock provider adapter signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -769,6 +845,18 @@ for (const importPath of forbiddenOcrRouteImports) {
 for (const pattern of forbiddenOcrRouteBehaviorPatterns) {
   if (pattern.test(ocrRoute)) {
     failures.push(`Synthetic OCR route behavior check failed: route uses forbidden pattern ${pattern}`);
+  }
+}
+
+for (const importPath of forbiddenMockProviderAdapterImports) {
+  if (new RegExp(`from\\s+["'][^"']*${importPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i").test(mockProviderAdapter)) {
+    failures.push(`Mock provider adapter boundary check failed: adapter imports forbidden path ${importPath}`);
+  }
+}
+
+for (const pattern of forbiddenMockProviderAdapterBehaviorPatterns) {
+  if (pattern.test(mockProviderAdapter)) {
+    failures.push(`Mock provider adapter behavior check failed: adapter uses forbidden pattern ${pattern}`);
   }
 }
 
