@@ -143,6 +143,9 @@ const phase422OpenAiVisionSandboxFixturePolicyPlan = readRequiredFile(
 const phase423OpenAiVisionSandboxValidationProbePlan = readRequiredFile(
   "PHASE_4_23_OPENAI_VISION_SANDBOX_VALIDATION_PROBE_PLAN.md",
 );
+const phase424SyntheticFixtureMetadataSchemaPlan = readRequiredFile(
+  "PHASE_4_24_SYNTHETIC_FIXTURE_METADATA_SCHEMA_PLAN.md",
+);
 
 const requiredSemanticSignals = [
   {
@@ -2150,6 +2153,222 @@ const forbiddenPhase423OpenAiVisionSandboxValidationProbePlanPatterns = [
   /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
 ];
 
+const requiredPhase424SyntheticFixtureMetadataSchemaPlanSignals = [
+  {
+    label: "Phase 4.24 planning-only marker",
+    patterns: [
+      /Phase 4\.24 is a synthetic fixture metadata schema planning-only milestone/,
+      /No metadata schema\/types are implemented/,
+      /No fixture files or fixture images are added/,
+      /It is a metadata-schema planning milestone only/,
+    ],
+  },
+  {
+    label: "no implementation scope",
+    patterns: [
+      /does not add OpenAI SDKs, provider SDKs, environment variables, provider calls/,
+      /does not add.*runtime schema\/types/,
+      /does not change existing `POST \/api\/analysis\/ocr` behavior/,
+      /does not change existing `POST \/api\/analysis\/mock-provider` behavior/,
+      /does not change `analyzeEvidenceFile`/,
+      /does not change `LocalAnalysisResult`/,
+      /does not start Phase 4\.25/,
+    ],
+  },
+  {
+    label: "metadata goals",
+    patterns: [
+      /Identify fixture category and evidence type/,
+      /Enforce a synthetic-only default/,
+      /Map fixtures to prompt families/,
+      /Map fixtures to expected sandbox schema fields/,
+      /Document package-distribution safety/,
+      /Prevent private identifiers, real evidence, unsafe labels, provider payloads, object URLs, storage handles, and public image URLs/,
+    ],
+  },
+  {
+    label: "identity fields",
+    patterns: [
+      /`fixtureKey`/,
+      /`fixtureVersion`/,
+      /`fixtureTitle`/,
+      /`fixtureDescription`/,
+      /`scenarioSlug`/,
+      /`schemaVersionTarget`/,
+      /`approvalStatus`/,
+      /`fixtureKey` must be stable and non-identifying/,
+    ],
+  },
+  {
+    label: "category and enum planning",
+    patterns: [
+      /`synthetic-receipt-image`/,
+      /`synthetic-order-screenshot`/,
+      /`synthetic-product-photo`/,
+      /`synthetic-altered-ai-uncertainty`/,
+      /`real-customer-receipt`/,
+      /`provider-payload-replay`/,
+      /Allowed future `packageDistributionStatus` values/,
+    ],
+  },
+  {
+    label: "prompt schema linkage fields",
+    patterns: [
+      /`allowedPromptFamilies`/,
+      /`blockedPromptFamilies`/,
+      /`targetAnalysisModes`/,
+      /`expectedSchemaFields`/,
+      /`expectedObservationCategories`/,
+      /`expectedFailureShape`/,
+      /Linkage fields must not wire runtime behavior/,
+    ],
+  },
+  {
+    label: "expected output metadata fields",
+    patterns: [
+      /`expectedVisualSummaryBehavior`/,
+      /`expectedObservationBehavior`/,
+      /`expectedUncertaintySignalBehavior`/,
+      /`expectedAlteredAiUncertaintyBehavior`/,
+      /`disallowedOutputPatterns`/,
+      /Expected outputs are test expectations only/,
+      /Expected outputs must preserve observation-vs-signal separation/,
+    ],
+  },
+  {
+    label: "altered AI uncertainty metadata fields",
+    patterns: [
+      /`alteredAiUncertaintyApplicability`/,
+      /`expectedAlteredAiUncertaintyBand`/,
+      /`expectedAlteredAiUncertaintyRange`/,
+      /`alteredAiUncertaintySafetyNotes`/,
+      /Metadata must use "altered-or-AI-generated-image uncertainty\."/,
+      /Metadata must say review signal only/,
+      /High concern must not mean fake, forged, AI-generated, altered, or fraud confirmed/,
+    ],
+  },
+  {
+    label: "privacy identifier redaction fields",
+    patterns: [
+      /`syntheticStatus`/,
+      /`redactionStatus`/,
+      /`identifierPolicy`/,
+      /`identifierScanRequired`/,
+      /`containsCustomerName`/,
+      /`containsProviderPayload`/,
+      /`privacyReviewStatus`/,
+      /Synthetic fixtures should default all identifier-containing fields to false/,
+    ],
+  },
+  {
+    label: "retention and ownership fields",
+    patterns: [
+      /`retentionPolicy`/,
+      /`retentionReviewStatus`/,
+      /`deletionRequired`/,
+      /`sourcePolicy`/,
+      /`ownershipPolicy`/,
+      /`licenseStatus`/,
+      /Approval notes must not contain identifiers/,
+    ],
+  },
+  {
+    label: "package distribution fields",
+    patterns: [
+      /`packageDistributionStatus`/,
+      /`safeForDownloadablePackage`/,
+      /`safeForDemoMode`/,
+      /`safeForSelfHostedInstall`/,
+      /`safeForPublicRepository`/,
+      /`distributable-synthetic-demo`/,
+      /Provider features should be disabled unless explicitly configured/,
+    ],
+  },
+  {
+    label: "cost timeout fields",
+    patterns: [
+      /`expectedCostBucket`/,
+      /`expectedInputSizeBucket`/,
+      /`expectedOutputSizeBucket`/,
+      /`expectedTimeoutBehavior`/,
+      /`expectedRetryPolicy`/,
+      /Cost\/timeout expectations are operational only/,
+      /No automatic retry by default/,
+    ],
+  },
+  {
+    label: "required optional groups",
+    patterns: [
+      /Required future metadata groups should include/,
+      /Top-level identity/,
+      /Fixture category\/evidence type/,
+      /Privacy\/identifier policy/,
+      /Package-distribution status/,
+      /Optional future metadata groups may include/,
+      /Optional does not mean unreviewed/,
+    ],
+  },
+  {
+    label: "metadata validation expectations",
+    patterns: [
+      /Required fields are present/,
+      /Enum values are allowed/,
+      /`fixtureKey` format is valid/,
+      /No private identifiers appear/,
+      /No provider payload dumps appear/,
+      /Package-safe fixtures meet package distribution requirements/,
+      /Future validation should fail closed/,
+    ],
+  },
+  {
+    label: "relationship to existing plans",
+    patterns: [
+      /Existing `POST \/api\/analysis\/ocr` remains exact `fixtureKey` only/,
+      /Existing `POST \/api\/analysis\/mock-provider` remains synthetic\/mock-only/,
+      /Metadata schema planning must not modify either existing route/,
+      /Future metadata should align with Phase 4\.20 prompt\/output contract planning/,
+      /Future metadata should align with Phase 4\.21 schema planning/,
+      /Future metadata should align with Phase 4\.22 fixture policy planning/,
+      /Future metadata should align with Phase 4\.23 validation\/probe planning/,
+    ],
+  },
+  {
+    label: "approval gates and next options",
+    patterns: [
+      /Robert explicitly approves metadata schema implementation/,
+      /Robert separately approves fixture creation/,
+      /Package-safety requirements are confirmed/,
+      /Option A: Phase 4\.25 OpenAI Vision sandbox validation\/probe implementation plan only/,
+      /Option B: Phase 4\.25 synthetic fixture metadata schema implementation plan only/,
+      /Option C: Phase 4\.25 downloadable package safety planning for sandbox\/demo data only/,
+    ],
+  },
+];
+
+const forbiddenPhase424SyntheticFixtureMetadataSchemaPlanPatterns = [
+  /npm\s+(?:install|add)\s+(?:openai|@aws-sdk|@google-cloud)/i,
+  /OPENAI_API_KEY|GOOGLE_APPLICATION_CREDENTIALS|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/,
+  /process\.env\.(?:OPENAI|GOOGLE|AWS|OCR|VISION)/i,
+  /import\s+.*\s+from\s+["'](?:openai|@aws-sdk|@google-cloud)/i,
+  /curl\s+/i,
+  /\bfetch\s*\(/,
+  /multipart\/form-data\s+is\s+accepted/i,
+  /raw provider payloads? (?:will|should) be logged/i,
+  /raw OCR (?:will|should) be retained/i,
+  /real evidence processing (?:is|will be) enabled/i,
+  /live OpenAI Vision implementation (?:is|was|will be) added/i,
+  /(?:This milestone|Phase 4\.24) (?:adds|added|implements|implemented|wires|wired) (?:live|real|provider|upload|storage|runtime|fixture files|fixture images|metadata schema|schema types|package artifacts)/i,
+  /(?:ClaimReviewWorkflow|ProductPhotoReviewPanel) (?:is|was|will be) (?:wired|routed)/i,
+  /(?:analyzeEvidenceFile|LocalAnalysisResult) (?:is|was|will be) (?:changed|migrated|updated)/i,
+  /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
+  /confidence (?:proves|confirms|verifies)/i,
+  /uncertainty (?:proves|confirms|verifies)/i,
+  /blob:|data:|file:/i,
+  /\b[A-Z]{2,}-\d{3,}\b/,
+  /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i,
+  /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -2312,6 +2531,12 @@ for (const signal of requiredPhase423OpenAiVisionSandboxValidationProbePlanSigna
   }
 }
 
+for (const signal of requiredPhase424SyntheticFixtureMetadataSchemaPlanSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase424SyntheticFixtureMetadataSchemaPlan))) {
+    failures.push(`Missing Phase 4.24 synthetic fixture metadata schema planning signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -2459,6 +2684,12 @@ for (const pattern of forbiddenPhase422OpenAiVisionSandboxFixturePolicyPlanPatte
 for (const pattern of forbiddenPhase423OpenAiVisionSandboxValidationProbePlanPatterns) {
   if (pattern.test(phase423OpenAiVisionSandboxValidationProbePlan)) {
     failures.push(`Phase 4.23 OpenAI Vision sandbox validation/probe plan failed: forbidden implementation/privacy pattern ${pattern}`);
+  }
+}
+
+for (const pattern of forbiddenPhase424SyntheticFixtureMetadataSchemaPlanPatterns) {
+  if (pattern.test(phase424SyntheticFixtureMetadataSchemaPlan)) {
+    failures.push(`Phase 4.24 synthetic fixture metadata schema plan failed: forbidden implementation/privacy pattern ${pattern}`);
   }
 }
 
