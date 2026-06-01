@@ -172,6 +172,9 @@ const phase430OpenAiVisionSandboxSkeletonPlan = readRequiredFile(
 const phase432VisionSandboxFixtureRunnerValidation = readRequiredFile(
   "PHASE_4_32_VISION_SANDBOX_FIXTURE_RUNNER_VALIDATION.md",
 );
+const phase433VisionSandboxDeveloperUsageReadiness = readRequiredFile(
+  "PHASE_4_33_VISION_SANDBOX_DEVELOPER_USAGE_READINESS.md",
+);
 const visionSandboxSkeletonCorpus = [
   "src/lib/analysis/vision-sandbox/types.ts",
   "src/lib/analysis/vision-sandbox/fixture-registry.ts",
@@ -3091,6 +3094,84 @@ const requiredPhase432VisionSandboxDocSignals = [
   },
 ];
 
+const requiredPhase433VisionSandboxDeveloperUsageReadinessSignals = [
+  {
+    label: "Phase 4.33 documentation/readiness scope",
+    patterns: [
+      /Phase 4\.33 exists after Phase 4\.31 and Phase 4\.32/,
+      /documentation\/readiness only/i,
+      /no provider configuration/i,
+      /no OpenAI SDK/i,
+      /no provider call/i,
+      /no API-credit-using behavior/i,
+      /This is not live AI/i,
+    ],
+  },
+  {
+    label: "Phase 4.33 current capabilities and non-capabilities",
+    patterns: [
+      /Current Sandbox Capabilities/,
+      /Reference approved synthetic fixture metadata/i,
+      /Validate approved synthetic fixture references/i,
+      /Current Sandbox Non-Capabilities/,
+      /Call OpenAI/i,
+      /Use API credits/i,
+      /Produce `LocalAnalysisResult`/i,
+      /Modify `\/api\/analysis\/ocr`/i,
+      /Modify `\/api\/analysis\/mock-provider`/i,
+    ],
+  },
+  {
+    label: "Phase 4.33 developer commands",
+    patterns: [
+      /`npm\.cmd run check:vision-sandbox-boundaries`/,
+      /`npm\.cmd run check:vision-sandbox-skeleton`/,
+      /`npm\.cmd run check:vision-sandbox-fixture-runner`/,
+      /`npm\.cmd run check:report-semantics`/,
+      /`npm\.cmd run check:product-photo-probes`/,
+      /`npm\.cmd run lint`/,
+      /`npm\.cmd run build`/,
+      /No provider use and no API credits/i,
+    ],
+  },
+  {
+    label: "Phase 4.33 fixture metadata and package safety",
+    patterns: [
+      /Only approved synthetic fixture keys/i,
+      /No real customer evidence/i,
+      /No anonymized or redacted real fixtures/i,
+      /No public image URLs, object URLs, file URLs, data URLs, storage handles/i,
+      /Package And Downloadable Safety/,
+      /No `.env` files with real values/i,
+      /Provider features remain disabled/i,
+      /Package artifacts are not generated in Phase 4\.33/i,
+    ],
+  },
+  {
+    label: "Phase 4.33 safety language and readiness",
+    patterns: [
+      /altered-or-AI-generated-image uncertainty/i,
+      /review signal only/i,
+      /manual-review driver/i,
+      /It is not proof/i,
+      /It is not a final decision/i,
+      /Readiness Checkpoint/,
+      /ready for provider configuration planning only/i,
+      /not ready for live OpenAI Vision implementation/i,
+    ],
+  },
+  {
+    label: "Phase 4.33 next phase recommendation",
+    patterns: [
+      /Phase 4\.34 OpenAI Vision provider configuration planning only/,
+      /API-credit usage policy/,
+      /Provider opt-in boundaries/,
+      /\.env\.example/,
+      /No live OpenAI Vision implementation yet unless Robert explicitly approves API-credit-using work/,
+    ],
+  },
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -3328,6 +3409,12 @@ for (const signal of requiredPhase432VisionSandboxFixtureRunnerSignals) {
 for (const signal of requiredPhase432VisionSandboxDocSignals) {
   if (!signal.patterns.every((pattern) => pattern.test(phase432VisionSandboxFixtureRunnerValidation))) {
     failures.push(`Missing Phase 4.32 OpenAI Vision sandbox fixture-runner documentation signal: ${signal.label}`);
+  }
+}
+
+for (const signal of requiredPhase433VisionSandboxDeveloperUsageReadinessSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase433VisionSandboxDeveloperUsageReadiness))) {
+    failures.push(`Missing Phase 4.33 OpenAI Vision sandbox developer usage readiness signal: ${signal.label}`);
   }
 }
 
