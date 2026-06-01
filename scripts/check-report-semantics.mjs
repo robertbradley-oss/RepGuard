@@ -157,6 +157,9 @@ const phase427SyntheticFixtureRegistry = readRequiredFile(
 );
 const phase428SyntheticFixtureCreationPlan = readRequiredFile("PHASE_4_28_SYNTHETIC_FIXTURE_CREATION_PLAN.md");
 const phase429SyntheticVisionFixtures = readRequiredFile("PHASE_4_29_SYNTHETIC_VISION_FIXTURES.md");
+const phase430OpenAiVisionSandboxSkeletonPlan = readRequiredFile(
+  "PHASE_4_30_OPENAI_VISION_SANDBOX_SKELETON_PLAN.md",
+);
 const phase429FixtureAssetCorpus = [
   "fixtures/vision-sandbox/assets/synthetic-clean-receipt-baseline.svg",
   "fixtures/vision-sandbox/assets/synthetic-suspicious-layout-receipt.svg",
@@ -2843,6 +2846,87 @@ const requiredPhase429FixtureAssetSignals = [
   /safeForSelfHostedInstall: true/,
 ];
 
+const requiredPhase430OpenAiVisionSandboxSkeletonPlanSignals = [
+  {
+    label: "Phase 4.30 planning-only scope",
+    patterns: [
+      /Phase 4\.30 is an OpenAI Vision sandbox skeleton planning-only milestone/,
+      /No sandbox skeleton code is implemented/,
+      /No new route is implemented/,
+      /No existing route behavior is changed/,
+      /This is not live AI/,
+    ],
+  },
+  {
+    label: "readiness review",
+    patterns: [
+      /Phase 4\.24 planned synthetic fixture metadata schema requirements/,
+      /Phase 4\.26 implemented `check:vision-sandbox-boundaries`/,
+      /Phase 4\.27 added `fixtures\/vision-sandbox\/metadata\/synthetic-fixture-registry\.json`/,
+      /Phase 4\.29 added 9 hand-authored synthetic SVG fixtures/,
+      /Gaps before skeleton implementation/,
+    ],
+  },
+  {
+    label: "future skeleton module boundaries",
+    patterns: [
+      /Sandbox fixture registry access/,
+      /Sandbox fixture resolver/,
+      /Sandbox prompt family selector/,
+      /Sandbox stub response builder/,
+      /Sandbox schema-shape guard/,
+      /Sandbox privacy guard/,
+      /Sandbox package-safety guard/,
+      /Sandbox unsupported\/failure response builder/,
+      /Sandbox result normalizer/,
+    ],
+  },
+  {
+    label: "route input output boundaries",
+    patterns: [
+      /No route is implemented in Phase 4\.30/,
+      /script\/module-only sandbox skeleton, no API route/,
+      /Allowed future inputs should remain/,
+      /Disallowed future inputs/,
+      /Future outputs must not include/,
+      /`LocalAnalysisResult`/,
+    ],
+  },
+  {
+    label: "fixture metadata validation package safety",
+    patterns: [
+      /reference fixtures only through approved synthetic fixture keys/,
+      /Fixture metadata must not become runtime scoring input/,
+      /Phase 4\.26 boundary checks should guard future skeleton implementation/,
+      /No SDK\/env\/provider calls/,
+      /Package And Downloadable Safety Plan/,
+      /Do not ship secrets/,
+    ],
+  },
+  {
+    label: "existing routes and Phase 4.31 recommendation",
+    patterns: [
+      /Existing `POST \/api\/analysis\/ocr` remains exact `fixtureKey` only/,
+      /Existing `POST \/api\/analysis\/mock-provider` remains synthetic\/mock-only and adapter-only/,
+      /`analyzeEvidenceFile` and `LocalAnalysisResult` remain unchanged/,
+      /Phase 4\.31 OpenAI Vision sandbox skeleton implementation/,
+      /Do not recommend live OpenAI Vision implementation yet/,
+      /Stop Phase 4\.31 if implementation would require/,
+    ],
+  },
+  {
+    label: "altered AI review signal safety",
+    patterns: [
+      /altered-or-AI-generated-image uncertainty/,
+      /1-100 review signal/,
+      /not proof/,
+      /not a final decision/,
+      /not a fraud score/,
+      /manual-review/,
+    ],
+  },
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -3056,6 +3140,12 @@ for (const signal of requiredPhase429SyntheticVisionFixtureSignals) {
 for (const pattern of requiredPhase429FixtureAssetSignals) {
   if (!pattern.test(phase429FixtureAssetCorpus)) {
     failures.push(`Missing Phase 4.29 fixture asset/simulation signal: ${pattern}`);
+  }
+}
+
+for (const signal of requiredPhase430OpenAiVisionSandboxSkeletonPlanSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase430OpenAiVisionSandboxSkeletonPlan))) {
+    failures.push(`Missing Phase 4.30 OpenAI Vision sandbox skeleton planning signal: ${signal.label}`);
   }
 }
 

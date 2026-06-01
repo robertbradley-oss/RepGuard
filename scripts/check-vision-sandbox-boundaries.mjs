@@ -142,7 +142,7 @@ if (/"(?:openai|@openai\/agents|@google-cloud\/vision|@google-cloud\/documentai|
 const sourceFiles = allTextFiles.filter((file) => file.path.startsWith("src/"));
 const scriptFiles = allTextFiles.filter((file) => file.path.startsWith("scripts/"));
 const docsFiles = allTextFiles.filter((file) => file.path.endsWith(".md"));
-const sandboxDocs = docsFiles.filter((file) => /PHASE_4_(?:19|20|21|22|23|24|25|26|27|28|29)_/.test(file.path));
+const sandboxDocs = docsFiles.filter((file) => /PHASE_4_(?:19|20|21|22|23|24|25|26|27|28|29|30)_/.test(file.path));
 const sourceAndScriptFiles = [...sourceFiles, ...scriptFiles];
 
 addPatternFailures("Provider SDK import guard", sourceAndScriptFiles, [
@@ -211,7 +211,7 @@ for (const changedFile of changedFiles) {
 
   if (
     !allowedChangedFiles.has(changedFile) &&
-    !/^PHASE_4_(?:26|27|28|29)_/.test(changedFile) &&
+    !/^PHASE_4_(?:26|27|28|29|30)_/.test(changedFile) &&
     !changedFile.startsWith("sandbox-fixtures/") &&
     !changedFile.startsWith("synthetic-fixtures/") &&
     !changedFile.startsWith("fixtures/vision-sandbox/")
@@ -225,7 +225,7 @@ const protectedRuntimeCorpus = protectedRuntimeFiles
   .filter((file) => file.contents);
 
 addPatternFailures("Sandbox runtime wiring guard", protectedRuntimeCorpus, [
-  /PHASE_4_2[4-9]/,
+  /PHASE_4_(?:2[4-9]|30)/,
   /VISION_SANDBOX/i,
   /synthetic[-_/]vision[-_/]sandbox/i,
   /fixtureMetadata/i,
