@@ -134,6 +134,9 @@ const phase419OpenAiVisionSandboxPlan = readRequiredFile("PHASE_4_19_OPENAI_VISI
 const phase420OpenAiVisionPromptOutputContractPlan = readRequiredFile(
   "PHASE_4_20_OPENAI_VISION_PROMPT_OUTPUT_CONTRACT_PLAN.md",
 );
+const phase421OpenAiVisionSandboxSchemaPlan = readRequiredFile(
+  "PHASE_4_21_OPENAI_VISION_SANDBOX_SCHEMA_PLAN.md",
+);
 
 const requiredSemanticSignals = [
   {
@@ -1478,6 +1481,237 @@ const forbiddenPhase420OpenAiVisionPromptOutputContractPatterns = [
   /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
 ];
 
+const requiredPhase421OpenAiVisionSandboxSchemaPlanSignals = [
+  {
+    label: "Phase 4.21 planning-only marker",
+    patterns: [
+      /Phase 4\.21 is an OpenAI Vision sandbox schema planning-only milestone/,
+      /It is a schema-planning milestone only, not a provider-integration milestone/,
+    ],
+  },
+  {
+    label: "no implementation scope",
+    patterns: [
+      /does not implement runtime TypeScript schema or types/,
+      /does not add OpenAI SDKs, provider SDKs, environment variables, provider calls/,
+      /does not change existing `POST \/api\/analysis\/ocr` behavior/,
+      /does not change existing `POST \/api\/analysis\/mock-provider` behavior/,
+      /does not change `analyzeEvidenceFile`/,
+      /does not change `LocalAnalysisResult`/,
+    ],
+  },
+  {
+    label: "top-level schema identity",
+    patterns: [
+      /`schemaVersion`/,
+      /`providerMode`: required/,
+      /`providerFamily`: required/,
+      /`analysisMode`: required/,
+      /`fixtureScope`: required/,
+      /`resultStatus`: required/,
+      /`requestId`: required/,
+      /`providerMode` must be locked to `sandbox`/,
+      /`providerFamily` must be locked to `openai-vision-style`/,
+    ],
+  },
+  {
+    label: "analysis mode and status enums",
+    patterns: [
+      /`visual-context-review`/,
+      /`receipt-visual-review`/,
+      /`order-screenshot-review`/,
+      /`product-photo-review`/,
+      /`altered-ai-uncertainty-review`/,
+      /`schema-validation-failed`/,
+      /`internal-sandbox-error`/,
+    ],
+  },
+  {
+    label: "evidence classification fields",
+    patterns: [
+      /`evidenceSubtype`/,
+      /`evidenceCategory`/,
+      /`fixtureKey`/,
+      /`inputRedactionStatus`/,
+      /`inputIdentifierPolicy`/,
+      /`sourceRestriction`/,
+      /Allowed evidence categories:/,
+      /Disallowed evidence categories:/,
+    ],
+  },
+  {
+    label: "visual summary and observation fields",
+    patterns: [
+      /`visualSummary`/,
+      /`visibleContextSummary`/,
+      /`documentOrPhotoContext`/,
+      /`layoutObservations`/,
+      /`qualityObservations`/,
+      /`contentBoundaries`/,
+      /Each future observation object should include:/,
+      /Allowed observation categories:/,
+    ],
+  },
+  {
+    label: "uncertainty signals",
+    patterns: [
+      /Each future uncertainty signal object should include:/,
+      /`signalType`/,
+      /`supportingObservationIds`/,
+      /Allowed signal types:/,
+      /Signals are review signals only/,
+      /Signals must not become fraud findings/,
+    ],
+  },
+  {
+    label: "altered AI uncertainty schema",
+    patterns: [
+      /`alteredOrAiGeneratedImageUncertainty`/,
+      /`value`: integer 1-100 only when applicable/,
+      /nullable or omitted when not applicable/,
+      /altered-or-AI-generated-image uncertainty/,
+      /review signal only/,
+      /manual-review driver/,
+      /not proof/,
+      /not a final decision/,
+    ],
+  },
+  {
+    label: "confidence and manual-review drivers",
+    patterns: [
+      /Each future confidence note should include:/,
+      /Allowed levels:/,
+      /Confidence is about analysis reliability, not claim truth/,
+      /Each future manual-review driver should include:/,
+      /Allowed priorities:/,
+      /Drivers are internal review aids only/,
+    ],
+  },
+  {
+    label: "limitations and summaries",
+    patterns: [
+      /`limitations`: required for all result statuses/,
+      /`safeSupportSummary`: required/,
+      /`internalReviewSummary`/,
+      /`customerSafeSummary`/,
+      /Each limitation should include:/,
+      /Allowed limitation types:/,
+    ],
+  },
+  {
+    label: "privacy retention metadata",
+    patterns: [
+      /`privacyFlags`: required/,
+      /`retentionFlags`: required/,
+      /`redactionStatus`: required/,
+      /`identifierHandling`: required/,
+      /`payloadLoggingPolicy`: required/,
+      /`providerPayloadRetention`: required/,
+      /`objectUrlPolicy`: required/,
+      /`storagePolicy`: required/,
+      /Raw provider payload logging is not allowed by default/,
+    ],
+  },
+  {
+    label: "cost timeout metadata",
+    patterns: [
+      /Future `costMetadata` fields:/,
+      /`estimatedInputUnits`/,
+      /`estimatedOutputUnits`/,
+      /`estimatedCostBucket`/,
+      /`costLimitApplied`/,
+      /Future `timeoutMetadata` fields:/,
+      /`timeoutMs`/,
+      /No automatic retry by default/,
+    ],
+  },
+  {
+    label: "failure and unsupported shapes",
+    patterns: [
+      /Completed Result/,
+      /Unsupported Evidence Result/,
+      /Prompt Refusal Result/,
+      /Provider Timeout Result/,
+      /Provider Unavailable Result/,
+      /Provider Rate-Limit Result/,
+      /Cost-Limit Result/,
+      /Malformed Provider Response Result/,
+      /Schema-Validation-Failed Result/,
+      /Internal Sandbox Error Result/,
+    ],
+  },
+  {
+    label: "schema validation rules",
+    patterns: [
+      /Allowed enum values only/,
+      /No raw identifiers/,
+      /No provider payload dumps/,
+      /No object URLs/,
+      /No storage handles/,
+      /No public image URLs/,
+      /Observation and signal separation/,
+      /Provider mode locked to `sandbox`/,
+      /Provider family locked to `openai-vision-style`/,
+    ],
+  },
+  {
+    label: "relationship to existing routes and mock adapter",
+    patterns: [
+      /Existing `POST \/api\/analysis\/ocr` remains exact `fixtureKey` only/,
+      /Existing `POST \/api\/analysis\/mock-provider` remains synthetic\/mock-only/,
+      /OpenAI Vision schema planning must not modify either existing route/,
+      /The mock provider adapter remains the test boundary before live provider behavior/,
+      /`analyzeEvidenceFile` and `LocalAnalysisResult` remain unchanged/,
+    ],
+  },
+  {
+    label: "future QA and probe requirements",
+    patterns: [
+      /No SDK\/env\/package until approved/,
+      /Enum validation probe/,
+      /Required field validation probe/,
+      /Unsupported\/failure shape probe/,
+      /Altered\/AI uncertainty nullable\/applicability probe/,
+      /Observation-vs-signal separation scan/,
+      /No route\/UI wiring scan/,
+    ],
+  },
+  {
+    label: "Phase 4.22 safe options",
+    patterns: [
+      /Option A: Phase 4\.22 OpenAI Vision sandbox fixture-policy planning only/,
+      /Option B: Phase 4\.22 OpenAI Vision sandbox validation\/probe planning only/,
+      /Option C: Phase 4\.22 OpenAI Vision sandbox skeleton implementation plan/,
+    ],
+  },
+];
+
+const forbiddenPhase421OpenAiVisionSandboxSchemaPlanPatterns = [
+  /npm\s+(?:install|add)\s+(?:openai|@aws-sdk|@google-cloud)/i,
+  /OPENAI_API_KEY|GOOGLE_APPLICATION_CREDENTIALS|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/,
+  /process\.env\.(?:OPENAI|GOOGLE|AWS|OCR|VISION)/i,
+  /import\s+.*\s+from\s+["'](?:openai|@aws-sdk|@google-cloud)/i,
+  /curl\s+/i,
+  /\bfetch\s*\(/,
+  /multipart\/form-data\s+is\s+accepted/i,
+  /raw provider payloads? (?:will|should) be logged/i,
+  /raw OCR (?:will|should) be retained/i,
+  /real evidence processing (?:is|will be) enabled/i,
+  /live OpenAI Vision implementation (?:is|was|will be) added/i,
+  /(?:This milestone|Phase 4\.21) (?:adds|added|implements|implemented|wires|wired) (?:live|real|provider|upload|storage|runtime)/i,
+  /(?:ClaimReviewWorkflow|ProductPhotoReviewPanel) (?:is|was|will be) (?:wired|routed)/i,
+  /(?:analyzeEvidenceFile|LocalAnalysisResult) (?:is|was|will be) (?:changed|migrated|updated)/i,
+  /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
+  /confidence (?:proves|confirms|verifies)/i,
+  /uncertainty (?:proves|confirms|verifies)/i,
+  /https?:\/\//i,
+  /blob:|data:|file:/i,
+  /[A-Za-z]:\\/,
+  /\b[A-Z]{2,}-\d{3,}\b/,
+  /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i,
+  /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -1622,6 +1856,12 @@ for (const signal of requiredPhase420OpenAiVisionPromptOutputContractSignals) {
   }
 }
 
+for (const signal of requiredPhase421OpenAiVisionSandboxSchemaPlanSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase421OpenAiVisionSandboxSchemaPlan))) {
+    failures.push(`Missing Phase 4.21 OpenAI Vision sandbox schema planning signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -1751,6 +1991,12 @@ for (const pattern of forbiddenPhase419OpenAiVisionSandboxPlanPatterns) {
 for (const pattern of forbiddenPhase420OpenAiVisionPromptOutputContractPatterns) {
   if (pattern.test(phase420OpenAiVisionPromptOutputContractPlan)) {
     failures.push(`Phase 4.20 OpenAI Vision prompt/output contract plan failed: forbidden implementation/privacy pattern ${pattern}`);
+  }
+}
+
+for (const pattern of forbiddenPhase421OpenAiVisionSandboxSchemaPlanPatterns) {
+  if (pattern.test(phase421OpenAiVisionSandboxSchemaPlan)) {
+    failures.push(`Phase 4.21 OpenAI Vision sandbox schema plan failed: forbidden implementation/privacy pattern ${pattern}`);
   }
 }
 
