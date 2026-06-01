@@ -1,0 +1,15 @@
+<svg viewBox="0 0 360 460" role="img" aria-label="Synthetic cropped receipt limitation">
+  <rect width="360" height="460" fill="#f7f2e8"/>
+  <rect x="44" y="24" width="222" height="404" fill="#fffdf7" stroke="#2f3a45" stroke-width="3"/>
+  <rect x="260" y="24" width="56" height="404" fill="#e9ded0"/>
+  <text x="155" y="66" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#2f3a45">SYNTHETIC STORE</text>
+  <text x="155" y="92" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#68707a">CROPPED DEMO</text>
+  <line x1="72" y1="122" x2="236" y2="122" stroke="#d8cdbb" stroke-width="2"/>
+  <text x="78" y="160" font-family="Arial, sans-serif" font-size="13" fill="#2f3a45">ITEM A</text>
+  <text x="198" y="160" font-family="Arial, sans-serif" font-size="13" fill="#2f3a45">12.00</text>
+  <text x="78" y="194" font-family="Arial, sans-serif" font-size="13" fill="#2f3a45">ITEM B</text>
+  <text x="198" y="194" font-family="Arial, sans-serif" font-size="13" fill="#2f3a45">8.00</text>
+  <rect x="264" y="150" width="38" height="132" fill="#d7c6b7"/>
+  <text x="180" y="316" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#7a4b20">right edge context missing</text>
+  <text x="155" y="368" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#25624b">synthetic fixture</text>
+</svg>

@@ -334,7 +334,11 @@ Phase 4.2 synthetic OCR fixture harness decision:
 - Phase 4.28 documents which package-safe synthetic fixture files Phase 4.29 may create, allowed file types, allowed directories, naming rules, image/content rules, synthetic receipt rules, synthetic order screenshot rules, synthetic product/mock image rules, altered-or-AI-generated-image uncertainty rules, unsupported/failure simulation rules, package-safety requirements, license/origin rules, QA checks, stop conditions, and the Phase 4.29 recommendation.
 - No fixture files/images are created in Phase 4.28.
 - Existing `POST /api/analysis/ocr` remains exact `fixtureKey` only. Existing `POST /api/analysis/mock-provider` remains synthetic/mock-only and adapter-only. `analyzeEvidenceFile`, `LocalAnalysisResult`, receipt parser/scoring/report behavior, `ClaimReviewWorkflow`, and `ProductPhotoReviewPanel` remain unchanged.
-- The next safe option is Phase 4.29 synthetic fixture creation only. Live OCR/provider work, real evidence handling, SDKs, env vars, uploads, storage, persistence, UI wiring, receipt behavior changes, runtime schema/types, and `LocalAnalysisResult` migration remain blocked unless Robert explicitly opens a named implementation slice.
+- Phase 4.29 synthetic vision fixture creation decision:
+- Phase 4.29 adds package-safe synthetic SVG fixtures under `fixtures/vision-sandbox/assets/` and synthetic markdown simulations under `fixtures/vision-sandbox/simulations/`, all matched to Phase 4.27 metadata and documented in `PHASE_4_29_SYNTHETIC_VISION_FIXTURES.md`.
+- Fixtures are hand-authored, synthetic-only, non-identifying, package-safe, and free of provider payloads, raw OCR dumps, public URLs, object URLs, storage handles, EXIF/location metadata, real customer evidence, external customer/copyrighted images, and live-provider assumptions.
+- Existing `POST /api/analysis/ocr` remains exact `fixtureKey` only. Existing `POST /api/analysis/mock-provider` remains synthetic/mock-only and adapter-only. `analyzeEvidenceFile`, `LocalAnalysisResult`, receipt parser/scoring/report behavior, `ClaimReviewWorkflow`, and `ProductPhotoReviewPanel` remain unchanged.
+- Stop at Phase 4.29. Do not start Phase 4.30, OpenAI Vision sandbox skeleton planning, provider implementation, SDK/env work, provider calls, upload wiring, route/runtime/UI changes, package artifacts, or real evidence processing.
 
 Deferred until a later Phase 4 implementation slice is explicitly opened:
 

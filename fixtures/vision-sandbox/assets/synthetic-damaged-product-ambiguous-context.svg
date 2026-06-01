@@ -1,0 +1,9 @@
+<svg viewBox="0 0 420 360" role="img" aria-label="Synthetic damaged product ambiguous context">
+  <rect width="420" height="360" fill="#ece8df"/>
+  <rect x="70" y="62" width="280" height="220" rx="18" fill="#f7f2e8" stroke="#2f3a45" stroke-width="3"/>
+  <rect x="132" y="116" width="150" height="112" rx="10" fill="#a9c7d8" stroke="#456b7d" stroke-width="3"/>
+  <path d="M154 132 L198 180 L184 180 L228 218 L208 168 L224 168 Z" fill="#f1c56c" stroke="#9a6a21" stroke-width="2"/>
+  <rect x="104" y="250" width="212" height="32" rx="6" fill="#fdebd3" stroke="#c27836"/>
+  <text x="210" y="271" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#7a4b20">cause context unavailable</text>
+  <text x="210" y="312" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#25624b">synthetic fixture</text>
+</svg>

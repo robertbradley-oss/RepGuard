@@ -1,0 +1,13 @@
+<svg viewBox="0 0 520 360" role="img" aria-label="Synthetic order screenshot missing context">
+  <rect width="520" height="360" fill="#eef3f7"/>
+  <rect x="42" y="36" width="436" height="288" rx="12" fill="#ffffff" stroke="#2f3a45" stroke-width="3"/>
+  <rect x="42" y="36" width="436" height="54" rx="12" fill="#dce8f2"/>
+  <text x="70" y="70" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#2f3a45">Synthetic order summary</text>
+  <rect x="70" y="116" width="180" height="38" rx="6" fill="#f8efe2" stroke="#d3b98c"/>
+  <text x="86" y="140" font-family="Arial, sans-serif" font-size="12" fill="#2f3a45">status: generic demo</text>
+  <rect x="70" y="176" width="380" height="42" rx="6" fill="#f7f7f7" stroke="#ccd3da"/>
+  <text x="88" y="202" font-family="Arial, sans-serif" font-size="13" fill="#2f3a45">item area present, account context omitted</text>
+  <rect x="70" y="242" width="250" height="42" rx="6" fill="#fdebd3" stroke="#c27836"/>
+  <text x="88" y="268" font-family="Arial, sans-serif" font-size="13" fill="#7a4b20">missing context observation</text>
+  <text x="260" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#25624b">synthetic fixture</text>
+</svg>

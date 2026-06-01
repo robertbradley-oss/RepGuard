@@ -156,6 +156,21 @@ const phase427SyntheticFixtureRegistry = readRequiredFile(
   "fixtures/vision-sandbox/metadata/synthetic-fixture-registry.json",
 );
 const phase428SyntheticFixtureCreationPlan = readRequiredFile("PHASE_4_28_SYNTHETIC_FIXTURE_CREATION_PLAN.md");
+const phase429SyntheticVisionFixtures = readRequiredFile("PHASE_4_29_SYNTHETIC_VISION_FIXTURES.md");
+const phase429FixtureAssetCorpus = [
+  "fixtures/vision-sandbox/assets/synthetic-clean-receipt-baseline.svg",
+  "fixtures/vision-sandbox/assets/synthetic-suspicious-layout-receipt.svg",
+  "fixtures/vision-sandbox/assets/synthetic-partial-cropped-receipt.svg",
+  "fixtures/vision-sandbox/assets/synthetic-order-screenshot-missing-context.svg",
+  "fixtures/vision-sandbox/assets/synthetic-product-photo-normal-context.svg",
+  "fixtures/vision-sandbox/assets/synthetic-damaged-product-ambiguous-context.svg",
+  "fixtures/vision-sandbox/assets/synthetic-altered-ai-low-concern.svg",
+  "fixtures/vision-sandbox/assets/synthetic-altered-ai-medium-concern.svg",
+  "fixtures/vision-sandbox/assets/synthetic-altered-ai-high-concern.svg",
+  "fixtures/vision-sandbox/simulations/synthetic-unsupported-evidence.md",
+  "fixtures/vision-sandbox/simulations/synthetic-provider-timeout-simulation.md",
+  "fixtures/vision-sandbox/simulations/synthetic-schema-validation-failure.md",
+].map(readRequiredFile).join("\n");
 
 const requiredSemanticSignals = [
   {
@@ -2757,6 +2772,77 @@ const requiredPhase428SyntheticFixtureCreationPlanSignals = [
   },
 ];
 
+const requiredPhase429SyntheticVisionFixtureSignals = [
+  {
+    label: "Phase 4.29 creation scope",
+    patterns: [
+      /Phase 4\.29 creates the initial package-safe synthetic OpenAI Vision sandbox fixture assets/,
+      /creates synthetic SVG and markdown fixture files only/,
+      /does not add real receipts/,
+      /does not add.*runtime schema\/types/,
+      /does not add.*route behavior changes/,
+    ],
+  },
+  {
+    label: "created assets and simulations",
+    patterns: [
+      /`synthetic-clean-receipt-baseline\.svg`/,
+      /`synthetic-altered-ai-high-concern\.svg`/,
+      /`synthetic-schema-validation-failure\.md`/,
+      /All SVG assets are hand-authored in-repo/,
+      /Each markdown simulation includes metadata safety fields/,
+    ],
+  },
+  {
+    label: "metadata matching",
+    patterns: [
+      /Every created fixture matches a Phase 4\.27 metadata `fixtureKey`/,
+      /`synthetic-provider-timeout-simulation`/,
+      /The Phase 4\.27 metadata registry remains the matching metadata source/,
+      /No runtime schema\/types were added/,
+    ],
+  },
+  {
+    label: "altered AI and package safety",
+    patterns: [
+      /altered-or-AI-generated-image uncertainty fixtures/,
+      /uncertainty review signals/,
+      /do not state proof/,
+      /Low review concern does not confirm authenticity/,
+      /Package Safety/,
+      /No package archive, installer, release bundle/,
+    ],
+  },
+  {
+    label: "stop point",
+    patterns: [
+      /Stop at Phase 4\.29/,
+      /Do not start Phase 4\.30/,
+      /OpenAI SDK integration/,
+      /real evidence processing/,
+    ],
+  },
+];
+
+const requiredPhase429FixtureAssetSignals = [
+  /Synthetic clean receipt baseline/,
+  /SYNTHETIC STORE/,
+  /LAYOUT REVIEW FIXTURE/,
+  /CROPPED DEMO/,
+  /Synthetic order summary/,
+  /generic synthetic object/,
+  /cause context unavailable/,
+  /low review concern signal/,
+  /not proof or final decision/,
+  /manual review only/,
+  /fixtureKey: synthetic-unsupported-evidence/,
+  /fixtureKey: synthetic-provider-timeout-simulation/,
+  /fixtureKey: synthetic-schema-validation-failure/,
+  /safeForDownloadablePackage: true/,
+  /safeForDemoMode: true/,
+  /safeForSelfHostedInstall: true/,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -2958,6 +3044,18 @@ for (const pattern of requiredPhase427SyntheticFixtureRegistrySignals) {
 for (const signal of requiredPhase428SyntheticFixtureCreationPlanSignals) {
   if (!signal.patterns.every((pattern) => pattern.test(phase428SyntheticFixtureCreationPlan))) {
     failures.push(`Missing Phase 4.28 synthetic fixture creation plan signal: ${signal.label}`);
+  }
+}
+
+for (const signal of requiredPhase429SyntheticVisionFixtureSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase429SyntheticVisionFixtures))) {
+    failures.push(`Missing Phase 4.29 synthetic vision fixture signal: ${signal.label}`);
+  }
+}
+
+for (const pattern of requiredPhase429FixtureAssetSignals) {
+  if (!pattern.test(phase429FixtureAssetCorpus)) {
+    failures.push(`Missing Phase 4.29 fixture asset/simulation signal: ${pattern}`);
   }
 }
 
