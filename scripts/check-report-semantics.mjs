@@ -155,6 +155,7 @@ const phase427SyntheticFixtureMetadata = readRequiredFile("PHASE_4_27_SYNTHETIC_
 const phase427SyntheticFixtureRegistry = readRequiredFile(
   "fixtures/vision-sandbox/metadata/synthetic-fixture-registry.json",
 );
+const phase428SyntheticFixtureCreationPlan = readRequiredFile("PHASE_4_28_SYNTHETIC_FIXTURE_CREATION_PLAN.md");
 
 const requiredSemanticSignals = [
   {
@@ -2690,6 +2691,72 @@ const requiredPhase427SyntheticFixtureRegistrySignals = [
   /"lastReviewedForPhase": "phase-4-27"/,
 ];
 
+const requiredPhase428SyntheticFixtureCreationPlanSignals = [
+  {
+    label: "Phase 4.28 planning-only scope",
+    patterns: [
+      /Phase 4\.28 plans the synthetic fixture files\/assets that Phase 4\.29 may create/,
+      /This milestone is planning-only/,
+      /It creates no fixture files, no fixture images/,
+      /The Phase 4\.29 creation step may begin only if this plan is committed, pushed, all checks pass/,
+    ],
+  },
+  {
+    label: "fixture set and file types",
+    patterns: [
+      /`synthetic-clean-receipt-baseline`/,
+      /`synthetic-altered-ai-high-concern`/,
+      /`synthetic-schema-validation-failure`/,
+      /\.svg` for simple artificial synthetic visual fixtures/,
+      /\.md` for unsupported\/failure simulation notes/,
+      /Real photos/,
+      /Provider request\/response files/,
+    ],
+  },
+  {
+    label: "directories and naming",
+    patterns: [
+      /`fixtures\/vision-sandbox\/assets\/`/,
+      /`fixtures\/vision-sandbox\/simulations\/`/,
+      /`fixtures\/vision-sandbox\/metadata\/`/,
+      /`fixtures\/vision-sandbox\/assets\/<fixtureKey>\.svg`/,
+      /File names should match `fixtureKey` exactly/,
+    ],
+  },
+  {
+    label: "content rules",
+    patterns: [
+      /Synthetic SVG fixtures must/,
+      /Synthetic receipt visuals may show generic fields only/,
+      /Synthetic order screenshot visuals may show/,
+      /Synthetic product-photo visuals may show/,
+      /Unsupported\/failure fixtures should use markdown only/,
+    ],
+  },
+  {
+    label: "altered AI and package safety",
+    patterns: [
+      /Altered-or-AI-generated-image uncertainty fixtures/,
+      /review signal only/,
+      /not proof/,
+      /not a final decision/,
+      /Package-Safe Distribution Requirements/,
+      /No package archive, installer, release bundle/,
+    ],
+  },
+  {
+    label: "license QA stop recommendation",
+    patterns: [
+      /License And Origin Rules/,
+      /Hand-authored SVG and markdown/,
+      /QA Checks Before Creation/,
+      /QA Checks After Creation/,
+      /Stop Phase 4\.29 if/,
+      /Proceed to Phase 4\.29 synthetic fixture creation only if all checks pass/,
+    ],
+  },
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -2885,6 +2952,12 @@ for (const signal of requiredPhase427SyntheticFixtureMetadataSignals) {
 for (const pattern of requiredPhase427SyntheticFixtureRegistrySignals) {
   if (!pattern.test(phase427SyntheticFixtureRegistry)) {
     failures.push(`Missing Phase 4.27 synthetic fixture registry signal: ${pattern}`);
+  }
+}
+
+for (const signal of requiredPhase428SyntheticFixtureCreationPlanSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase428SyntheticFixtureCreationPlan))) {
+    failures.push(`Missing Phase 4.28 synthetic fixture creation plan signal: ${signal.label}`);
   }
 }
 
