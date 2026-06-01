@@ -151,6 +151,10 @@ const phase425ValidationProbeImplementationPlan = readRequiredFile(
 );
 const phase426SandboxValidationProbes = readRequiredFile("PHASE_4_26_SANDBOX_VALIDATION_PROBES.md");
 const visionSandboxBoundaryChecker = readRequiredFile("scripts/check-vision-sandbox-boundaries.mjs");
+const phase427SyntheticFixtureMetadata = readRequiredFile("PHASE_4_27_SYNTHETIC_FIXTURE_METADATA.md");
+const phase427SyntheticFixtureRegistry = readRequiredFile(
+  "fixtures/vision-sandbox/metadata/synthetic-fixture-registry.json",
+);
 
 const requiredSemanticSignals = [
   {
@@ -2597,6 +2601,95 @@ const requiredVisionSandboxBoundaryCheckerSignals = [
   /Package artifact path is blocked/,
 ];
 
+const requiredPhase427SyntheticFixtureMetadataSignals = [
+  {
+    label: "Phase 4.27 metadata-only scope",
+    patterns: [
+      /Phase 4\.27 implements synthetic OpenAI Vision sandbox fixture metadata only/,
+      /without adding image files, evidence files/,
+      /The metadata is source-of-truth test planning data only/,
+      /It is not imported by runtime code/,
+    ],
+  },
+  {
+    label: "metadata registry and scenarios",
+    patterns: [
+      /`fixtures\/vision-sandbox\/metadata\/synthetic-fixture-registry\.json`/,
+      /Clean synthetic receipt/,
+      /Synthetic order screenshot with missing context/,
+      /Altered-or-AI-generated-image uncertainty high review concern/,
+      /Schema-validation-failure simulation/,
+    ],
+  },
+  {
+    label: "required metadata fields",
+    patterns: [
+      /`fixtureKey`/,
+      /`fixtureVersion`/,
+      /`fixtureCategory`/,
+      /`expectedResultStatus`/,
+      /`expectedPrivacyFlags`/,
+      /`packageDistributionStatus`/,
+      /`lastReviewedForPhase`/,
+    ],
+  },
+  {
+    label: "safety package posture",
+    patterns: [
+      /`syntheticStatus: synthetic-only`/,
+      /`packageDistributionStatus: distributable-synthetic-demo`/,
+      /no real evidence/,
+      /no provider payloads/,
+      /no raw OCR dumps/,
+      /no public image URLs/,
+      /no storage handles/,
+    ],
+  },
+  {
+    label: "altered AI framing",
+    patterns: [
+      /Altered-or-AI-generated-image uncertainty metadata remains a review signal only/,
+      /not proof/,
+      /not a final decision/,
+      /Low review concern does not confirm authenticity/,
+      /do not confirm alteration, AI generation, deception, or a claim outcome/,
+    ],
+  },
+  {
+    label: "validation and next gate",
+    patterns: [
+      /`npm\.cmd run check:vision-sandbox-boundaries`/,
+      /The boundary checker confirms required metadata safety fields/,
+      /Recommended Phase 4\.28 task/,
+      /Plan synthetic fixture file\/image creation only/,
+    ],
+  },
+];
+
+const requiredPhase427SyntheticFixtureRegistrySignals = [
+  /"registryVersion": "phase-4-27-v1"/,
+  /"registrySafetyNote": "All entries are synthetic-only/,
+  /"fixtureKey": "synthetic-clean-receipt-baseline"/,
+  /"fixtureKey": "synthetic-suspicious-layout-receipt"/,
+  /"fixtureKey": "synthetic-partial-cropped-receipt"/,
+  /"fixtureKey": "synthetic-order-screenshot-missing-context"/,
+  /"fixtureKey": "synthetic-product-photo-normal-context"/,
+  /"fixtureKey": "synthetic-damaged-product-ambiguous-context"/,
+  /"fixtureKey": "synthetic-altered-ai-low-concern"/,
+  /"fixtureKey": "synthetic-altered-ai-medium-concern"/,
+  /"fixtureKey": "synthetic-altered-ai-high-concern"/,
+  /"fixtureKey": "synthetic-unsupported-evidence"/,
+  /"fixtureKey": "synthetic-provider-timeout-simulation"/,
+  /"fixtureKey": "synthetic-schema-validation-failure"/,
+  /"safeForDownloadablePackage": true/,
+  /"safeForDemoMode": true/,
+  /"safeForSelfHostedInstall": true/,
+  /"expectedPrivacyFlags": \[/,
+  /"expectedRetentionFlags": \[/,
+  /"createdForPhase": "phase-4-27"/,
+  /"lastReviewedForPhase": "phase-4-27"/,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -2780,6 +2873,18 @@ for (const signal of requiredPhase426SandboxValidationProbeSignals) {
 for (const pattern of requiredVisionSandboxBoundaryCheckerSignals) {
   if (!pattern.test(visionSandboxBoundaryChecker)) {
     failures.push(`Missing Phase 4.26 boundary checker implementation signal: ${pattern}`);
+  }
+}
+
+for (const signal of requiredPhase427SyntheticFixtureMetadataSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase427SyntheticFixtureMetadata))) {
+    failures.push(`Missing Phase 4.27 synthetic fixture metadata signal: ${signal.label}`);
+  }
+}
+
+for (const pattern of requiredPhase427SyntheticFixtureRegistrySignals) {
+  if (!pattern.test(phase427SyntheticFixtureRegistry)) {
+    failures.push(`Missing Phase 4.27 synthetic fixture registry signal: ${pattern}`);
   }
 }
 
