@@ -140,6 +140,9 @@ const phase421OpenAiVisionSandboxSchemaPlan = readRequiredFile(
 const phase422OpenAiVisionSandboxFixturePolicyPlan = readRequiredFile(
   "PHASE_4_22_OPENAI_VISION_SANDBOX_FIXTURE_POLICY_PLAN.md",
 );
+const phase423OpenAiVisionSandboxValidationProbePlan = readRequiredFile(
+  "PHASE_4_23_OPENAI_VISION_SANDBOX_VALIDATION_PROBE_PLAN.md",
+);
 
 const requiredSemanticSignals = [
   {
@@ -1911,6 +1914,242 @@ const forbiddenPhase422OpenAiVisionSandboxFixturePolicyPlanPatterns = [
   /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
 ];
 
+const requiredPhase423OpenAiVisionSandboxValidationProbePlanSignals = [
+  {
+    label: "Phase 4.23 planning-only marker",
+    patterns: [
+      /Phase 4\.23 is an OpenAI Vision sandbox validation\/probe planning-only milestone/,
+      /No validators or probes are implemented yet except narrow semantic checker coverage/,
+      /It is a validation\/probe planning milestone only, not a validation implementation milestone/,
+    ],
+  },
+  {
+    label: "no implementation scope",
+    patterns: [
+      /does not add OpenAI SDKs, provider SDKs, environment variables, provider calls/,
+      /does not add.*runtime schema\/types/,
+      /does not change existing `POST \/api\/analysis\/ocr` behavior/,
+      /does not change existing `POST \/api\/analysis\/mock-provider` behavior/,
+      /does not change `analyzeEvidenceFile`/,
+      /does not change `LocalAnalysisResult`/,
+      /No fixtures are added/,
+    ],
+  },
+  {
+    label: "future validation probe goals",
+    patterns: [
+      /Prompt\/output safety language/,
+      /Schema identity and enum constraints/,
+      /Observation-vs-signal separation/,
+      /Altered-or-AI-generated-image uncertainty wording/,
+      /Provider timeout handling/,
+      /Fixture-policy enforcement/,
+      /No unsafe package\/distribution artifacts/,
+    ],
+  },
+  {
+    label: "validation categories",
+    patterns: [
+      /Semantic safety validation/,
+      /Prompt safety validation/,
+      /Output schema validation/,
+      /Enum\/value validation/,
+      /Unsupported\/failure-state validation/,
+      /Privacy\/identifier validation/,
+      /Fixture-policy validation/,
+      /Package\/distribution safety validation/,
+    ],
+  },
+  {
+    label: "probe categories",
+    patterns: [
+      /No-SDK\/env\/package probe/,
+      /No-provider-call probe/,
+      /No-upload\/storage\/persistence probe/,
+      /No-real-evidence fixture probe/,
+      /No-provider-payload dump probe/,
+      /No-runtime-wiring probe/,
+      /Output schema safety probe/,
+      /Downloadable-package safety probe/,
+    ],
+  },
+  {
+    label: "semantic safety scans",
+    patterns: [
+      /Fraud-confirmation language/,
+      /Proof language/,
+      /Automatic deny\/refund wording/,
+      /Single fraud score wording/,
+      /"AI-generated confidence" without uncertainty framing/,
+      /"fake image score\."/,
+      /Prohibited labels may appear only inside explicit "must not use," "disallowed wording," or safety-rule documentation sections/,
+    ],
+  },
+  {
+    label: "altered AI uncertainty validation",
+    patterns: [
+      /Field is named and described as "altered-or-AI-generated-image uncertainty\."/,
+      /Field is review-signal-only/,
+      /Field is manual-review-driver-only/,
+      /Field is not proof/,
+      /Field is not a fraud score/,
+      /Field is nullable\/omitted when not applicable/,
+      /Value range is 1-100 only when applicable/,
+    ],
+  },
+  {
+    label: "observation signal separation",
+    patterns: [
+      /Direct visual observations/,
+      /Inferred uncertainty signals/,
+      /Confidence notes/,
+      /Limitations/,
+      /Manual-review drivers/,
+      /Safe support summaries/,
+      /Observations are not conclusions/,
+    ],
+  },
+  {
+    label: "privacy identifier scans",
+    patterns: [
+      /Customer names/,
+      /Emails/,
+      /Order numbers/,
+      /Tracking numbers/,
+      /Barcodes\/QR code references/,
+      /Raw unredacted OCR text/,
+      /Provider payload dumps/,
+      /Identifier scans must apply to docs, future fixture metadata, future prompt fixtures, future schema examples, and future package artifacts/,
+    ],
+  },
+  {
+    label: "fixture policy enforcement",
+    patterns: [
+      /Fixture category is allowed/,
+      /Fixture naming convention is followed/,
+      /Fixture metadata required fields are present/,
+      /Synthetic\/redacted status is explicit/,
+      /Redaction approval gate is documented/,
+      /Altered\/AI labels use uncertainty framing/,
+      /Fixture package\/distribution status is safe/,
+    ],
+  },
+  {
+    label: "unsupported failure probes",
+    patterns: [
+      /Unsupported evidence category/,
+      /Provider refusal/,
+      /Provider timeout/,
+      /Provider unavailable/,
+      /Cost limit reached/,
+      /Malformed provider response/,
+      /Schema validation failed/,
+      /Failure states are operational limitations only/,
+    ],
+  },
+  {
+    label: "schema output probes",
+    patterns: [
+      /`providerMode` remains `sandbox`/,
+      /`providerFamily` remains `openai-vision-style`/,
+      /`schemaVersion` is present/,
+      /`resultStatus` is allowed/,
+      /Required fields exist by result status/,
+      /`privacyFlags` are present/,
+      /`retentionFlags` are present/,
+      /Safe support summaries pass wording checks/,
+    ],
+  },
+  {
+    label: "route runtime package guards",
+    patterns: [
+      /OpenAI SDK or provider SDK imports/,
+      /Environment variable additions/,
+      /Package dependency additions/,
+      /Provider call patterns/,
+      /Multipart parsing/,
+      /Object URL handling/,
+      /`ClaimReviewWorkflow` wiring/,
+      /These scans must block commit\/push/,
+      /block package creation/,
+    ],
+  },
+  {
+    label: "downloadable package safety",
+    patterns: [
+      /Future validation for downloadable\/self-hosted ClaimGuard packages/,
+      /Real customer evidence/,
+      /Raw OCR dumps/,
+      /Provider payload dumps/,
+      /Secrets/,
+      /API keys/,
+      /Synthetic demo data only/,
+      /Provider features disabled unless explicitly configured/,
+      /License\/distribution notes documented later/,
+    ],
+  },
+  {
+    label: "execution strategy",
+    patterns: [
+      /Semantic checker group/,
+      /Route\/runtime guard group/,
+      /Privacy\/identifier group/,
+      /Fixture-policy group/,
+      /Schema\/output group/,
+      /Unsupported\/failure-state group/,
+      /Package-safety group/,
+      /Provider-call\/env failures block implementation unless explicitly approved/,
+    ],
+  },
+  {
+    label: "relationship to existing routes and plans",
+    patterns: [
+      /Existing `POST \/api\/analysis\/ocr` remains exact `fixtureKey` only/,
+      /Existing `POST \/api\/analysis\/mock-provider` remains synthetic\/mock-only/,
+      /Validation\/probe planning must not modify either existing route/,
+      /Future validation should enforce Phase 4\.20 prompt\/output contract planning/,
+      /Future validation should enforce Phase 4\.21 schema planning/,
+      /Future validation should enforce Phase 4\.22 fixture policy planning/,
+      /Validation\/probe planning should not be wired into live receipt scoring/,
+    ],
+  },
+  {
+    label: "future approval gates and next options",
+    patterns: [
+      /Robert explicitly approves validation\/probe implementation phase/,
+      /Target validation categories are selected/,
+      /Package-safety requirements are confirmed/,
+      /Option A: Phase 4\.24 synthetic fixture metadata schema planning only/,
+      /Option B: Phase 4\.24 OpenAI Vision sandbox validation\/probe implementation plan/,
+      /Option C: Phase 4\.24 OpenAI Vision sandbox skeleton implementation plan/,
+    ],
+  },
+];
+
+const forbiddenPhase423OpenAiVisionSandboxValidationProbePlanPatterns = [
+  /npm\s+(?:install|add)\s+(?:openai|@aws-sdk|@google-cloud)/i,
+  /OPENAI_API_KEY|GOOGLE_APPLICATION_CREDENTIALS|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/,
+  /process\.env\.(?:OPENAI|GOOGLE|AWS|OCR|VISION)/i,
+  /import\s+.*\s+from\s+["'](?:openai|@aws-sdk|@google-cloud)/i,
+  /curl\s+/i,
+  /\bfetch\s*\(/,
+  /multipart\/form-data\s+is\s+accepted/i,
+  /raw provider payloads? (?:will|should) be logged/i,
+  /raw OCR (?:will|should) be retained/i,
+  /real evidence processing (?:is|will be) enabled/i,
+  /live OpenAI Vision implementation (?:is|was|will be) added/i,
+  /(?:This milestone|Phase 4\.23) (?:adds|added|implements|implemented|wires|wired) (?:live|real|provider|upload|storage|runtime|fixture files|fixture images|validation|probe)/i,
+  /(?:ClaimReviewWorkflow|ProductPhotoReviewPanel) (?:is|was|will be) (?:wired|routed)/i,
+  /(?:analyzeEvidenceFile|LocalAnalysisResult) (?:is|was|will be) (?:changed|migrated|updated)/i,
+  /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
+  /confidence (?:proves|confirms|verifies)/i,
+  /uncertainty (?:proves|confirms|verifies)/i,
+  /blob:|data:|file:/i,
+  /\b[A-Z]{2,}-\d{3,}\b/,
+  /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i,
+  /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -2067,6 +2306,12 @@ for (const signal of requiredPhase422OpenAiVisionSandboxFixturePolicyPlanSignals
   }
 }
 
+for (const signal of requiredPhase423OpenAiVisionSandboxValidationProbePlanSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase423OpenAiVisionSandboxValidationProbePlan))) {
+    failures.push(`Missing Phase 4.23 OpenAI Vision sandbox validation/probe planning signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -2208,6 +2453,12 @@ for (const pattern of forbiddenPhase421OpenAiVisionSandboxSchemaPlanPatterns) {
 for (const pattern of forbiddenPhase422OpenAiVisionSandboxFixturePolicyPlanPatterns) {
   if (pattern.test(phase422OpenAiVisionSandboxFixturePolicyPlan)) {
     failures.push(`Phase 4.22 OpenAI Vision sandbox fixture-policy plan failed: forbidden implementation/privacy pattern ${pattern}`);
+  }
+}
+
+for (const pattern of forbiddenPhase423OpenAiVisionSandboxValidationProbePlanPatterns) {
+  if (pattern.test(phase423OpenAiVisionSandboxValidationProbePlan)) {
+    failures.push(`Phase 4.23 OpenAI Vision sandbox validation/probe plan failed: forbidden implementation/privacy pattern ${pattern}`);
   }
 }
 
