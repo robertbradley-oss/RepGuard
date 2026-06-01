@@ -131,6 +131,9 @@ const phase418MockProviderRouteDeveloperUsage = readRequiredFile(
   "PHASE_4_18_MOCK_PROVIDER_ROUTE_DEVELOPER_USAGE.md",
 );
 const phase419OpenAiVisionSandboxPlan = readRequiredFile("PHASE_4_19_OPENAI_VISION_SANDBOX_PLAN.md");
+const phase420OpenAiVisionPromptOutputContractPlan = readRequiredFile(
+  "PHASE_4_20_OPENAI_VISION_PROMPT_OUTPUT_CONTRACT_PLAN.md",
+);
 
 const requiredSemanticSignals = [
   {
@@ -1314,6 +1317,167 @@ const forbiddenPhase419OpenAiVisionSandboxPlanPatterns = [
   /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
 ];
 
+const requiredPhase420OpenAiVisionPromptOutputContractSignals = [
+  {
+    label: "Phase 4.20 planning-only marker",
+    patterns: [
+      /Phase 4\.20 is an OpenAI Vision sandbox prompt\/output contract planning-only milestone/,
+      /It is a contract-planning milestone only, not a provider-integration milestone/,
+    ],
+  },
+  {
+    label: "no implementation scope",
+    patterns: [
+      /does not add OpenAI SDKs, provider SDKs, environment variables, provider calls/,
+      /does not change existing `POST \/api\/analysis\/ocr` behavior/,
+      /does not change existing `POST \/api\/analysis\/mock-provider` behavior/,
+      /does not change `analyzeEvidenceFile`/,
+      /does not change `LocalAnalysisResult`/,
+    ],
+  },
+  {
+    label: "future sandbox prompt goals",
+    patterns: [
+      /Screenshot\/layout observations/,
+      /Receipt visual\/context observations/,
+      /Product-photo context observations/,
+      /Altered-or-AI-generated-image uncertainty signals/,
+      /Manual-review driver generation/,
+    ],
+  },
+  {
+    label: "prompt template families",
+    patterns: [
+      /Synthetic Receipt Visual Review/,
+      /Synthetic Order Screenshot Review/,
+      /Synthetic Product Photo Review/,
+      /Synthetic Damaged-Product Review/,
+      /Synthetic Altered\/AI-Generated-Image Uncertainty Review/,
+      /Unsupported Or Ambiguous Evidence Handling/,
+      /Provider Failure Or Timeout Limitation Handling/,
+    ],
+  },
+  {
+    label: "prompt safety language requirements",
+    patterns: [
+      /Ask for uncertainty and review signals only/,
+      /Forbid fraud conclusions/,
+      /Forbid fake or forged accusations/,
+      /Forbid proof language/,
+      /Request structured output only/,
+      /Avoid presenting a single fraud score/,
+    ],
+  },
+  {
+    label: "future structured output contract",
+    patterns: [
+      /OpenAiVisionSandboxPromptOutputContract/,
+      /`providerMode`: `sandbox`/,
+      /`providerFamily`: `openai-vision-style`/,
+      /`alteredOrAiGeneratedImageUncertainty`/,
+      /`providerFailureReason`/,
+      /`unsupportedEvidenceReason`/,
+      /`schemaVersion`/,
+    ],
+  },
+  {
+    label: "altered uncertainty wording",
+    patterns: [
+      /altered-or-AI-generated-image uncertainty/,
+      /review signal only/,
+      /manual-review driver/,
+      /not proof/,
+      /not a final decision/,
+      /The value must never be displayed or stored as a single fraud score/,
+    ],
+  },
+  {
+    label: "observation conclusion separation",
+    patterns: [
+      /Direct visual observations/,
+      /Inferred uncertainty signals/,
+      /Confidence notes/,
+      /Limitations/,
+      /Manual-review drivers/,
+      /Future outputs must not collapse observations into final conclusions/,
+    ],
+  },
+  {
+    label: "unsupported and provider failure handling",
+    patterns: [
+      /Unsupported evidence must be treated as an evidence limitation only/,
+      /Provider failure must produce:/,
+      /`providerFailureReason`/,
+      /Operational-only wording/,
+      /No customer-risk conclusion/,
+    ],
+  },
+  {
+    label: "privacy constraints",
+    patterns: [
+      /Avoid real customer evidence by default/,
+      /Avoid raw private identifiers/,
+      /Avoid raw unredacted OCR text/,
+      /Avoid provider payload dumps/,
+      /Require redaction before anonymized fixture testing/,
+    ],
+  },
+  {
+    label: "relationship to existing routes and mock adapter",
+    patterns: [
+      /Existing `POST \/api\/analysis\/ocr` remains exact `fixtureKey` only/,
+      /Existing `POST \/api\/analysis\/mock-provider` remains synthetic\/mock-only and adapter-only/,
+      /The mock provider adapter remains the test boundary before live provider behavior/,
+      /`analyzeEvidenceFile` and `LocalAnalysisResult` remain unchanged/,
+    ],
+  },
+  {
+    label: "future QA and probe requirements",
+    patterns: [
+      /No SDK\/env\/package until approved/,
+      /Prompt safety scan/,
+      /Output schema safety scan/,
+      /Altered\/AI-generated wording scan/,
+      /Observation-vs-conclusion separation scan/,
+      /No route\/UI wiring scan/,
+    ],
+  },
+  {
+    label: "Phase 4.21 safe options",
+    patterns: [
+      /Option A: Phase 4\.21 OpenAI Vision sandbox schema planning only/,
+      /Option B: Phase 4\.21 OpenAI Vision sandbox test-fixture policy planning only/,
+      /Option C: Phase 4\.21 OpenAI Vision sandbox skeleton implementation plan/,
+    ],
+  },
+];
+
+const forbiddenPhase420OpenAiVisionPromptOutputContractPatterns = [
+  /npm\s+(?:install|add)\s+(?:openai|@aws-sdk|@google-cloud)/i,
+  /OPENAI_API_KEY|GOOGLE_APPLICATION_CREDENTIALS|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/,
+  /process\.env\.(?:OPENAI|GOOGLE|AWS|OCR|VISION)/i,
+  /import\s+.*\s+from\s+["'](?:openai|@aws-sdk|@google-cloud)/i,
+  /curl\s+/i,
+  /\bfetch\s*\(/,
+  /multipart\/form-data\s+is\s+accepted/i,
+  /raw provider payloads? (?:will|should) be logged/i,
+  /raw OCR (?:will|should) be retained/i,
+  /real evidence processing (?:is|will be) enabled/i,
+  /live OpenAI Vision implementation (?:is|was|will be) added/i,
+  /(?:This milestone|Phase 4\.20) (?:adds|added|implements|implemented|wires|wired) (?:live|real|provider|upload|storage)/i,
+  /(?:ClaimReviewWorkflow|ProductPhotoReviewPanel) (?:is|was|will be) (?:wired|routed)/i,
+  /(?:analyzeEvidenceFile|LocalAnalysisResult) (?:is|was|will be) (?:changed|migrated|updated)/i,
+  /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
+  /confidence (?:proves|confirms|verifies)/i,
+  /uncertainty (?:proves|confirms|verifies)/i,
+  /https?:\/\//i,
+  /blob:|data:|file:/i,
+  /[A-Za-z]:\\/,
+  /\b[A-Z]{2,}-\d{3,}\b/,
+  /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i,
+  /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -1452,6 +1616,12 @@ for (const signal of requiredPhase419OpenAiVisionSandboxPlanSignals) {
   }
 }
 
+for (const signal of requiredPhase420OpenAiVisionPromptOutputContractSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase420OpenAiVisionPromptOutputContractPlan))) {
+    failures.push(`Missing Phase 4.20 OpenAI Vision prompt/output contract planning signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -1575,6 +1745,12 @@ for (const pattern of forbiddenPhase418MockProviderRouteDeveloperUsagePatterns) 
 for (const pattern of forbiddenPhase419OpenAiVisionSandboxPlanPatterns) {
   if (pattern.test(phase419OpenAiVisionSandboxPlan)) {
     failures.push(`Phase 4.19 OpenAI Vision sandbox plan failed: forbidden implementation/privacy pattern ${pattern}`);
+  }
+}
+
+for (const pattern of forbiddenPhase420OpenAiVisionPromptOutputContractPatterns) {
+  if (pattern.test(phase420OpenAiVisionPromptOutputContractPlan)) {
+    failures.push(`Phase 4.20 OpenAI Vision prompt/output contract plan failed: forbidden implementation/privacy pattern ${pattern}`);
   }
 }
 
