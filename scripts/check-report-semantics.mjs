@@ -137,6 +137,9 @@ const phase420OpenAiVisionPromptOutputContractPlan = readRequiredFile(
 const phase421OpenAiVisionSandboxSchemaPlan = readRequiredFile(
   "PHASE_4_21_OPENAI_VISION_SANDBOX_SCHEMA_PLAN.md",
 );
+const phase422OpenAiVisionSandboxFixturePolicyPlan = readRequiredFile(
+  "PHASE_4_22_OPENAI_VISION_SANDBOX_FIXTURE_POLICY_PLAN.md",
+);
 
 const requiredSemanticSignals = [
   {
@@ -1712,6 +1715,202 @@ const forbiddenPhase421OpenAiVisionSandboxSchemaPlanPatterns = [
   /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
 ];
 
+const requiredPhase422OpenAiVisionSandboxFixturePolicyPlanSignals = [
+  {
+    label: "Phase 4.22 planning-only marker",
+    patterns: [
+      /Phase 4\.22 is an OpenAI Vision sandbox fixture-policy planning-only milestone/,
+      /No fixtures are added yet/,
+      /It is a fixture-policy milestone only, not a fixture-creation milestone and not a provider-integration milestone/,
+    ],
+  },
+  {
+    label: "no implementation scope",
+    patterns: [
+      /does not add OpenAI SDKs, provider SDKs, environment variables, provider calls/,
+      /does not add.*runtime schema\/types/,
+      /does not change existing `POST \/api\/analysis\/ocr` behavior/,
+      /does not change existing `POST \/api\/analysis\/mock-provider` behavior/,
+      /does not change `analyzeEvidenceFile`/,
+      /does not change `LocalAnalysisResult`/,
+    ],
+  },
+  {
+    label: "future fixture policy goals",
+    patterns: [
+      /Synthetic receipt visual review/,
+      /Synthetic order screenshot review/,
+      /Synthetic product photo review/,
+      /Synthetic damaged-product review/,
+      /Synthetic altered-or-AI-generated-image uncertainty review/,
+      /Provider failure and timeout limitation handling/,
+      /Manual-review driver generation/,
+    ],
+  },
+  {
+    label: "future fixture policy must not support",
+    patterns: [
+      /Real customer receipt processing/,
+      /Real customer product photo processing/,
+      /Public image URL ingestion/,
+      /Storage handle processing/,
+      /Raw provider payload replay/,
+      /Final claim decisions/,
+      /Customer-facing accusation generation/,
+    ],
+  },
+  {
+    label: "allowed synthetic fixture categories",
+    patterns: [
+      /Synthetic receipt image fixtures/,
+      /Synthetic order screenshot fixtures/,
+      /Synthetic product photo fixtures/,
+      /Synthetic damaged-product photo fixtures/,
+      /Synthetic packaging\/shipping-context image fixtures/,
+      /Synthetic mixed-evidence fixture sets/,
+      /Synthetic unsupported-evidence fixtures/,
+      /Synthetic altered-or-AI-generated-image uncertainty fixtures/,
+    ],
+  },
+  {
+    label: "redacted anonymized approval policy",
+    patterns: [
+      /Explicit Robert approval/,
+      /Documented source/,
+      /Documented redaction process/,
+      /Removal of customer names/,
+      /Removal of order numbers/,
+      /Removal of EXIF\/location metadata/,
+      /Legal\/privacy review checkpoint/,
+      /QA private-identifier scan/,
+      /No provider payload replay unless separately approved/,
+    ],
+  },
+  {
+    label: "disallowed fixture categories",
+    patterns: [
+      /Real customer receipts/,
+      /Real support ticket attachments/,
+      /Provider payload dumps/,
+      /Raw OCR dumps containing identifiers/,
+      /Screenshots of real Amazon\/customer order pages/,
+      /Product photos submitted by actual customers/,
+      /Any fixture that can identify a real person, customer, address, ticket, order, or shipment/,
+    ],
+  },
+  {
+    label: "fixture naming and metadata policy",
+    patterns: [
+      /vision-sandbox__synthetic__product-photo__low-quality-damage-context__v1__completed/,
+      /No customer names/,
+      /No public URLs/,
+      /`fixtureKey`/,
+      /`fixtureCategory`/,
+      /`identifierPolicy`/,
+      /`allowedPromptFamilies`/,
+      /`expectedSchemaFields`/,
+      /`disallowedOutputPatterns`/,
+      /Metadata must not contain real identifiers/,
+    ],
+  },
+  {
+    label: "fixture scenario matrix",
+    patterns: [
+      /Clean synthetic receipt/,
+      /Synthetic order screenshot with layout mismatch/,
+      /Synthetic damaged product with ambiguous visible issue/,
+      /Synthetic altered-or-AI-generated-image uncertainty high concern/,
+      /Provider timeout simulation/,
+      /Malformed provider response simulation/,
+      /Schema-validation-failure simulation/,
+    ],
+  },
+  {
+    label: "altered AI fixture policy",
+    patterns: [
+      /Fixture labels must use "altered-or-AI-generated-image uncertainty\."/,
+      /Expected values must be used only as schema\/test expectations, not truth labels about real evidence/,
+      /High uncertainty fixtures must still be framed as review-priority scenarios, not proof/,
+      /Fixtures must not train or imply automatic denial\/refund/,
+      /Fixtures must not include real customer photos/,
+    ],
+  },
+  {
+    label: "privacy retention fixture rules",
+    patterns: [
+      /Synthetic fixtures preferred by default/,
+      /Real evidence forbidden by default/,
+      /Redacted\/anonymized fixtures require separate approval/,
+      /No raw OCR dumps with identifiers/,
+      /No provider payload dumps/,
+      /No EXIF\/location metadata/,
+      /Private identifier scan required for any redacted\/anonymized fixture/,
+    ],
+  },
+  {
+    label: "fixture QA and probe requirements",
+    patterns: [
+      /No real evidence fixture scan/,
+      /No private identifier scan/,
+      /No public URL\/object URL\/storage handle scan/,
+      /Fixture naming convention scan/,
+      /Fixture metadata required-field scan/,
+      /Redaction approval gate scan/,
+      /Altered\/AI-generated uncertainty label scan/,
+      /No SDK\/env\/provider call scan/,
+      /No runtime wiring scan/,
+    ],
+  },
+  {
+    label: "relationship to existing routes and schema plan",
+    patterns: [
+      /Existing `POST \/api\/analysis\/ocr` remains exact `fixtureKey` only/,
+      /Existing `POST \/api\/analysis\/mock-provider` remains synthetic\/mock-only/,
+      /Fixture-policy planning must not modify either existing route/,
+      /The mock provider adapter remains the test boundary before live provider behavior/,
+      /Future fixtures should align with Phase 4\.20 prompt\/output contract planning and Phase 4\.21 schema planning/,
+      /Fixture policy should not be wired into live receipt scoring/,
+    ],
+  },
+  {
+    label: "future approval gates and next options",
+    patterns: [
+      /Robert explicitly approves fixture creation phase/,
+      /Storage location is approved/,
+      /Metadata format is approved/,
+      /Retention\/deletion policy is approved/,
+      /Fixture QA\/probe requirements are implemented or manually verified/,
+      /Option A: Phase 4\.23 OpenAI Vision sandbox validation\/probe planning only/,
+      /Option B: Phase 4\.23 OpenAI Vision sandbox skeleton implementation plan/,
+      /Option C: Phase 4\.23 synthetic fixture metadata schema planning only/,
+    ],
+  },
+];
+
+const forbiddenPhase422OpenAiVisionSandboxFixturePolicyPlanPatterns = [
+  /npm\s+(?:install|add)\s+(?:openai|@aws-sdk|@google-cloud)/i,
+  /OPENAI_API_KEY|GOOGLE_APPLICATION_CREDENTIALS|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/,
+  /process\.env\.(?:OPENAI|GOOGLE|AWS|OCR|VISION)/i,
+  /import\s+.*\s+from\s+["'](?:openai|@aws-sdk|@google-cloud)/i,
+  /curl\s+/i,
+  /\bfetch\s*\(/,
+  /multipart\/form-data\s+is\s+accepted/i,
+  /raw provider payloads? (?:will|should) be logged/i,
+  /raw OCR (?:will|should) be retained/i,
+  /real evidence processing (?:is|will be) enabled/i,
+  /live OpenAI Vision implementation (?:is|was|will be) added/i,
+  /(?:This milestone|Phase 4\.22) (?:adds|added|implements|implemented|wires|wired) (?:live|real|provider|upload|storage|runtime|fixture files|fixture images)/i,
+  /(?:ClaimReviewWorkflow|ProductPhotoReviewPanel) (?:is|was|will be) (?:wired|routed)/i,
+  /(?:analyzeEvidenceFile|LocalAnalysisResult) (?:is|was|will be) (?:changed|migrated|updated)/i,
+  /automatic (?:deny|approval|rejection|refund|disposition) (?:is|will be|should be) (?:enabled|allowed|performed)/i,
+  /confidence (?:proves|confirms|verifies)/i,
+  /uncertainty (?:proves|confirms|verifies)/i,
+  /blob:|data:|file:/i,
+  /\b[A-Z]{2,}-\d{3,}\b/,
+  /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i,
+  /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -1862,6 +2061,12 @@ for (const signal of requiredPhase421OpenAiVisionSandboxSchemaPlanSignals) {
   }
 }
 
+for (const signal of requiredPhase422OpenAiVisionSandboxFixturePolicyPlanSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase422OpenAiVisionSandboxFixturePolicyPlan))) {
+    failures.push(`Missing Phase 4.22 OpenAI Vision sandbox fixture-policy planning signal: ${signal.label}`);
+  }
+}
+
 for (const bannedPhrase of guardedBannedPhrases) {
   if (bannedPhrase.test(corpus)) {
     failures.push(`Unsafe report, fixture, or QA wording found: ${bannedPhrase}`);
@@ -1997,6 +2202,12 @@ for (const pattern of forbiddenPhase420OpenAiVisionPromptOutputContractPatterns)
 for (const pattern of forbiddenPhase421OpenAiVisionSandboxSchemaPlanPatterns) {
   if (pattern.test(phase421OpenAiVisionSandboxSchemaPlan)) {
     failures.push(`Phase 4.21 OpenAI Vision sandbox schema plan failed: forbidden implementation/privacy pattern ${pattern}`);
+  }
+}
+
+for (const pattern of forbiddenPhase422OpenAiVisionSandboxFixturePolicyPlanPatterns) {
+  if (pattern.test(phase422OpenAiVisionSandboxFixturePolicyPlan)) {
+    failures.push(`Phase 4.22 OpenAI Vision sandbox fixture-policy plan failed: forbidden implementation/privacy pattern ${pattern}`);
   }
 }
 
