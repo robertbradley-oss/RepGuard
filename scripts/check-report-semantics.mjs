@@ -175,6 +175,9 @@ const phase432VisionSandboxFixtureRunnerValidation = readRequiredFile(
 const phase433VisionSandboxDeveloperUsageReadiness = readRequiredFile(
   "PHASE_4_33_VISION_SANDBOX_DEVELOPER_USAGE_READINESS.md",
 );
+const phase434OpenAiVisionProviderConfigPlan = readRequiredFile(
+  "PHASE_4_34_OPENAI_VISION_PROVIDER_CONFIG_PLAN.md",
+);
 const visionSandboxSkeletonCorpus = [
   "src/lib/analysis/vision-sandbox/types.ts",
   "src/lib/analysis/vision-sandbox/fixture-registry.ts",
@@ -3172,6 +3175,91 @@ const requiredPhase433VisionSandboxDeveloperUsageReadinessSignals = [
   },
 ];
 
+const requiredPhase434OpenAiVisionProviderConfigPlanSignals = [
+  {
+    label: "Phase 4.34 planning-only provider configuration scope",
+    patterns: [
+      /Phase 4\.34 is an OpenAI Vision provider configuration planning milestone/,
+      /documentation\/planning only/i,
+      /No provider configuration is implemented/i,
+      /No OpenAI SDK/i,
+      /No provider call/i,
+      /API-credit-using behavior/i,
+      /This is not live AI/i,
+    ],
+  },
+  {
+    label: "Phase 4.34 future goals and opt-in",
+    patterns: [
+      /Future Provider Configuration Goals/,
+      /Keep provider features disabled by default/i,
+      /Prevent accidental provider calls/i,
+      /Provider Opt-In Model/,
+      /Robert approval before provider configuration implementation/i,
+      /Separate Robert approval before any API-credit-using work/i,
+      /documented no-real-evidence boundary/i,
+    ],
+  },
+  {
+    label: "Phase 4.34 API credit and environment guidance",
+    patterns: [
+      /API Credit Usage Planning/,
+      /existing script\/module-only sandbox uses zero API credits/i,
+      /Future synthetic provider sandbox calls may use credits/i,
+      /Future Environment Variable Guidance/,
+      /\.env\.example/,
+      /Never commit API keys/i,
+      /Provider behavior remains disabled when key or configuration is absent/i,
+    ],
+  },
+  {
+    label: "Phase 4.34 model, operational defaults, and privacy",
+    patterns: [
+      /Model And Provider Selection Strategy/,
+      /provider adapter boundaries/i,
+      /Timeout, Retry, Rate, And Cost Defaults/,
+      /no automatic retry by default/i,
+      /Logging, Payload Retention, And Privacy Defaults/,
+      /No raw provider payload logging by default/i,
+      /Real customer evidence requires a separate privacy and retention milestone/i,
+    ],
+  },
+  {
+    label: "Phase 4.34 sandbox relationship and package safety",
+    patterns: [
+      /Relationship To Current Sandbox/,
+      /current OpenAI Vision-style sandbox remains script\/module-only/i,
+      /Change `analyzeEvidenceFile`/i,
+      /Change `LocalAnalysisResult`/i,
+      /Downloadable And Self-Hosted Package Safety/,
+      /Provider features must remain disabled by default/i,
+      /Package-safety checks must block unsafe config/i,
+    ],
+  },
+  {
+    label: "Phase 4.34 approval gates and next phase",
+    patterns: [
+      /Future Approval Gates/,
+      /Robert explicitly approves provider configuration implementation/i,
+      /Robert separately approves API-credit-using work before any provider call/i,
+      /Phase 4\.35 real OpenAI Vision sandbox implementation planning only/,
+      /provider configuration implementation skeleton, no provider calls/i,
+      /Do not recommend live OpenAI Vision implementation yet/i,
+    ],
+  },
+  {
+    label: "Phase 4.34 safety language",
+    patterns: [
+      /altered-or-AI-generated-image uncertainty/i,
+      /review signal only/i,
+      /not proof/i,
+      /not a final claim decision/i,
+      /not a customer accusation/i,
+      /manual-review/i,
+    ],
+  },
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -3415,6 +3503,12 @@ for (const signal of requiredPhase432VisionSandboxDocSignals) {
 for (const signal of requiredPhase433VisionSandboxDeveloperUsageReadinessSignals) {
   if (!signal.patterns.every((pattern) => pattern.test(phase433VisionSandboxDeveloperUsageReadiness))) {
     failures.push(`Missing Phase 4.33 OpenAI Vision sandbox developer usage readiness signal: ${signal.label}`);
+  }
+}
+
+for (const signal of requiredPhase434OpenAiVisionProviderConfigPlanSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase434OpenAiVisionProviderConfigPlan))) {
+    failures.push(`Missing Phase 4.34 OpenAI Vision provider configuration planning signal: ${signal.label}`);
   }
 }
 
