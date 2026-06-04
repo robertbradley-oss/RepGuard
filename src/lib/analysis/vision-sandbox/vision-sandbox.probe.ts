@@ -81,14 +81,23 @@ function runVisionSandboxSkeletonProbe() {
   });
   const defaultProviderConfig = resolveVisionSandboxProviderConfig();
   const unsafeProviderConfig = resolveVisionSandboxProviderConfig({
+    providerMode: "live",
+    providerFamily: "unknown-provider",
     providerEnabled: true,
+    providerCallsAllowed: true,
+    requestExecutionAllowed: true,
+    apiCreditUsageAllowed: true,
+    modelName: "configured-model",
     timeoutMs: VISION_SANDBOX_PROVIDER_CONFIG_TIMEOUT_CEILING_MS + 1,
     retryPolicy: { automaticRetriesEnabled: true, maxAttempts: 2 },
     maxFixtureBatchSize: 2,
+    costLimitMode: "live-cost",
     payloadLoggingPolicy: "enabled",
     rawOcrRetentionPolicy: "enabled",
     evidenceScope: "real-evidence",
     packageSafetyMode: "provider-enabled",
+    secretsRequired: true,
+    envConfigRequired: true,
   });
 
   const moduleChecks = {
@@ -220,11 +229,17 @@ function runVisionSandboxSkeletonProbe() {
       defaultProviderConfig.config.packageSafetyMode === "downloadable-safe-disabled" &&
       !defaultProviderConfig.config.secretsRequired &&
       !defaultProviderConfig.config.envConfigRequired &&
+      defaultProviderConfig.config.envExampleStatus === "safe-example-added-provider-disabled" &&
       defaultProviderConfig.futureApprovalRequired,
     unsafeCandidateBlocked:
       !unsafeProviderConfig.guard.passed &&
+      unsafeProviderConfig.guard.reasons.length >= 14 &&
       !unsafeProviderConfig.config.providerEnabled &&
       !unsafeProviderConfig.config.providerCallsAllowed &&
+      !unsafeProviderConfig.config.requestExecutionAllowed &&
+      !unsafeProviderConfig.config.apiCreditUsageAllowed &&
+      unsafeProviderConfig.config.providerMode === "sandbox" &&
+      unsafeProviderConfig.config.providerFamily === "openai-vision-style" &&
       unsafeProviderConfig.config.evidenceScope === "synthetic-fixture-only",
   };
 

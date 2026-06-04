@@ -188,6 +188,10 @@ const phase436OpenAiVisionSandboxApprovalCheckpoint = readRequiredFile(
 const phase437OpenAiVisionProviderConfigSkeleton = readRequiredFile(
   "PHASE_4_37_OPENAI_VISION_PROVIDER_CONFIG_SKELETON.md",
 );
+const phase438OpenAiVisionProviderConfigHardening = readRequiredFile(
+  "PHASE_4_38_OPENAI_VISION_PROVIDER_CONFIG_HARDENING.md",
+);
+const envExample = readRequiredFile(".env.example");
 const visionSandboxSkeletonCorpus = [
   "src/lib/analysis/vision-sandbox/types.ts",
   "src/lib/analysis/vision-sandbox/fixture-registry.ts",
@@ -3544,6 +3548,107 @@ const requiredPhase437OpenAiVisionProviderConfigSkeletonSignals = [
   },
 ];
 
+const requiredPhase438OpenAiVisionProviderConfigHardeningSignals = [
+  {
+    label: "Phase 4.38 hardening-only scope",
+    patterns: [
+      /Phase 4\.38 is OpenAI Vision provider configuration skeleton hardening/i,
+      /hardening\/review only/i,
+      /no provider calls/i,
+      /no API-credit usage/i,
+      /no live OpenAI calls/i,
+      /no real evidence/i,
+    ],
+  },
+  {
+    label: "Phase 4.38 disabled defaults",
+    patterns: [
+      /providerEnabled:\s*false/,
+      /providerCallsAllowed:\s*false/,
+      /requestExecutionAllowed:\s*false/,
+      /apiCreditUsageAllowed:\s*false/,
+      /payloadLoggingPolicy:\s*"disabled"/,
+      /rawOcrRetentionPolicy:\s*"disabled"/,
+      /evidenceScope:\s*"synthetic-fixture-only"/,
+      /packageSafetyMode:\s*"downloadable-safe-disabled"/,
+    ],
+  },
+  {
+    label: "Phase 4.38 env example decision",
+    patterns: [
+      /\.env\.example is added/i,
+      /contains no secrets/i,
+      /contains no real values/i,
+      /does not enable provider calls/i,
+      /requires separate Robert approval/i,
+      /current sandbox works without provider configuration/i,
+      /no real evidence/i,
+    ],
+  },
+  {
+    label: "Phase 4.38 config validation hardening",
+    patterns: [
+      /provider enabled attempts/i,
+      /request execution attempts/i,
+      /API-credit usage attempts/i,
+      /payload logging attempts/i,
+      /raw OCR retention attempts/i,
+      /evidence scope broader than synthetic-fixture-only/i,
+      /timeout above the ceiling/i,
+      /fixture batch size above 1/i,
+      /unknown provider family or mode/i,
+    ],
+  },
+  {
+    label: "Phase 4.38 package and sandbox relationship",
+    patterns: [
+      /Package And Downloadable Safety/i,
+      /no secrets/i,
+      /provider disabled by default/i,
+      /no provider payloads/i,
+      /self-hosted users may configure providers only after later approved guidance/i,
+      /Relationship To Current Sandbox/i,
+      /does not change routes/i,
+      /does not change receipt scoring/i,
+      /does not use `LocalAnalysisResult`/,
+      /does not change `analyzeEvidenceFile`/,
+    ],
+  },
+  {
+    label: "Phase 4.38 recommendation and safety language",
+    patterns: [
+      /Phase 4\.39 provider configuration developer usage documentation and API-credit approval readiness/i,
+      /first API-credit-using OpenAI Vision sandbox implementation.*only if Robert explicitly approves Choice B/is,
+      /altered-or-AI-generated-image uncertainty/i,
+      /review signal/i,
+      /not proof/i,
+      /not a final claim decision/i,
+      /manual-review/i,
+    ],
+  },
+];
+
+const requiredPhase438EnvExampleSignals = [
+  {
+    label: "Phase 4.38 env example disabled and blank",
+    patterns: [
+      /ClaimGuard Phase 4\.38 safe example configuration/i,
+      /example only/i,
+      /contains no secrets/i,
+      /provider calls and API-credit usage require separate Robert approval/i,
+      /current sandbox works without provider configuration/i,
+      /^CLAIMGUARD_VISION_PROVIDER_ENABLED=false$/m,
+      /^CLAIMGUARD_VISION_PROVIDER_CALLS_ALLOWED=false$/m,
+      /^CLAIMGUARD_VISION_REQUEST_EXECUTION_ALLOWED=false$/m,
+      /^CLAIMGUARD_VISION_API_CREDIT_USAGE_ALLOWED=false$/m,
+      /^CLAIMGUARD_VISION_PROVIDER_API_KEY=$/m,
+      /^CLAIMGUARD_VISION_EVIDENCE_SCOPE=synthetic-fixture-only$/m,
+      /^CLAIMGUARD_VISION_PAYLOAD_LOGGING_POLICY=disabled$/m,
+      /^CLAIMGUARD_VISION_RAW_OCR_RETENTION_POLICY=disabled$/m,
+    ],
+  },
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -3811,6 +3916,18 @@ for (const signal of requiredPhase436OpenAiVisionSandboxApprovalCheckpointSignal
 for (const signal of requiredPhase437OpenAiVisionProviderConfigSkeletonSignals) {
   if (!signal.patterns.every((pattern) => pattern.test(phase437OpenAiVisionProviderConfigSkeleton))) {
     failures.push(`Missing Phase 4.37 OpenAI Vision provider config skeleton signal: ${signal.label}`);
+  }
+}
+
+for (const signal of requiredPhase438OpenAiVisionProviderConfigHardeningSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase438OpenAiVisionProviderConfigHardening))) {
+    failures.push(`Missing Phase 4.38 OpenAI Vision provider config hardening signal: ${signal.label}`);
+  }
+}
+
+for (const signal of requiredPhase438EnvExampleSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(envExample))) {
+    failures.push(`Missing Phase 4.38 safe env example signal: ${signal.label}`);
   }
 }
 
