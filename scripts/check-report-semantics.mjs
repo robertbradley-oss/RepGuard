@@ -194,6 +194,9 @@ const phase438OpenAiVisionProviderConfigHardening = readRequiredFile(
 const phase439ProviderConfigDeveloperUsageAndApiCreditReadiness = readRequiredFile(
   "PHASE_4_39_PROVIDER_CONFIG_DEVELOPER_USAGE_AND_API_CREDIT_READINESS.md",
 );
+const phase440ApiCreditApprovalAndFirstLiveSandboxCallPlan = readRequiredFile(
+  "PHASE_4_40_API_CREDIT_APPROVAL_AND_FIRST_LIVE_SANDBOX_CALL_PLAN.md",
+);
 const envExample = readRequiredFile(".env.example");
 const visionSandboxSkeletonCorpus = [
   "src/lib/analysis/vision-sandbox/types.ts",
@@ -3752,6 +3755,106 @@ const requiredPhase439ProviderConfigDeveloperUsageAndApiCreditReadinessSignals =
   },
 ];
 
+const requiredPhase440ApiCreditApprovalAndFirstLiveSandboxCallPlanSignals = [
+  {
+    label: "Phase 4.40 decision-planning scope",
+    patterns: [
+      /Phase 4\.40 exists before Choice B implementation/i,
+      /decision\/planning only/i,
+      /no live provider behavior/i,
+      /no OpenAI SDK/i,
+      /no provider call/i,
+      /no API-credit usage/i,
+      /not live AI and not production analysis/i,
+    ],
+  },
+  {
+    label: "Phase 4.40 Choice B definition",
+    patterns: [
+      /Choice B:\s*Approve first API-credit-using OpenAI Vision sandbox implementation for synthetic fixtures only/i,
+      /one tiny manually triggered synthetic-only provider call path/i,
+      /API-credit usage for approved synthetic fixtures only/i,
+      /sandbox-only response normalization and validation/i,
+      /would not authorize/i,
+      /real customer evidence/i,
+      /production routes/i,
+      /LocalAnalysisResult/i,
+      /raw provider payload retention/i,
+      /deployment/i,
+    ],
+  },
+  {
+    label: "Phase 4.40 recommended approval position",
+    patterns: [
+      /technical foundation appears ready for a tiny synthetic-only first call/i,
+      /provider defaults are safe and disabled/i,
+      /boundary checks exist/i,
+      /fixture runner exists/i,
+      /API-credit work remains blocked unless Robert explicitly approves Choice B/i,
+      /continue hardening config\/checkers/i,
+    ],
+  },
+  {
+    label: "Phase 4.40 first live synthetic-only call plan",
+    patterns: [
+      /developer-only/i,
+      /manually triggered/i,
+      /exactly one fixture/i,
+      /no uploads/i,
+      /no UI/i,
+      /no route exposure unless separately approved/i,
+      /no public URLs/i,
+      /no object URLs/i,
+      /strict timeout/i,
+      /cost metadata captured/i,
+      /boundary checks required before and after call/i,
+      /synthetic-clean-receipt-baseline/i,
+      /Avoid first-call fixtures that test high altered\/AI uncertainty/i,
+    ],
+  },
+  {
+    label: "Phase 4.40 provider configuration and API-credit controls",
+    patterns: [
+      /provider disabled by default/i,
+      /request execution disabled by default/i,
+      /API-credit usage disabled by default/i,
+      /provider key not committed/i,
+      /local config must not be logged/i,
+      /no automatic retry/i,
+      /stop after first result/i,
+      /stop if usage is unexpected/i,
+    ],
+  },
+  {
+    label: "Phase 4.40 output validation and rollback",
+    patterns: [
+      /schema shape validation/i,
+      /semantic safety scan/i,
+      /altered-or-AI-generated-image uncertainty wording scan/i,
+      /observation-vs-signal separation check/i,
+      /no proof\/fraud\/fake\/forged wording/i,
+      /no automatic deny\/refund wording/i,
+      /no receipt scoring output/i,
+      /Stop and rollback conditions/i,
+      /revert provider implementation commit/i,
+      /do not weaken safety gates/i,
+    ],
+  },
+  {
+    label: "Phase 4.40 package safety and next recommendation",
+    patterns: [
+      /Package\/downloadable safety/i,
+      /no secrets in repo/i,
+      /provider disabled by default/i,
+      /`?\.env\.example`? only/i,
+      /no live-provider assumptions in downloadable package/i,
+      /Phase 4\.41 first API-credit-using OpenAI Vision sandbox implementation/i,
+      /Phase 4\.41 provider config\/checker hardening, still no API credits/i,
+      /Do not start API-credit-using implementation unless Robert explicitly approves Choice B in plain language/i,
+    ],
+  },
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -4037,6 +4140,12 @@ for (const signal of requiredPhase438EnvExampleSignals) {
 for (const signal of requiredPhase439ProviderConfigDeveloperUsageAndApiCreditReadinessSignals) {
   if (!signal.patterns.every((pattern) => pattern.test(phase439ProviderConfigDeveloperUsageAndApiCreditReadiness))) {
     failures.push(`Missing Phase 4.39 provider config developer usage/API-credit readiness signal: ${signal.label}`);
+  }
+}
+
+for (const signal of requiredPhase440ApiCreditApprovalAndFirstLiveSandboxCallPlanSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase440ApiCreditApprovalAndFirstLiveSandboxCallPlan))) {
+    failures.push(`Missing Phase 4.40 API-credit approval and first live sandbox call plan signal: ${signal.label}`);
   }
 }
 

@@ -149,7 +149,7 @@ if (/"(?:openai|@openai\/agents|@google-cloud\/vision|@google-cloud\/documentai|
 const sourceFiles = allTextFiles.filter((file) => file.path.startsWith("src/"));
 const scriptFiles = allTextFiles.filter((file) => file.path.startsWith("scripts/"));
 const docsFiles = allTextFiles.filter((file) => file.path.endsWith(".md"));
-const sandboxDocs = docsFiles.filter((file) => /PHASE_4_(?:19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39)_/.test(file.path));
+const sandboxDocs = docsFiles.filter((file) => /PHASE_4_(?:19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40)_/.test(file.path));
 const sourceAndScriptFiles = [...sourceFiles, ...scriptFiles];
 const sandboxSkeletonSourcePrefix = "src/lib/analysis/vision-sandbox/";
 const sandboxSkeletonFiles = allTextFiles.filter(
@@ -239,7 +239,7 @@ for (const changedFile of changedFiles) {
   if (
     !allowedChangedFiles.has(changedFile) &&
     !changedFile.startsWith(sandboxSkeletonSourcePrefix) &&
-    !/^PHASE_4_(?:26|27|28|29|30|31|32|33|34|35|36|37|38|39)_/.test(changedFile) &&
+    !/^PHASE_4_(?:26|27|28|29|30|31|32|33|34|35|36|37|38|39|40)_/.test(changedFile) &&
     !changedFile.startsWith("sandbox-fixtures/") &&
     !changedFile.startsWith("synthetic-fixtures/") &&
     !changedFile.startsWith("fixtures/vision-sandbox/")
