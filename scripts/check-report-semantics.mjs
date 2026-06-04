@@ -181,6 +181,9 @@ const phase434OpenAiVisionProviderConfigPlan = readRequiredFile(
 const phase435OpenAiVisionSandboxImplementationPlan = readRequiredFile(
   "PHASE_4_35_OPENAI_VISION_SANDBOX_IMPLEMENTATION_PLAN.md",
 );
+const phase436OpenAiVisionSandboxApprovalCheckpoint = readRequiredFile(
+  "PHASE_4_36_OPENAI_VISION_SANDBOX_APPROVAL_CHECKPOINT.md",
+);
 const visionSandboxSkeletonCorpus = [
   "src/lib/analysis/vision-sandbox/types.ts",
   "src/lib/analysis/vision-sandbox/fixture-registry.ts",
@@ -3360,6 +3363,101 @@ const requiredPhase435OpenAiVisionSandboxImplementationPlanSignals = [
   },
 ];
 
+const requiredPhase436OpenAiVisionSandboxApprovalCheckpointSignals = [
+  {
+    label: "Phase 4.36 approval-checkpoint-only scope",
+    patterns: [
+      /Phase 4\.36 exists as the real OpenAI Vision sandbox implementation approval checkpoint/,
+      /approval checkpoint documentation only/i,
+      /No live provider behavior is implemented/i,
+      /No OpenAI SDK/i,
+      /No provider call/i,
+      /No API-credit usage/i,
+      /This is not live AI/i,
+    ],
+  },
+  {
+    label: "Phase 4.36 readiness summary",
+    patterns: [
+      /Current Readiness Summary/,
+      /sandbox skeleton exists/i,
+      /fixture runner exists/i,
+      /synthetic fixture metadata registry exists/i,
+      /No provider calls exist/i,
+      /No API credits have been used/i,
+      /Production receipt flow is unchanged/i,
+    ],
+  },
+  {
+    label: "Phase 4.36 approval choices",
+    patterns: [
+      /Choice A: Provider Configuration Skeleton Only/,
+      /Choice B: First API-Credit-Using OpenAI Vision Sandbox/,
+      /Choice C: Pause Live Provider Work/,
+      /Choice D: Downloadable\/Self-Hosted Provider Setup Guide First/,
+      /Only Choice B authorizes API-credit-using work/i,
+    ],
+  },
+  {
+    label: "Phase 4.36 work allowed and blocked",
+    patterns: [
+      /Work Allowed Without API-Credit Approval/,
+      /Provider configuration skeleton with no calls/i,
+      /Boundary checker hardening/i,
+      /Work Blocked Without API-Credit Approval/,
+      /Any real OpenAI call/i,
+      /Any API-credit-spending test/i,
+    ],
+  },
+  {
+    label: "Phase 4.36 first API-credit phase rules",
+    patterns: [
+      /First API-Credit-Using Phase Rules/,
+      /Developer-only/i,
+      /Synthetic fixture only/i,
+      /Tiny batch only/i,
+      /Manually triggered/i,
+      /No uploads/i,
+      /No production route/i,
+      /Cost metadata required/i,
+      /No `LocalAnalysisResult`/,
+    ],
+  },
+  {
+    label: "Phase 4.36 readiness and rollback",
+    patterns: [
+      /Provider Configuration Skeleton Readiness/,
+      /Provider behavior remains disabled by default/i,
+      /API-Credit-Using Readiness/,
+      /API-credit usage remains blocked until Robert explicitly approves/i,
+      /Stop And Rollback Conditions/,
+      /Revert the provider implementation commit if unsafe behavior appears/i,
+    ],
+  },
+  {
+    label: "Phase 4.36 package safety and recommendation",
+    patterns: [
+      /Package And Downloadable Safety Checkpoint/,
+      /Provider disabled by default/i,
+      /No secrets in package/i,
+      /Recommended Next Phase/,
+      /Phase 4\.37 provider configuration skeleton implementation, no provider calls and no API-credit usage/,
+      /only if Robert explicitly approves API-credit use/i,
+    ],
+  },
+  {
+    label: "Phase 4.36 safety language",
+    patterns: [
+      /altered-or-AI-generated-image uncertainty/i,
+      /review signal only/i,
+      /not proof/i,
+      /not a final claim decision/i,
+      /not a customer accusation/i,
+      /manual-review/i,
+    ],
+  },
+];
+
 const forbiddenOcrRouteImports = [
   "@/lib/analysis/analyzer",
   "@/lib/analysis/types",
@@ -3615,6 +3713,12 @@ for (const signal of requiredPhase434OpenAiVisionProviderConfigPlanSignals) {
 for (const signal of requiredPhase435OpenAiVisionSandboxImplementationPlanSignals) {
   if (!signal.patterns.every((pattern) => pattern.test(phase435OpenAiVisionSandboxImplementationPlan))) {
     failures.push(`Missing Phase 4.35 OpenAI Vision sandbox implementation planning signal: ${signal.label}`);
+  }
+}
+
+for (const signal of requiredPhase436OpenAiVisionSandboxApprovalCheckpointSignals) {
+  if (!signal.patterns.every((pattern) => pattern.test(phase436OpenAiVisionSandboxApprovalCheckpoint))) {
+    failures.push(`Missing Phase 4.36 OpenAI Vision sandbox approval checkpoint signal: ${signal.label}`);
   }
 }
 
