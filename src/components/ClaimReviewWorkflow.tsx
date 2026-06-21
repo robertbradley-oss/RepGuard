@@ -26,7 +26,6 @@ import {
   RotateCcw,
   ScanLine,
   ScanText,
-  ShieldCheck,
   Type,
   UploadCloud,
 } from "lucide-react";
@@ -507,19 +506,14 @@ export function ClaimReviewWorkflow() {
 
   return (
     <div className="mx-auto grid min-h-screen max-w-[1344px] content-start gap-3 px-4 pb-6 sm:px-6">
-      <header className="-mx-4 flex min-h-[58px] items-center justify-between gap-4 border-b border-[rgba(125,103,64,0.16)] px-4 sm:-mx-6 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="relative size-6 shrink-0">
-            <Image className="object-contain" src="/brand/claimguard-logo-mark.png" alt="ClaimGuard" fill priority sizes="24px" />
-          </div>
-          <div className="cg-phase-badge inline-flex min-w-0 items-center gap-2 rounded-full px-3 py-1 text-xs font-medium uppercase">
-            <ShieldCheck className="size-3.5 shrink-0" aria-hidden="true" />
-            <span className="truncate">Phase 1 Receipt Authenticity Analyzer</span>
-          </div>
+      <header className="-mx-4 flex min-h-[60px] items-center gap-3 border-b border-[rgba(125,103,64,0.16)] px-4 sm:-mx-6 sm:px-6">
+        <div className="relative size-11 shrink-0">
+          <Image className="object-contain" src="/brand/repguard-logo-mark.svg" alt="RepGuard" fill priority unoptimized sizes="44px" />
         </div>
-        <div className="cg-privacy-pill hidden rounded-full px-4 py-2 text-sm sm:block">
-          Local browser analysis only. No customer evidence is stored by default.
-        </div>
+        <p className="text-[28px] font-bold leading-none tracking-[-0.015em]">
+          <span className="text-[var(--cg-text)]">Rep</span>
+          <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(180deg, #c08f31, #92502f)" }}>Guard</span>
+        </p>
       </header>
 
       <section className="pt-5">
@@ -579,14 +573,14 @@ export function ClaimReviewWorkflow() {
 
                 <div className="mx-auto my-6 h-px max-w-[520px] bg-[rgba(125,103,64,0.16)]" />
 
-                <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-subtle)]">What ClaimGuard checks</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-subtle)]">What RepGuard checks</p>
                 <div className="mx-auto mt-3 grid max-w-[450px] gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {claimGuardCheckChips.map((chip) => (
                     <Chip key={chip.label} {...chip} />
                   ))}
                 </div>
                 <p className="mx-auto mt-4 max-w-[390px] text-xs leading-5 text-[var(--cg-text-subtle)]">
-                  ClaimGuard reviews evidence for potential inconsistencies and recommends manual review when needed.
+                  RepGuard reviews evidence for potential inconsistencies and recommends manual review when needed.
                 </p>
                 {uploadError ? <p className="mt-4 text-sm font-medium text-[var(--cg-red)]">{uploadError}</p> : null}
               </div>
@@ -669,7 +663,7 @@ export function ClaimReviewWorkflow() {
                       <div>
                         <p className="text-base font-medium text-[var(--cg-text)]">Rendering PDF preview</p>
                         <p className="mt-2 max-w-md text-sm leading-6 text-[var(--cg-text-muted)]">
-                          ClaimGuard is preparing the first page for visual inspection.
+                          RepGuard is preparing the first page for visual inspection.
                         </p>
                       </div>
                     </div>
@@ -685,7 +679,7 @@ export function ClaimReviewWorkflow() {
                           {isPdfFile ? "PDF preview could not render" : "Evidence preview unavailable"}
                         </p>
                         <p className="mt-2 max-w-md text-sm leading-6 text-[var(--cg-text-muted)]">
-                          {pdfPreviewError ?? "ClaimGuard can still run local OCR and document consistency checks on the selected file."}
+                          {pdfPreviewError ?? "RepGuard can still run local OCR and document consistency checks on the selected file."}
                         </p>
                       </div>
                     </div>

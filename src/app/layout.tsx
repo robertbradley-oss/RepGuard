@@ -13,12 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ClaimGuard",
+  title: "RepGuard",
   description: "Support-safe receipt evidence reliability analyzer.",
   icons: {
-    icon: "/brand/claimguard-logo-mark.png",
-    shortcut: "/brand/claimguard-logo-mark.png",
-    apple: "/brand/claimguard-logo-mark.png",
+    icon: "/brand/repguard-logo-mark.svg",
+    shortcut: "/brand/repguard-logo-mark.svg",
+    apple: "/brand/repguard-logo-mark.svg",
   },
 };
 

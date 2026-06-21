@@ -49,10 +49,11 @@ export function AppSidebar() {
       <div className="relative h-12 w-44 overflow-hidden lg:w-full">
         <Image
           className="object-contain object-left"
-          src="/brand/claimguard-logo-full.png"
-          alt="ClaimGuard logo"
+          src="/brand/repguard-logo-full.svg"
+          alt="RepGuard logo"
           fill
           priority
+          unoptimized
           sizes="200px"
         />
       </div>

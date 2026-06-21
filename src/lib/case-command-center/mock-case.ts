@@ -655,7 +655,7 @@ export const phase32MockCase: ClaimGuardLocalCase = {
         whenToUse:
           "Use when the case has mixed evidence and the reviewer has not chosen a support action.",
         avoids: [
-          "Does not present ClaimGuard as the decision maker",
+          "Does not present RepGuard as the decision maker",
           "Does not state that submitted evidence proved or disproved the claim",
           "Does not promise a specific result",
         ],
@@ -742,7 +742,7 @@ export const phase32MockCase: ClaimGuardLocalCase = {
       severity: "Complete",
       timestamp: "Today 09:21",
       relativeTime: "33 minutes ago",
-      actor: "ClaimGuard shell",
+      actor: "RepGuard shell",
       detail: "Local receipt review summary is staged as an evidence item; external verification was not performed.",
       caseStatusAfter: "Evidence review",
       relatedEvidenceKeys: ["receipt-summary"],
@@ -768,7 +768,7 @@ export const phase32MockCase: ClaimGuardLocalCase = {
       severity: "Needs review",
       timestamp: "Today 09:34",
       relativeTime: "20 minutes ago",
-      actor: "ClaimGuard shell",
+      actor: "RepGuard shell",
       detail: "Product-photo-like evidence remains manual-review-only and no automated analysis result was produced.",
       caseStatusAfter: "Manual review",
       relatedEvidenceKeys: ["photo-unsupported"],
