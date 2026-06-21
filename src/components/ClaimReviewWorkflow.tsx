@@ -506,8 +506,11 @@ export function ClaimReviewWorkflow() {
 
   return (
     <div className="mx-auto grid min-h-screen max-w-[1344px] content-start gap-3 px-4 pb-6 sm:px-6">
-      <header className="-mx-4 flex min-h-[60px] items-center border-b border-[rgba(125,103,64,0.16)] px-4 sm:-mx-6 sm:px-6">
-        <Image className="h-11 w-auto" src="/brand/repguard-logo-full.png" alt="RepGuard" width={1252} height={340} priority />
+      <header className="-mx-4 flex min-h-[76px] items-center border-b border-[rgba(125,103,64,0.16)] px-4 sm:-mx-6 sm:px-6">
+        <div className="flex flex-col">
+          <Image className="h-11 w-auto" src="/brand/repguard-logo-full.png" alt="RepGuard" width={1252} height={340} priority />
+          <p className="mt-1.5 pl-12 text-[13px] leading-none text-[var(--cg-text-muted)]">Authenticity, in focus.</p>
+        </div>
       </header>
 
       <section className="pt-5">
