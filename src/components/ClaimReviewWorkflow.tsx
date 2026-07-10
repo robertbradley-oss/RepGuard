@@ -2,14 +2,16 @@
 
 /* eslint-disable @next/next/no-img-element -- Local object URL evidence previews cannot be optimized through next/image. */
 
-import { useEffect, useMemo, useRef, useState, type DragEvent, type ReactNode } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type DragEvent, type ReactNode } from "react";
 import Image from "next/image";
 import {
   AlertTriangle,
   CalendarCheck,
   Camera,
+  Check,
   CheckCircle2,
   ChevronDown,
+  ChevronRight,
   Clipboard,
   ClipboardCheck,
   FileImage,
@@ -213,7 +215,7 @@ function EmptyDetail() {
 function Chip({ label, Icon }: IconChip) {
   return (
     <span className="cg-lab-chip inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs">
-      <Icon className="size-3.5" aria-hidden="true" />
+      <Icon className="size-3.5 text-[var(--rg-accent-strong)]" aria-hidden="true" />
       {label}
     </span>
   );
@@ -222,7 +224,7 @@ function Chip({ label, Icon }: IconChip) {
 function AnalyzerReviewItem({ label, Icon }: IconChip) {
   return (
     <li className="rg-review-item flex items-center gap-3 px-3 py-2 text-sm text-[var(--cg-text-soft)]">
-      <Icon className="size-4 shrink-0 text-[var(--cg-amber)]" aria-hidden="true" />
+      <Icon className="size-4 shrink-0 text-[var(--rg-accent-strong)]" aria-hidden="true" />
       <span>{label}</span>
     </li>
   );
@@ -510,8 +512,11 @@ export function ClaimReviewWorkflow() {
   }
 
   return (
-    <div className="rg-shell mx-auto grid min-h-screen max-w-[1380px] content-start gap-4 px-4 py-4 sm:px-6 sm:py-5 lg:px-8" data-status={status}>
-      <header className="rg-topbar flex min-h-[76px] items-center justify-between gap-4 px-4 py-3 sm:px-5">
+    <div
+      className="rg-shell mx-auto grid min-h-screen max-w-[1380px] content-start gap-4 px-4 py-4 sm:px-6 sm:py-5 lg:h-screen lg:grid-rows-[auto_auto_minmax(0,1fr)_auto] lg:overflow-hidden lg:px-8"
+      data-status={status}
+    >
+      <header className="rg-topbar flex min-h-[76px] items-center justify-between gap-4 px-1 py-3 md:px-2">
         <div className="rg-brand-lockup flex min-w-0 items-center gap-3">
           <Image
             className="rg-brand-mark h-12 w-[45px] shrink-0 object-contain"
@@ -522,7 +527,7 @@ export function ClaimReviewWorkflow() {
             priority
           />
           <div className="min-w-0">
-            <p className="rg-wordmark truncate text-[29px] font-semibold leading-none tracking-[-0.035em]">
+            <p className="rg-wordmark truncate text-[32px] font-bold leading-none tracking-[-0.03em]">
               <span className="text-[var(--rg-ink)]">Rep</span>
               <span className="text-[var(--rg-accent-strong)]">Guard</span>
             </p>
@@ -530,44 +535,51 @@ export function ClaimReviewWorkflow() {
           </div>
         </div>
 
-        <div className="rg-stage-rail hidden items-center gap-1 p-1 sm:flex" aria-label="Evidence review stages">
-          <span
-            className={`rg-stage-pill ${selectedFile ? "rg-stage-complete" : "rg-stage-active"}`}
-            aria-current={!selectedFile ? "step" : undefined}
-          >
-            01 Intake
-            {selectedFile ? <span className="sr-only"> completed</span> : null}
-          </span>
-          <span
-            className={`rg-stage-pill ${selectedFile && !hasCompletedReport ? "rg-stage-active" : hasCompletedReport ? "rg-stage-complete" : ""}`}
-            aria-current={selectedFile && !hasCompletedReport ? "step" : undefined}
-          >
-            02 Analyze
-            {hasCompletedReport ? <span className="sr-only"> completed</span> : null}
-          </span>
-          <span className={`rg-stage-pill ${hasCompletedReport ? "rg-stage-active" : ""}`} aria-current={hasCompletedReport ? "step" : undefined}>
-            03 Review
-          </span>
+        <div className="rg-stage-rail hidden items-center gap-0.5 p-1 sm:flex" aria-label="Evidence review stages">
+          {[
+            { num: "01", label: "Intake" },
+            { num: "02", label: "Analyze" },
+            { num: "03", label: "Review" },
+          ].map((stage, index) => {
+            const stageNumber = index + 1;
+            const isActive = stageNumber === activeStageNumber;
+            const isComplete = stageNumber < activeStageNumber;
+            return (
+              <Fragment key={stage.num}>
+                {index > 0 ? (
+                  <ChevronRight className="rg-stage-arrow size-3.5 shrink-0" aria-hidden="true" />
+                ) : null}
+                <span
+                  className={`rg-stage-pill ${isActive ? "rg-stage-active" : ""} ${isComplete ? "rg-stage-complete" : ""}`}
+                  aria-current={isActive ? "step" : undefined}
+                >
+                  {stage.label}
+                  {isComplete ? <Check className="rg-stage-check size-3.5" aria-hidden="true" /> : null}
+                  {isComplete ? <span className="sr-only"> completed</span> : null}
+                </span>
+              </Fragment>
+            );
+          })}
         </div>
 
         <div
           className="rg-local-pill inline-flex shrink-0 items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--cg-text-muted)]"
           aria-label="Browser-local analysis"
         >
-          <LockKeyhole className="size-4 text-[var(--rg-accent-strong)]" aria-hidden="true" />
+          <LockKeyhole className="size-4 text-[var(--rg-ink-tertiary)]" aria-hidden="true" />
           <span className="hidden md:inline">Browser-local</span>
         </div>
       </header>
 
-      <section className="rg-hero grid gap-4 px-1 pb-1 pt-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:px-2">
+      <section className="rg-hero grid gap-4 px-1 pb-1 pt-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:px-2">
         <div>
           <div className="rg-mobile-stage mb-4 inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold sm:hidden">
             <span className="rg-mobile-stage-count">{activeStageNumber}/3</span>
             {activeStageLabel}
           </div>
           <p className="rg-eyebrow">Evidence reliability analyzer</p>
-          <h1 className="mt-2 text-[clamp(2rem,4vw,3.35rem)] font-semibold leading-[1.04] tracking-[-0.035em] text-[var(--cg-text)]">
-            Evidence analysis workspace
+          <h1 className="mt-2 text-[clamp(1.85rem,3vw,2.6rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-[var(--cg-text)]">
+            Evidence analysis <span className="text-[var(--rg-accent-strong)]">workspace</span>
           </h1>
           <p className="mt-3 max-w-2xl text-[15px] leading-6 text-[var(--cg-text-muted)]">
             Upload one receipt, order screenshot, PDF, or evidence image and review the local analysis result.
@@ -575,15 +587,14 @@ export function ClaimReviewWorkflow() {
         </div>
         <div className="flex flex-wrap gap-2 md:justify-end">
           <span className="rg-meta-pill inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--cg-text-muted)]">
-            <ShieldCheck className="size-4 text-[var(--rg-accent-strong)]" aria-hidden="true" />
-            Manual review only
+            <ShieldCheck className="size-4 text-[var(--rg-ink-tertiary)]" aria-hidden="true" />
+            Manual review only · No external verification
           </span>
-          <span className="rg-meta-pill px-3 py-2 text-xs font-medium text-[var(--cg-text-muted)]">External verification not performed</span>
         </div>
       </section>
 
       <div
-        className="grid min-h-0 items-stretch gap-4 lg:grid-cols-[minmax(0,1fr)_380px] xl:h-[min(680px,calc(100vh-226px))] xl:min-h-[590px]"
+        className="grid min-h-0 items-stretch gap-4 lg:grid-cols-[minmax(0,1fr)_380px]"
         data-testid="analyzer-workspace-row"
       >
         <section
@@ -597,7 +608,7 @@ export function ClaimReviewWorkflow() {
         >
           {!selectedFile ? (
             <div
-              className="rg-upload-empty relative grid min-h-[510px] flex-1 place-items-center p-6 text-center sm:min-h-[530px] xl:min-h-0"
+              className="rg-upload-empty relative grid min-h-[440px] flex-1 place-items-center p-6 text-center lg:min-h-0"
             >
               <div className="mx-auto max-w-[620px]">
                 <div className="rg-upload-icon mx-auto grid size-[68px] place-items-center rounded-full text-[var(--rg-accent-strong)]">
@@ -631,7 +642,7 @@ export function ClaimReviewWorkflow() {
 
                 <div className="mx-auto my-6 h-px max-w-[520px] bg-[var(--rg-hairline)]" />
 
-                <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-subtle)]">What RepGuard checks</p>
+                <p className="rg-eyebrow justify-center text-[var(--cg-text-subtle)]">What RepGuard checks</p>
                 <div className="mx-auto mt-3 grid max-w-[450px] gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {claimGuardCheckChips.map((chip) => (
                     <Chip key={chip.label} {...chip} />
@@ -715,7 +726,7 @@ export function ClaimReviewWorkflow() {
                     </div>
                   ) : isPdfFile && isPdfPreviewLoading ? (
                     <div className="grid place-items-center gap-3 p-6 text-center">
-                      <Loader2 className="size-10 animate-spin text-[var(--cg-amber)]" aria-hidden="true" />
+                      <Loader2 className="size-10 animate-spin text-[var(--rg-accent-strong)]" aria-hidden="true" />
                       <div>
                         <p className="text-base font-medium text-[var(--cg-text)]">Rendering PDF preview</p>
                         <p className="mt-2 max-w-md text-sm leading-6 text-[var(--cg-text-muted)]">
@@ -803,7 +814,7 @@ export function ClaimReviewWorkflow() {
               {isAnalyzing ? (
                 <div className="rg-analysis-progress mt-4 p-4">
                   <div className="flex items-center gap-3">
-                    <Loader2 className="size-5 animate-spin text-[var(--cg-amber)]" aria-hidden="true" />
+                    <Loader2 className="size-5 animate-spin text-[var(--rg-accent-strong)]" aria-hidden="true" />
                     <div>
                       <p className="text-sm font-medium text-[var(--cg-dark-text)]">{currentStep.label}</p>
                       <p className="mt-1 text-xs text-[var(--cg-dark-muted)]">{currentStep.detail}</p>
@@ -918,13 +929,13 @@ export function ClaimReviewWorkflow() {
       </div>
 
       {shouldShowAnalysisDetails ? (
-        <details className="cg-analysis-drawer group mb-8" data-testid="analysis-details-drawer">
+        <details className="cg-analysis-drawer group" data-testid="analysis-details-drawer">
           <summary className="flex cursor-pointer list-none flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-amber)]">Analysis Details</p>
               <p className="mt-1 text-sm text-[var(--cg-text-muted)]">Review OCR metrics, metadata summaries, signals, notes, and privacy-safe export details.</p>
             </div>
-            <ChevronDown className="size-5 text-[var(--rg-accent-strong)] transition group-open:rotate-180" aria-hidden="true" />
+            <ChevronDown className="size-5 text-[var(--cg-amber)] transition group-open:rotate-180" aria-hidden="true" />
           </summary>
           <div className="grid gap-3 border-t border-[var(--rg-hairline)] p-4">
             <DetailSection title="Extracted Data">
