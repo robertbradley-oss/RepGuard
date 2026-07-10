@@ -86,6 +86,24 @@ const riskTone: Record<RiskLevel, string> = {
   High: "cg-risk-high",
 };
 
+const riskFillTone: Record<RiskLevel, string> = {
+  Low: "rg-score-fill-low",
+  Medium: "rg-score-fill-medium",
+  High: "rg-score-fill-high",
+};
+
+const riskInkTone: Record<RiskLevel, string> = {
+  Low: "text-[#16723b]",
+  Medium: "text-[#9a4b12]",
+  High: "text-[#b42318]",
+};
+
+const riskDotTone: Record<RiskLevel, string> = {
+  Low: "bg-[#16a34a]",
+  Medium: "bg-[#d97706]",
+  High: "bg-[#dc2626]",
+};
+
 function isSupportedEvidenceFile(file: File) {
   return (
     file.type.startsWith("image/") ||
@@ -630,7 +648,7 @@ export function ClaimReviewWorkflow() {
 
                 <div className="mt-5">
                   <EvidenceFileButton
-                    className="cg-primary-button inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition"
+                    className="cg-primary-button inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full px-10 py-3.5 text-[15px] font-semibold transition"
                     isAnalyzing={isAnalyzing}
                     onFileSelect={handleFileSelect}
                     stopPropagation
@@ -829,25 +847,47 @@ export function ClaimReviewWorkflow() {
                 </div>
               ) : null}
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-3 xl:grid-cols-1 2xl:grid-cols-3">
-                <div className={`cg-metric-card p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
-                  <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Evidence reliability</p>
-                  <p className="mt-2 text-xl font-medium text-[var(--cg-dark-text)]">{hasCompletedReport ? report.score : "--"}</p>
-                  <p className="mt-1 text-xs text-[var(--cg-dark-muted)]">local score / 100</p>
-                </div>
-                <div className={`cg-metric-card p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
-                  <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Risk level</p>
-                  <p className="mt-2 text-lg font-medium text-[var(--cg-dark-text)]">{hasCompletedReport ? report.riskLevel : "Pending"}</p>
-                  <p className="mt-2 text-xs text-[var(--cg-dark-muted)]">Review guidance only</p>
-                </div>
-                <div className={`cg-metric-card p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
-                  <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Confidence</p>
-                  <p className="mt-2 text-lg font-medium text-[var(--cg-dark-text)]">
-                    {hasCompletedReport ? report.confidenceLevel : "Pending"}
+              <div className="mt-4 grid gap-3">
+                <div className={`cg-metric-card p-4 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                    <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Evidence reliability</p>
+                    <p className="text-xs text-[var(--cg-dark-muted)]">local score / 100</p>
+                  </div>
+                  <p className="mt-3 text-[34px] font-semibold leading-none tracking-[-0.02em] text-[var(--cg-dark-text)]">
+                    {hasCompletedReport ? report.score : "--"}
                   </p>
-                  <p className="mt-2 text-xs text-[var(--cg-dark-muted)]">
-                    {hasCompletedReport ? `${report.internalStructureConfidence ?? "--"}% structure` : "External verification not performed"}
-                  </p>
+                  <div className="rg-score-track mt-3.5" aria-hidden="true">
+                    <div
+                      className={`rg-score-fill ${hasCompletedReport ? riskFillTone[report.riskLevel] : ""}`}
+                      style={{ width: hasCompletedReport ? `${Math.max(0, Math.min(100, report.score))}%` : "0%" }}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className={`cg-metric-card p-3.5 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
+                    <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Risk level</p>
+                    <p
+                      className={`mt-2.5 flex items-center gap-2 text-base font-semibold ${
+                        hasCompletedReport ? riskInkTone[report.riskLevel] : "text-[var(--cg-dark-text)]"
+                      }`}
+                    >
+                      <span
+                        className={`size-2 shrink-0 rounded-full ${hasCompletedReport ? riskDotTone[report.riskLevel] : "bg-[var(--rg-ink-tertiary)]"}`}
+                        aria-hidden="true"
+                      />
+                      {hasCompletedReport ? report.riskLevel : "Pending"}
+                    </p>
+                    <p className="mt-1.5 text-xs text-[var(--cg-dark-muted)]">Review guidance only</p>
+                  </div>
+                  <div className={`cg-metric-card p-3.5 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
+                    <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Confidence</p>
+                    <p className="mt-2.5 text-base font-semibold text-[var(--cg-dark-text)]">
+                      {hasCompletedReport ? report.confidenceLevel : "Pending"}
+                    </p>
+                    <p className="mt-1.5 text-xs text-[var(--cg-dark-muted)]">
+                      {hasCompletedReport ? `${report.internalStructureConfidence ?? "--"}% structure` : "External verification not performed"}
+                    </p>
+                  </div>
                 </div>
               </div>
 
