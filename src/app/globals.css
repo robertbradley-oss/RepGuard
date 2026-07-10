@@ -1031,9 +1031,14 @@ body::after {
   animation: rg-result-settle 240ms ease-out both;
 }
 
+/* Overflow safety only — the panel is sized to fit its content, and any
+   rare overflow scrolls invisibly rather than showing a scrollbar. */
 .repguard-page .cg-analyzer-scroll {
-  scrollbar-color: rgba(229, 72, 61, 0.28) transparent;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+}
+
+.repguard-page .cg-analyzer-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes rg-result-settle {

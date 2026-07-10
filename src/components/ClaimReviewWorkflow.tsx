@@ -242,16 +242,12 @@ function AnalyzerReviewItem({ label, Icon }: IconChip) {
   );
 }
 
-function SignalItem({ signal, tone = "dark" }: { signal: RedFlag; tone?: "dark" | "light" }) {
+function SignalItem({ signal, tone = "dark", compact = false }: { signal: RedFlag; tone?: "dark" | "light"; compact?: boolean }) {
   const isDark = tone === "dark";
 
   return (
     <li
-      className={
-        isDark
-          ? "rg-signal-item rg-signal-item-dark p-3"
-          : "rg-signal-item rg-signal-item-light p-3"
-      }
+      className={`rg-signal-item ${isDark ? "rg-signal-item-dark" : "rg-signal-item-light"} ${compact ? "px-3 py-1.5" : "p-3"}`}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className={`text-sm font-medium ${isDark ? "text-[var(--cg-dark-text)]" : "text-[var(--cg-text)]"}`}>{signal.label}</p>
@@ -265,7 +261,9 @@ function SignalItem({ signal, tone = "dark" }: { signal: RedFlag; tone?: "dark" 
           {signal.confidence}
         </span>
       </div>
-      <p className={`mt-2 text-sm leading-6 ${isDark ? "text-[var(--cg-dark-muted)]" : "text-[var(--cg-text-muted)]"}`}>{signal.detail}</p>
+      {compact ? null : (
+        <p className={`mt-2 text-sm leading-6 ${isDark ? "text-[var(--cg-dark-muted)]" : "text-[var(--cg-text-muted)]"}`}>{signal.detail}</p>
+      )}
     </li>
   );
 }
@@ -342,7 +340,7 @@ export function ClaimReviewWorkflow() {
   const shouldShowAnalysisDetails = hasCompletedReport && Boolean(localAnalysisResult);
   const isPdfFile = isPdfEvidenceFile(selectedFile);
   const currentStep = mockAnalysisSteps[activeAnalysisStep];
-  const topSignals = hasCompletedReport ? report.redFlags.slice(0, 3) : [];
+  const topSignals = hasCompletedReport ? report.redFlags.slice(0, 2) : [];
   const previewUrl = useMemo(
     () => (selectedFile?.type.startsWith("image/") ? URL.createObjectURL(selectedFile) : null),
     [selectedFile],
@@ -583,7 +581,7 @@ export function ClaimReviewWorkflow() {
         </div>
       </header>
 
-      <section className="rg-hero grid gap-4 px-1 pb-1 pt-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:px-2">
+      <section className="rg-hero grid gap-4 px-1 pb-0 pt-1 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:px-2">
         <div>
           <div className="rg-mobile-stage mb-4 inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold sm:hidden">
             <span className="rg-mobile-stage-count">{activeStageNumber}/3</span>
@@ -593,7 +591,7 @@ export function ClaimReviewWorkflow() {
           <h1 className="mt-2 text-[clamp(1.85rem,3vw,2.6rem)] font-semibold leading-[1.08] tracking-[-0.03em] text-[var(--cg-text)]">
             Evidence analysis <span className="text-[var(--rg-accent-strong)]">workspace</span>
           </h1>
-          <p className="mt-3 max-w-2xl text-[15px] leading-6 text-[var(--cg-text-muted)]">
+          <p className="mt-2 max-w-2xl text-[15px] leading-6 text-[var(--cg-text-muted)]">
             Upload one receipt, order screenshot, PDF, or evidence image and review the local analysis result.
           </p>
         </div>
@@ -771,28 +769,28 @@ export function ClaimReviewWorkflow() {
         </section>
 
         <aside
-          className={`cg-analyzer-panel flex min-h-0 flex-col overflow-hidden p-4 sm:p-5 ${
+          className={`cg-analyzer-panel flex min-h-0 flex-col overflow-hidden p-4 ${
             isAnalyzing ? "cg-analyzer-panel-active" : ""
           } ${hasCompletedReport ? "cg-analyzer-panel-complete" : ""}`}
           data-testid="analyzer-panel"
         >
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-amber)]">Analyzer result</p>
+              <p className="rg-eyebrow">Analyzer result</p>
               <h2 className="mt-1 text-base font-medium text-[var(--cg-dark-text)]">
                 {hasCompletedReport ? displayReviewHeadline : selectedFile ? "Ready for local analysis" : "Awaiting evidence"}
               </h2>
             </div>
             <div
               className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium ${
-                hasCompletedReport ? riskTone[report.riskLevel] : "border-[var(--rg-hairline-strong)] bg-[var(--rg-glass-soft)] text-[var(--cg-dark-muted)]"
+                hasCompletedReport ? riskTone[report.riskLevel] : "border-[rgba(229,72,61,0.25)] bg-[var(--rg-accent-soft)] text-[var(--rg-accent-deep)]"
               }`}
             >
               {hasCompletedReport ? `Risk: ${report.riskLevel}` : isAnalyzing ? "Analyzing" : selectedFile ? "Ready" : "Pending"}
             </div>
           </div>
 
-          <div className="cg-analyzer-scroll mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+          <div className="cg-analyzer-scroll mt-2 min-h-0 flex-1 overflow-y-auto">
           {!selectedFile ? (
             <>
               <div className="rg-recommendation-card mt-6 p-4">
@@ -812,9 +810,9 @@ export function ClaimReviewWorkflow() {
             </>
           ) : (
             <>
-              <div className="rg-recommendation-card p-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Review recommendation</p>
-                <p className="mt-2 text-sm leading-6 text-[var(--cg-dark-text)]">
+              <div className="rg-recommendation-card p-3">
+                <p className="rg-eyebrow">Review recommendation</p>
+                <p className="mt-1.5 text-sm leading-5 text-[var(--cg-dark-text)]">
                   {hasCompletedReport
                     ? report.suggestedAction
                     : isAnalyzing
@@ -841,15 +839,19 @@ export function ClaimReviewWorkflow() {
                 </div>
               ) : null}
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-3 xl:grid-cols-1 2xl:grid-cols-3">
-                <div className={`cg-metric-card p-3.5 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
+              <div className="mt-3 grid gap-3 sm:grid-cols-3 xl:grid-cols-1 2xl:grid-cols-3">
+                <div className={`cg-metric-card p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
                   <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Evidence reliability</p>
-                  <p className="mt-2 text-[26px] font-semibold leading-none tracking-[-0.02em] text-[var(--cg-dark-text)]">
+                  <p
+                    className={`mt-2 text-[24px] font-semibold leading-none tracking-[-0.02em] ${
+                      hasCompletedReport ? "text-[var(--rg-accent-strong)]" : "text-[var(--cg-dark-text)]"
+                    }`}
+                  >
                     {hasCompletedReport ? report.score : "--"}
                   </p>
-                  <p className="mt-2 text-xs text-[var(--cg-dark-muted)]">local score / 100</p>
+                  <p className="mt-1.5 text-xs text-[var(--cg-dark-muted)]">local score / 100</p>
                 </div>
-                <div className={`cg-metric-card p-3.5 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
+                <div className={`cg-metric-card p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
                   <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Risk level</p>
                   <p
                     className={`mt-2 flex items-center gap-2 text-lg font-semibold leading-tight ${
@@ -862,37 +864,24 @@ export function ClaimReviewWorkflow() {
                     />
                     {hasCompletedReport ? report.riskLevel : "Pending"}
                   </p>
-                  <p className="mt-2 text-xs text-[var(--cg-dark-muted)]">Review guidance only</p>
+                  <p className="mt-1.5 text-xs text-[var(--cg-dark-muted)]">Review guidance only</p>
                 </div>
-                <div className={`cg-metric-card p-3.5 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
+                <div className={`cg-metric-card p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
                   <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Confidence</p>
                   <p className="mt-2 text-lg font-semibold leading-tight text-[var(--cg-dark-text)]">
                     {hasCompletedReport ? report.confidenceLevel : "Pending"}
                   </p>
-                  <p className="mt-2 text-xs text-[var(--cg-dark-muted)]">
+                  <p className="mt-1.5 text-xs text-[var(--cg-dark-muted)]">
                     {hasCompletedReport ? `${report.internalStructureConfidence ?? "--"}% structure` : "External verification not performed"}
                   </p>
                 </div>
               </div>
 
-              {hasCompletedReport ? (
-                <>
-                  <div className="cg-result-reveal rg-score-meaning mt-4 p-4">
-                    <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-amber)]">Score meaning</p>
-                    <p className="mt-2 text-sm leading-6 text-[var(--cg-dark-muted)]">
-                      {(report.scoreMeaning?.highScore ??
-                        "High score means the receipt is readable and structurally consistent based on local evidence analysis.")}{" "}
-                      {(report.scoreMeaning?.safetyNote ?? "High score does not prove the receipt is real.")}
-                    </p>
-                  </div>
-                </>
-              ) : null}
-
-              <div className="mt-5">
-                <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Top detected signals</p>
-                <ul className={`mt-3 grid gap-3 ${hasCompletedReport ? "cg-result-reveal" : ""}`}>
+              <div className="mt-3">
+                <p className="rg-eyebrow">Top detected signals</p>
+                <ul className={`mt-2.5 grid gap-2 ${hasCompletedReport ? "cg-result-reveal" : ""}`}>
                   {topSignals.length > 0 ? (
-                    topSignals.map((signal) => <SignalItem key={`${signal.label}-${signal.detail}`} signal={signal} />)
+                    topSignals.map((signal) => <SignalItem key={`${signal.label}-${signal.detail}`} signal={signal} compact />)
                   ) : (
                     <li className="rg-empty-signal p-3 text-sm leading-6 text-[var(--cg-dark-muted)]">
                       {hasCompletedReport ? "No material review signals detected beyond standard verification." : "Signals will appear after analysis."}
@@ -901,16 +890,9 @@ export function ClaimReviewWorkflow() {
                 </ul>
               </div>
 
-              <div className={`rg-customer-safe mt-5 p-4 ${hasCompletedReport ? "cg-result-reveal" : ""}`}>
-                <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-green)]">Customer-safe response snippet</p>
-                <p className="mt-2 text-sm leading-6 text-[var(--cg-dark-text)]">
-                  {hasCompletedReport ? report.customerSafeWording : "Customer-facing language will be generated after local analysis."}
-                </p>
-              </div>
-
-              <div className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+              <div className="mt-3 grid grid-cols-3 gap-2">
                 <button
-                  className="rg-secondary-button inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition disabled:cursor-not-allowed disabled:opacity-45"
+                  className="rg-secondary-button inline-flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-medium text-[var(--cg-dark-text)] transition disabled:cursor-not-allowed disabled:opacity-45"
                   disabled={!hasCompletedReport}
                   onClick={() => handleCopy("summary", buildSummary(report))}
                   type="button"
@@ -919,30 +901,22 @@ export function ClaimReviewWorkflow() {
                   Copy Summary
                 </button>
                 <button
-                  className="rg-secondary-button inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition disabled:cursor-not-allowed disabled:opacity-45"
+                  className="rg-secondary-button inline-flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-medium text-[var(--cg-dark-text)] transition disabled:cursor-not-allowed disabled:opacity-45"
                   disabled={!hasCompletedReport}
                   onClick={() => handleCopy("customer", report.customerSafeWording)}
                   type="button"
                 >
                   {copiedLabel("customer", copyNotice)}
-                  Copy Customer-Safe Response
+                  Copy Response
                 </button>
                 <button
-                  className="rg-secondary-button inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition disabled:cursor-not-allowed disabled:opacity-45"
+                  className="rg-secondary-button inline-flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-medium text-[var(--cg-dark-text)] transition disabled:cursor-not-allowed disabled:opacity-45"
                   disabled={!hasCompletedReport}
                   onClick={() => handleCopy("summary-json", privacySafeExport)}
                   type="button"
                 >
                   <FileJson className="size-4" aria-hidden="true" />
-                  Copy Safe Summary
-                </button>
-                <button
-                  className="rg-secondary-button inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition"
-                  onClick={handleReset}
-                  type="button"
-                >
-                  <RotateCcw className="size-4" aria-hidden="true" />
-                  Analyze Another File
+                  Copy JSON
                 </button>
               </div>
 
@@ -1008,6 +982,18 @@ export function ClaimReviewWorkflow() {
                     Raw OCR text is intentionally hidden in the main analyzer. Use privacy-safe summaries for review notes.
                   </div>
                 </div>
+              ) : (
+                <EmptyDetail />
+              )}
+            </DetailSection>
+
+            <DetailSection title="Score Meaning">
+              {hasCompletedReport ? (
+                <p className="text-sm leading-6 text-[var(--cg-text-muted)]">
+                  {(report.scoreMeaning?.highScore ??
+                    "High score means the receipt is readable and structurally consistent based on local evidence analysis.")}{" "}
+                  {(report.scoreMeaning?.safetyNote ?? "High score does not prove the receipt is real.")}
+                </p>
               ) : (
                 <EmptyDetail />
               )}
