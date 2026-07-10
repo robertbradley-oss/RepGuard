@@ -923,37 +923,22 @@ body::after {
   color: var(--rg-ink-secondary);
 }
 
-.repguard-page .cg-metric-card-complete {
+.repguard-page .cg-metric-card.cg-metric-card-complete {
   border-color: var(--rg-hairline);
-  background: rgba(255, 255, 255, 0.54);
-  box-shadow: inset 3px 0 0 rgba(229, 72, 61, 0.45), inset 1px 1px 0 rgba(255, 255, 255, 0.62);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.68));
+  box-shadow:
+    inset 3px 0 0 rgba(229, 72, 61, 0.45),
+    3px 3px 8px rgba(15, 23, 42, 0.06),
+    -3px -3px 8px rgba(255, 255, 255, 0.9);
 }
 
-.repguard-page .rg-score-track {
-  height: 6px;
-  overflow: hidden;
-  border-radius: 9999px;
-  background: rgba(15, 23, 42, 0.08);
-  box-shadow: inset 1px 1px 2px rgba(15, 23, 42, 0.1);
-}
-
-.repguard-page .rg-score-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: var(--rg-accent-strong);
-  transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.repguard-page .rg-score-fill-low {
-  background: linear-gradient(90deg, #34b06a, #16843f);
-}
-
-.repguard-page .rg-score-fill-medium {
-  background: linear-gradient(90deg, #e79245, #c05408);
-}
-
-.repguard-page .rg-score-fill-high {
-  background: linear-gradient(90deg, #e5483d, #b42318);
+.repguard-page .cg-metric-card {
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  border-radius: var(--rg-radius-card);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.6));
+  box-shadow:
+    3px 3px 8px rgba(15, 23, 42, 0.06),
+    -3px -3px 8px rgba(255, 255, 255, 0.9);
 }
 
 .repguard-page .rg-analysis-progress,
