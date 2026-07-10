@@ -16,9 +16,12 @@ export const metadata: Metadata = {
   title: "RepGuard",
   description: "Support-safe receipt evidence reliability analyzer.",
   icons: {
-    icon: "/brand/repguard-logo-mark.png",
-    shortcut: "/brand/repguard-logo-mark.png",
-    apple: "/brand/repguard-logo-mark.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/brand/repguard-favicon.png", type: "image/png", sizes: "512x512" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/brand/repguard-favicon.png",
   },
 };
 

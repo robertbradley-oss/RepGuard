@@ -9,6 +9,7 @@ import {
   CalendarCheck,
   Camera,
   CheckCircle2,
+  ChevronDown,
   Clipboard,
   ClipboardCheck,
   FileImage,
@@ -20,12 +21,14 @@ import {
   ImageIcon,
   Layers,
   ListChecks,
+  LockKeyhole,
   Loader2,
   MessageSquareText,
   ReceiptText,
   RotateCcw,
   ScanLine,
   ScanText,
+  ShieldCheck,
   Type,
   UploadCloud,
 } from "lucide-react";
@@ -178,7 +181,7 @@ function buildPrivacySafeExport(report: MockAnalysisReport, result: LocalAnalysi
 
 function FieldRow({ label, value }: { label: string; value?: string | number | null }) {
   return (
-    <div className="grid gap-1 border-b border-[rgba(125,103,64,0.16)] py-3 last:border-b-0 sm:grid-cols-[190px_minmax(0,1fr)]">
+    <div className="grid gap-1 border-b border-[var(--rg-hairline)] py-3 last:border-b-0 sm:grid-cols-[190px_minmax(0,1fr)]">
       <dt className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-muted)]">{label}</dt>
       <dd className="break-words text-sm text-[var(--cg-text)]">{value || "Not extracted"}</dd>
     </div>
@@ -193,12 +196,12 @@ function DetailSection({
   children: ReactNode;
 }) {
   return (
-    <details className="group rounded-lg border border-[var(--cg-border)] bg-[rgba(255,253,247,0.78)] shadow-[0_14px_36px_rgba(77,62,36,0.06)]">
+    <details className="rg-detail-section group">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-[var(--cg-text)]">
         {title}
-        <span className="text-[var(--cg-amber)] transition group-open:rotate-180">v</span>
+        <ChevronDown className="size-4 text-[var(--cg-amber)] transition group-open:rotate-180" aria-hidden="true" />
       </summary>
-      <div className="border-t border-[rgba(125,103,64,0.14)] px-4 py-4">{children}</div>
+      <div className="border-t border-[var(--rg-hairline)] px-4 py-4">{children}</div>
     </details>
   );
 }
@@ -218,7 +221,7 @@ function Chip({ label, Icon }: IconChip) {
 
 function AnalyzerReviewItem({ label, Icon }: IconChip) {
   return (
-    <li className="flex items-center gap-3 rounded-lg border border-[rgba(235,229,218,0.72)] bg-[rgba(255,253,247,0.04)] px-3 py-2 text-sm text-[var(--cg-text-soft)]">
+    <li className="rg-review-item flex items-center gap-3 px-3 py-2 text-sm text-[var(--cg-text-soft)]">
       <Icon className="size-4 shrink-0 text-[var(--cg-amber)]" aria-hidden="true" />
       <span>{label}</span>
     </li>
@@ -232,8 +235,8 @@ function SignalItem({ signal, tone = "dark" }: { signal: RedFlag; tone?: "dark" 
     <li
       className={
         isDark
-          ? "rounded-lg border border-[rgba(235,229,218,0.16)] bg-[rgba(255,253,247,0.05)] p-3"
-          : "rounded-lg border border-[rgba(125,103,64,0.16)] bg-[rgba(255,253,247,0.78)] p-3"
+          ? "rg-signal-item rg-signal-item-dark p-3"
+          : "rg-signal-item rg-signal-item-light p-3"
       }
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -241,8 +244,8 @@ function SignalItem({ signal, tone = "dark" }: { signal: RedFlag; tone?: "dark" 
         <span
           className={`rounded-md border px-2 py-1 text-xs ${
             isDark
-              ? "border-[rgba(235,229,218,0.16)] text-[var(--cg-text-soft)]"
-              : "border-[rgba(125,103,64,0.18)] text-[var(--cg-text-muted)]"
+              ? "border-[var(--rg-hairline-strong)] text-[var(--cg-text-soft)]"
+              : "border-[var(--rg-hairline-strong)] text-[var(--cg-text-muted)]"
           }`}
         >
           {signal.confidence}
@@ -344,6 +347,8 @@ export function ClaimReviewWorkflow() {
         : "Awaiting evidence";
   const displayReviewHeadline =
     hasCompletedReport && report.reviewLabel === "Unable to assess from current image" ? "Manual review recommended" : report.reviewLabel;
+  const activeStageNumber = hasCompletedReport ? 3 : selectedFile ? 2 : 1;
+  const activeStageLabel = hasCompletedReport ? "Review" : selectedFile ? "Analyze" : "Intake";
 
   useEffect(() => {
     return () => {
@@ -505,27 +510,84 @@ export function ClaimReviewWorkflow() {
   }
 
   return (
-    <div className="mx-auto grid min-h-screen max-w-[1344px] content-start gap-3 px-4 pb-6 sm:px-6">
-      <header className="-mx-4 flex min-h-[76px] items-center border-b border-[rgba(125,103,64,0.16)] px-4 sm:-mx-6 sm:px-6">
-        <div className="flex flex-col">
-          <Image className="h-11 w-auto" src="/brand/repguard-logo-full.png" alt="RepGuard" width={1252} height={340} priority />
-          <p className="-mt-1 pl-12 text-[13px] font-medium leading-none tracking-[0.01em] text-[#8a7656]">Authenticity, in focus.</p>
+    <div className="rg-shell mx-auto grid min-h-screen max-w-[1380px] content-start gap-4 px-4 py-4 sm:px-6 sm:py-5 lg:px-8" data-status={status}>
+      <header className="rg-topbar flex min-h-[76px] items-center justify-between gap-4 px-4 py-3 sm:px-5">
+        <div className="rg-brand-lockup flex min-w-0 items-center gap-3">
+          <Image
+            className="rg-brand-mark h-12 w-[45px] shrink-0 object-contain"
+            src="/brand/repguard-logo-mark-red.png"
+            alt=""
+            width={732}
+            height={789}
+            priority
+          />
+          <div className="min-w-0">
+            <p className="rg-wordmark truncate text-[29px] font-semibold leading-none tracking-[-0.035em]">
+              <span className="text-[var(--rg-ink)]">Rep</span>
+              <span className="text-[var(--rg-accent-strong)]">Guard</span>
+            </p>
+            <p className="mt-1 text-xs font-medium tracking-[0.015em] text-[var(--cg-text-subtle)]">Authenticity, in focus.</p>
+          </div>
+        </div>
+
+        <div className="rg-stage-rail hidden items-center gap-1 p-1 sm:flex" aria-label="Evidence review stages">
+          <span
+            className={`rg-stage-pill ${selectedFile ? "rg-stage-complete" : "rg-stage-active"}`}
+            aria-current={!selectedFile ? "step" : undefined}
+          >
+            01 Intake
+            {selectedFile ? <span className="sr-only"> completed</span> : null}
+          </span>
+          <span
+            className={`rg-stage-pill ${selectedFile && !hasCompletedReport ? "rg-stage-active" : hasCompletedReport ? "rg-stage-complete" : ""}`}
+            aria-current={selectedFile && !hasCompletedReport ? "step" : undefined}
+          >
+            02 Analyze
+            {hasCompletedReport ? <span className="sr-only"> completed</span> : null}
+          </span>
+          <span className={`rg-stage-pill ${hasCompletedReport ? "rg-stage-active" : ""}`} aria-current={hasCompletedReport ? "step" : undefined}>
+            03 Review
+          </span>
+        </div>
+
+        <div
+          className="rg-local-pill inline-flex shrink-0 items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--cg-text-muted)]"
+          aria-label="Browser-local analysis"
+        >
+          <LockKeyhole className="size-4 text-[var(--rg-accent-strong)]" aria-hidden="true" />
+          <span className="hidden md:inline">Browser-local</span>
         </div>
       </header>
 
-      <section className="pt-5">
-        <h1 className="text-2xl font-medium tracking-normal text-[var(--cg-text)]">Evidence analysis workspace</h1>
-        <p className="mt-1 max-w-3xl text-sm leading-5 text-[var(--cg-text-muted)]">
-          Upload one receipt, order screenshot, PDF, or evidence image and review the local analysis result.
-        </p>
+      <section className="rg-hero grid gap-4 px-1 pb-1 pt-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:px-2">
+        <div>
+          <div className="rg-mobile-stage mb-4 inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold sm:hidden">
+            <span className="rg-mobile-stage-count">{activeStageNumber}/3</span>
+            {activeStageLabel}
+          </div>
+          <p className="rg-eyebrow">Evidence reliability analyzer</p>
+          <h1 className="mt-2 text-[clamp(2rem,4vw,3.35rem)] font-semibold leading-[1.04] tracking-[-0.035em] text-[var(--cg-text)]">
+            Evidence analysis workspace
+          </h1>
+          <p className="mt-3 max-w-2xl text-[15px] leading-6 text-[var(--cg-text-muted)]">
+            Upload one receipt, order screenshot, PDF, or evidence image and review the local analysis result.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2 md:justify-end">
+          <span className="rg-meta-pill inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--cg-text-muted)]">
+            <ShieldCheck className="size-4 text-[var(--rg-accent-strong)]" aria-hidden="true" />
+            Manual review only
+          </span>
+          <span className="rg-meta-pill px-3 py-2 text-xs font-medium text-[var(--cg-text-muted)]">External verification not performed</span>
+        </div>
       </section>
 
       <div
-        className="grid min-h-0 items-stretch gap-5 xl:h-[min(640px,calc(100vh-220px))] xl:min-h-[560px] xl:grid-cols-[minmax(0,1fr)_380px]"
+        className="grid min-h-0 items-stretch gap-4 lg:grid-cols-[minmax(0,1fr)_380px] xl:h-[min(680px,calc(100vh-226px))] xl:min-h-[590px]"
         data-testid="analyzer-workspace-row"
       >
         <section
-          className={`cg-evidence-surface flex min-h-0 flex-col rounded-lg transition ${selectedFile ? "cg-workflow-has-evidence p-2" : "p-3"} ${
+          className={`cg-evidence-surface flex min-h-0 flex-col transition ${selectedFile ? "cg-workflow-has-evidence p-2" : "p-3"} ${
             isAnalyzing ? "cg-workflow-analyzing" : ""
           } ${hasCompletedReport ? "cg-workflow-complete" : ""} ${isDraggingEvidence ? "cg-evidence-surface-active" : ""}`}
           onDragEnter={handleDragEnter}
@@ -535,14 +597,13 @@ export function ClaimReviewWorkflow() {
         >
           {!selectedFile ? (
             <div
-              className="relative grid min-h-[510px] flex-1 place-items-center p-6 text-center sm:min-h-[530px] xl:min-h-0"
+              className="rg-upload-empty relative grid min-h-[510px] flex-1 place-items-center p-6 text-center sm:min-h-[530px] xl:min-h-0"
             >
-              <div className="cg-scan-corners" aria-hidden="true" />
               <div className="mx-auto max-w-[620px]">
-                <div className="mx-auto grid size-16 place-items-center rounded-xl border border-[rgba(143,93,45,0.24)] bg-[rgba(143,93,45,0.07)] text-[var(--cg-amber)]">
+                <div className="rg-upload-icon mx-auto grid size-[68px] place-items-center rounded-full text-[var(--rg-accent-strong)]">
                   <UploadCloud className="size-8" aria-hidden="true" />
                 </div>
-                <h2 className="mt-6 text-xl font-medium text-[var(--cg-text)]">
+                <h2 className="mt-6 text-2xl font-semibold tracking-[-0.018em] text-[var(--cg-text)]">
                   {isDraggingEvidence ? "Drop evidence to load it" : "Upload evidence to begin"}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[var(--cg-text-muted)]">
@@ -558,7 +619,7 @@ export function ClaimReviewWorkflow() {
 
                 <div className="mt-5">
                   <EvidenceFileButton
-                    className="cg-primary-button inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-medium transition"
+                    className="cg-primary-button inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition"
                     isAnalyzing={isAnalyzing}
                     onFileSelect={handleFileSelect}
                     stopPropagation
@@ -568,7 +629,7 @@ export function ClaimReviewWorkflow() {
                   </EvidenceFileButton>
                 </div>
 
-                <div className="mx-auto my-6 h-px max-w-[520px] bg-[rgba(125,103,64,0.16)]" />
+                <div className="mx-auto my-6 h-px max-w-[520px] bg-[var(--rg-hairline)]" />
 
                 <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-text-subtle)]">What RepGuard checks</p>
                 <div className="mx-auto mt-3 grid max-w-[450px] gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -584,30 +645,28 @@ export function ClaimReviewWorkflow() {
             </div>
           ) : (
             <div className="relative flex min-h-0 flex-1 flex-col">
-              <div className="cg-scan-corners" aria-hidden="true" />
-
               {uploadError ? (
-                <div className="mb-3 rounded-lg border border-[rgba(170,78,69,0.32)] bg-[rgba(170,78,69,0.08)] p-3 text-sm font-medium text-[var(--cg-red)]">
+                <div className="rg-error-callout mb-3 p-3 text-sm font-medium text-[var(--cg-red)]">
                   {uploadError}
                 </div>
               ) : null}
 
               <div
-                className={`cg-preview-frame relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border transition ${
+                className={`cg-preview-frame relative flex min-h-0 flex-1 flex-col overflow-hidden border transition ${
                   hasCompletedReport ? "cg-preview-frame-complete" : ""
                 } ${
-                  isDraggingEvidence ? "border-[rgba(184,133,24,0.78)]" : "border-[rgba(125,103,64,0.22)]"
+                  isDraggingEvidence ? "border-[var(--rg-accent)]" : "border-[var(--rg-hairline)]"
                 }`}
                 data-testid="evidence-preview-frame"
               >
                 <div
-                  className="relative z-10 grid shrink-0 gap-1.5 border-b border-[rgba(125,103,64,0.16)] bg-[rgba(255,253,247,0.88)] px-3 py-1.5 shadow-[0_8px_18px_rgba(77,62,36,0.06)] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                  className="rg-command-bar relative z-10 grid shrink-0 gap-2 border-b border-[var(--rg-hairline)] px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                   data-testid="evidence-command-bar"
                 >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-amber)]">Evidence Intake</p>
-                      <span className="rounded-md border border-[rgba(95,143,100,0.24)] bg-[rgba(95,143,100,0.08)] px-2 py-0.5 text-xs font-medium text-[var(--cg-green)]">
+                      <span className="rg-status-pill px-2.5 py-1 text-xs font-medium text-[var(--cg-green)]">
                         {uploadStatusLabel}
                       </span>
                     </div>
@@ -618,7 +677,7 @@ export function ClaimReviewWorkflow() {
                   <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
                     {!hasCompletedReport ? (
                       <button
-                        className="cg-primary-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed"
+                        className="cg-primary-button inline-flex min-h-9 items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition disabled:cursor-not-allowed"
                         disabled={isAnalyzing}
                         onClick={handleRunAnalysis}
                         type="button"
@@ -628,14 +687,14 @@ export function ClaimReviewWorkflow() {
                       </button>
                     ) : null}
                     <EvidenceFileButton
-                      className="whitespace-nowrap rounded-md border border-[var(--cg-border)] bg-[rgba(255,253,247,0.72)] px-2.5 py-1.5 text-xs font-medium text-[var(--cg-text)] transition hover:border-[var(--cg-border-strong)]"
+                      className="rg-secondary-button whitespace-nowrap px-3 py-2 text-xs font-semibold text-[var(--cg-text)] transition"
                       isAnalyzing={isAnalyzing}
                       onFileSelect={handleFileSelect}
                     >
                       Replace file
                     </EvidenceFileButton>
                     <button
-                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-[var(--cg-border)] bg-[rgba(255,253,247,0.72)] px-2.5 py-1.5 text-xs font-medium text-[var(--cg-text)] transition hover:border-[var(--cg-border-strong)]"
+                      className="rg-secondary-button inline-flex items-center gap-1.5 whitespace-nowrap px-3 py-2 text-xs font-semibold text-[var(--cg-text)] transition"
                       onClick={handleReset}
                       type="button"
                     >
@@ -689,7 +748,7 @@ export function ClaimReviewWorkflow() {
         </section>
 
         <aside
-          className={`cg-analyzer-panel flex min-h-0 flex-col overflow-hidden rounded-lg p-4 ${
+          className={`cg-analyzer-panel flex min-h-0 flex-col overflow-hidden p-4 sm:p-5 ${
             isAnalyzing ? "cg-analyzer-panel-active" : ""
           } ${hasCompletedReport ? "cg-analyzer-panel-complete" : ""}`}
           data-testid="analyzer-panel"
@@ -702,8 +761,8 @@ export function ClaimReviewWorkflow() {
               </h2>
             </div>
             <div
-              className={`whitespace-nowrap rounded-lg border px-3 py-1.5 text-sm font-medium ${
-                hasCompletedReport ? riskTone[report.riskLevel] : "border-[rgba(235,229,218,0.14)] bg-[rgba(255,253,247,0.06)] text-[var(--cg-dark-muted)]"
+              className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium ${
+                hasCompletedReport ? riskTone[report.riskLevel] : "border-[var(--rg-hairline-strong)] bg-[var(--rg-glass-soft)] text-[var(--cg-dark-muted)]"
               }`}
             >
               {hasCompletedReport ? `Risk: ${report.riskLevel}` : isAnalyzing ? "Analyzing" : selectedFile ? "Ready" : "Pending"}
@@ -713,14 +772,14 @@ export function ClaimReviewWorkflow() {
           <div className="cg-analyzer-scroll mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
           {!selectedFile ? (
             <>
-              <div className="mt-6 rounded-lg border border-[rgba(235,229,218,0.12)] bg-[rgba(255,253,247,0.05)] p-4">
+              <div className="rg-recommendation-card mt-6 p-4">
                 <p className="text-sm leading-6 text-[var(--cg-dark-text)]">
                   Upload one receipt, order screenshot, PDF, or claim image to begin.
                 </p>
               </div>
 
               <div className="mt-5">
-                <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Analyzer will review</p>
+                <p className="rg-eyebrow text-[var(--cg-dark-subtle)]">Analyzer will review</p>
                 <ul className="mt-3 grid gap-2">
                   {analyzerReviewItems.map((item) => (
                     <AnalyzerReviewItem key={item.label} {...item} />
@@ -730,7 +789,7 @@ export function ClaimReviewWorkflow() {
             </>
           ) : (
             <>
-              <div className="rounded-lg border border-[rgba(235,229,218,0.12)] bg-[rgba(255,253,247,0.05)] p-4">
+              <div className="rg-recommendation-card p-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Review recommendation</p>
                 <p className="mt-2 text-sm leading-6 text-[var(--cg-dark-text)]">
                   {hasCompletedReport
@@ -742,7 +801,7 @@ export function ClaimReviewWorkflow() {
               </div>
 
               {isAnalyzing ? (
-                <div className="mt-4 rounded-lg border border-[rgba(184,133,24,0.34)] bg-[rgba(184,133,24,0.08)] p-4">
+                <div className="rg-analysis-progress mt-4 p-4">
                   <div className="flex items-center gap-3">
                     <Loader2 className="size-5 animate-spin text-[var(--cg-amber)]" aria-hidden="true" />
                     <div>
@@ -754,23 +813,23 @@ export function ClaimReviewWorkflow() {
               ) : null}
 
               {analysisError ? (
-                <div className="mt-4 rounded-lg border border-[rgba(170,78,69,0.45)] bg-[rgba(170,78,69,0.14)] p-4 text-sm text-[#ffd9d5]">
+                <div className="rg-error-callout mt-4 p-4 text-sm text-[var(--cg-red)]">
                   {analysisError}
                 </div>
               ) : null}
 
               <div className="mt-4 grid gap-3 sm:grid-cols-3 xl:grid-cols-1 2xl:grid-cols-3">
-                <div className={`cg-metric-card rounded-lg border border-[rgba(235,229,218,0.12)] bg-[rgba(255,253,247,0.05)] p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
+                <div className={`cg-metric-card p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
                   <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Evidence reliability</p>
                   <p className="mt-2 text-xl font-medium text-[var(--cg-dark-text)]">{hasCompletedReport ? report.score : "--"}</p>
                   <p className="mt-1 text-xs text-[var(--cg-dark-muted)]">local score / 100</p>
                 </div>
-                <div className={`cg-metric-card rounded-lg border border-[rgba(235,229,218,0.12)] bg-[rgba(255,253,247,0.05)] p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
+                <div className={`cg-metric-card p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
                   <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Risk level</p>
                   <p className="mt-2 text-lg font-medium text-[var(--cg-dark-text)]">{hasCompletedReport ? report.riskLevel : "Pending"}</p>
                   <p className="mt-2 text-xs text-[var(--cg-dark-muted)]">Review guidance only</p>
                 </div>
-                <div className={`cg-metric-card rounded-lg border border-[rgba(235,229,218,0.12)] bg-[rgba(255,253,247,0.05)] p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
+                <div className={`cg-metric-card p-3 ${hasCompletedReport ? "cg-metric-card-complete" : ""}`}>
                   <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-dark-subtle)]">Confidence</p>
                   <p className="mt-2 text-lg font-medium text-[var(--cg-dark-text)]">
                     {hasCompletedReport ? report.confidenceLevel : "Pending"}
@@ -783,7 +842,7 @@ export function ClaimReviewWorkflow() {
 
               {hasCompletedReport ? (
                 <>
-                  <div className="cg-result-reveal mt-4 rounded-lg border border-[rgba(184,133,24,0.24)] bg-[rgba(184,133,24,0.08)] p-4">
+                  <div className="cg-result-reveal rg-score-meaning mt-4 p-4">
                     <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-amber)]">Score meaning</p>
                     <p className="mt-2 text-sm leading-6 text-[var(--cg-dark-muted)]">
                       {(report.scoreMeaning?.highScore ??
@@ -800,15 +859,15 @@ export function ClaimReviewWorkflow() {
                   {topSignals.length > 0 ? (
                     topSignals.map((signal) => <SignalItem key={`${signal.label}-${signal.detail}`} signal={signal} />)
                   ) : (
-                    <li className="rounded-lg border border-[rgba(235,229,218,0.12)] bg-[rgba(255,253,247,0.04)] p-3 text-sm leading-6 text-[var(--cg-dark-muted)]">
+                    <li className="rg-empty-signal p-3 text-sm leading-6 text-[var(--cg-dark-muted)]">
                       {hasCompletedReport ? "No material review signals detected beyond standard verification." : "Signals will appear after analysis."}
                     </li>
                   )}
                 </ul>
               </div>
 
-              <div className={`mt-5 rounded-lg border border-[rgba(95,143,100,0.34)] bg-[rgba(95,143,100,0.12)] p-4 ${hasCompletedReport ? "cg-result-reveal" : ""}`}>
-                <p className="text-xs font-medium uppercase tracking-wide text-[#cfe6d0]">Customer-safe response snippet</p>
+              <div className={`rg-customer-safe mt-5 p-4 ${hasCompletedReport ? "cg-result-reveal" : ""}`}>
+                <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-green)]">Customer-safe response snippet</p>
                 <p className="mt-2 text-sm leading-6 text-[var(--cg-dark-text)]">
                   {hasCompletedReport ? report.customerSafeWording : "Customer-facing language will be generated after local analysis."}
                 </p>
@@ -816,7 +875,7 @@ export function ClaimReviewWorkflow() {
 
               <div className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
                 <button
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[rgba(235,229,218,0.16)] px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition hover:border-[rgba(235,229,218,0.38)] disabled:cursor-not-allowed disabled:opacity-45"
+                  className="rg-secondary-button inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition disabled:cursor-not-allowed disabled:opacity-45"
                   disabled={!hasCompletedReport}
                   onClick={() => handleCopy("summary", buildSummary(report))}
                   type="button"
@@ -825,7 +884,7 @@ export function ClaimReviewWorkflow() {
                   Copy Summary
                 </button>
                 <button
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[rgba(235,229,218,0.16)] px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition hover:border-[rgba(235,229,218,0.38)] disabled:cursor-not-allowed disabled:opacity-45"
+                  className="rg-secondary-button inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition disabled:cursor-not-allowed disabled:opacity-45"
                   disabled={!hasCompletedReport}
                   onClick={() => handleCopy("customer", report.customerSafeWording)}
                   type="button"
@@ -834,7 +893,7 @@ export function ClaimReviewWorkflow() {
                   Copy Customer-Safe Response
                 </button>
                 <button
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[rgba(235,229,218,0.16)] px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition hover:border-[rgba(235,229,218,0.38)] disabled:cursor-not-allowed disabled:opacity-45"
+                  className="rg-secondary-button inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition disabled:cursor-not-allowed disabled:opacity-45"
                   disabled={!hasCompletedReport}
                   onClick={() => handleCopy("summary-json", privacySafeExport)}
                   type="button"
@@ -843,7 +902,7 @@ export function ClaimReviewWorkflow() {
                   Copy Safe Summary
                 </button>
                 <button
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[rgba(235,229,218,0.16)] px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition hover:border-[rgba(235,229,218,0.38)]"
+                  className="rg-secondary-button inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cg-dark-text)] transition"
                   onClick={handleReset}
                   type="button"
                 >
@@ -859,15 +918,15 @@ export function ClaimReviewWorkflow() {
       </div>
 
       {shouldShowAnalysisDetails ? (
-        <details className="cg-analysis-drawer group mb-8 rounded-lg" data-testid="analysis-details-drawer">
+        <details className="cg-analysis-drawer group mb-8" data-testid="analysis-details-drawer">
           <summary className="flex cursor-pointer list-none flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-amber)]">Analysis Details</p>
               <p className="mt-1 text-sm text-[var(--cg-text-muted)]">Review OCR metrics, metadata summaries, signals, notes, and privacy-safe export details.</p>
             </div>
-            <span className="text-sm font-medium text-[var(--cg-text)] transition group-open:rotate-180">v</span>
+            <ChevronDown className="size-5 text-[var(--rg-accent-strong)] transition group-open:rotate-180" aria-hidden="true" />
           </summary>
-          <div className="grid gap-3 border-t border-[rgba(125,103,64,0.14)] p-4">
+          <div className="grid gap-3 border-t border-[var(--rg-hairline)] p-4">
             <DetailSection title="Extracted Data">
               {localAnalysisResult ? (
                 <dl>
@@ -910,7 +969,7 @@ export function ClaimReviewWorkflow() {
                     <FieldRow label="Quality" value={localAnalysisResult.ocr.quality.label} />
                     <FieldRow label="Word count" value={localAnalysisResult.ocr.quality.wordCount} />
                   </dl>
-                  <div className="rounded-lg border border-[rgba(125,103,64,0.16)] bg-[rgba(255,253,247,0.82)] p-4 text-sm leading-6 text-[var(--cg-text-muted)]">
+                  <div className="rg-note-callout p-4 text-sm leading-6 text-[var(--cg-text-muted)]">
                     Raw OCR text is intentionally hidden in the main analyzer. Use privacy-safe summaries for review notes.
                   </div>
                 </div>
@@ -935,7 +994,7 @@ export function ClaimReviewWorkflow() {
             <DetailSection title="Manual Review Notes">
               {hasCompletedReport ? (
                 <div className="grid gap-4 text-sm leading-6 text-[var(--cg-text-muted)]">
-                  <div className="rounded-lg border border-[rgba(95,143,100,0.24)] bg-[rgba(95,143,100,0.08)] p-4">
+                  <div className="rg-customer-safe p-4">
                     <p className="text-xs font-medium uppercase tracking-wide text-[var(--cg-green)]">Customer-safe response</p>
                     <p className="mt-2 text-[var(--cg-text)]">{report.customerSafeWording}</p>
                   </div>
@@ -960,14 +1019,14 @@ export function ClaimReviewWorkflow() {
                   {hasCompletedReport ? (
                     <>
                       <button
-                        className="inline-flex w-fit items-center gap-2 rounded-lg border border-[var(--cg-border)] bg-[rgba(255,253,247,0.72)] px-3 py-2 text-sm font-medium text-[var(--cg-text)] transition hover:border-[var(--cg-border-strong)]"
+                        className="rg-secondary-button inline-flex w-fit items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--cg-text)] transition"
                         onClick={() => handleCopy("json-detail", privacySafeExport)}
                         type="button"
                       >
                         <FileJson className="size-4" aria-hidden="true" />
                         Copy Privacy-Safe Summary
                       </button>
-                      <pre className="max-h-96 overflow-auto rounded-lg border border-[rgba(125,103,64,0.16)] bg-[rgba(255,253,247,0.82)] p-4 text-xs leading-5 text-[var(--cg-text-muted)]">
+                      <pre className="rg-code-panel max-h-96 overflow-auto p-4 text-xs leading-5 text-[var(--cg-text-muted)]">
                         {privacySafeExport}
                       </pre>
                     </>
@@ -975,7 +1034,7 @@ export function ClaimReviewWorkflow() {
 
                   {localAnalysisResult ? (
                     <>
-                      <div className="rounded-lg border border-[rgba(182,106,53,0.24)] bg-[rgba(182,106,53,0.08)] p-4 text-sm leading-6 text-[var(--cg-copper)]">
+                      <div className="rg-warning-callout p-4 text-sm leading-6 text-[var(--cg-copper)]">
                         <AlertTriangle className="mr-2 inline size-4" aria-hidden="true" />
                         Debug values are for local tuning only and should not be shown as final customer determinations.
                       </div>

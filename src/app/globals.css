@@ -384,3 +384,482 @@ input {
     transition: none;
   }
 }
+
+/* --------------------------------------------------------------------------
+   RepGuard workspace — Rep family glass system, scoped to the live home page.
+   Other developer and case-workflow routes retain the legacy ClaimGuard skin.
+   -------------------------------------------------------------------------- */
+
+.repguard-page {
+  --rg-bg: #eef1f6;
+  --rg-bg-deep: #e3e8f1;
+  --rg-ink: #1d1d1f;
+  --rg-ink-secondary: #54545a;
+  --rg-ink-tertiary: #62636a;
+  --rg-accent: #e5483d;
+  --rg-accent-strong: #c9342d;
+  --rg-accent-deep: #a62420;
+  --rg-accent-soft: rgba(229, 72, 61, 0.14);
+  --rg-accent-ring: #c9342d;
+  --rg-glass-soft: rgba(255, 255, 255, 0.36);
+  --rg-glass: rgba(255, 255, 255, 0.56);
+  --rg-glass-strong: rgba(255, 255, 255, 0.76);
+  --rg-glass-raised: rgba(255, 255, 255, 0.88);
+  --rg-hairline: rgba(15, 23, 42, 0.08);
+  --rg-hairline-strong: rgba(15, 23, 42, 0.14);
+  --rg-bevel: inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.92),
+    inset -1px -1px 0 rgba(255, 255, 255, 0.56),
+    inset 0 0 0 1px rgba(15, 23, 42, 0.035);
+  --rg-shadow-resting: 0 1px 2px rgba(15, 23, 42, 0.035),
+    0 12px 28px -12px rgba(15, 23, 42, 0.16);
+  --rg-shadow-raised: 0 2px 4px rgba(15, 23, 42, 0.055),
+    0 22px 44px -16px rgba(15, 23, 42, 0.22);
+  --rg-shadow-floating: 0 4px 8px rgba(15, 23, 42, 0.08),
+    0 32px 64px -18px rgba(15, 23, 42, 0.28);
+  --rg-blur: blur(20px) saturate(180%);
+  --rg-radius-panel: 24px;
+  --rg-radius-card: 16px;
+
+  --cg-bg: var(--rg-bg);
+  --cg-bg-deep: var(--rg-bg-deep);
+  --cg-bg-panel: var(--rg-glass-strong);
+  --cg-bg-panel-2: var(--rg-glass);
+  --cg-bg-paper: rgba(255, 255, 255, 0.92);
+  --cg-bg-muted: var(--rg-glass-soft);
+  --cg-text: var(--rg-ink);
+  --cg-text-muted: var(--rg-ink-secondary);
+  --cg-text-subtle: #666870;
+  --cg-text-soft: var(--rg-ink-secondary);
+  --cg-dark-text: var(--rg-ink);
+  --cg-dark-muted: #5f6068;
+  --cg-dark-subtle: var(--rg-ink-tertiary);
+  --cg-text-paper: var(--rg-ink);
+  --cg-blue: var(--rg-accent);
+  --cg-cyan: var(--rg-accent);
+  --cg-amber: var(--rg-accent-strong);
+  --cg-brass: var(--rg-accent-deep);
+  --cg-copper: #b54708;
+  --cg-green: #16723b;
+  --cg-red: #b42318;
+  --cg-border: var(--rg-hairline);
+  --cg-border-strong: rgba(229, 72, 61, 0.46);
+  --cg-border-paper: var(--rg-hairline);
+  --cg-shadow-panel: var(--rg-shadow-raised);
+  --cg-shadow-blue: var(--rg-shadow-raised);
+  --cg-shadow-green: var(--rg-shadow-raised);
+  --cg-font-sans: var(--font-geist-sans), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(880px 520px at 8% -8%, rgba(243, 203, 200, 0.82), transparent 62%),
+    radial-gradient(760px 500px at 98% 7%, rgba(211, 231, 245, 0.78), transparent 62%),
+    radial-gradient(680px 440px at 52% 108%, rgba(241, 217, 210, 0.7), transparent 62%),
+    var(--rg-bg);
+  color: var(--rg-ink);
+  font-family: var(--cg-font-sans);
+  letter-spacing: -0.002em;
+}
+
+.repguard-page ::selection {
+  background: var(--rg-accent-soft);
+  color: var(--rg-ink);
+}
+
+.repguard-page .rg-shell {
+  position: relative;
+  z-index: 1;
+}
+
+.repguard-page .rg-topbar,
+.repguard-page .rg-local-pill,
+.repguard-page .rg-meta-pill,
+.repguard-page .rg-stage-rail {
+  border: 1px solid var(--rg-hairline);
+  background: var(--rg-glass);
+  -webkit-backdrop-filter: var(--rg-blur);
+  backdrop-filter: var(--rg-blur);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-resting);
+}
+
+.repguard-page .rg-topbar {
+  border-radius: var(--rg-radius-panel);
+}
+
+.repguard-page .rg-brand-mark {
+  border: 1px solid rgba(229, 72, 61, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 18px -10px rgba(166, 36, 32, 0.42);
+  object-fit: cover;
+}
+
+.repguard-page .rg-stage-rail,
+.repguard-page .rg-local-pill,
+.repguard-page .rg-meta-pill,
+.repguard-page .rg-mobile-stage {
+  border-radius: 9999px;
+}
+
+.repguard-page .rg-stage-rail {
+  box-shadow: var(--rg-bevel), inset 0 2px 8px rgba(15, 23, 42, 0.055);
+}
+
+.repguard-page .rg-stage-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  border-radius: 9999px;
+  padding: 0 14px;
+  color: var(--rg-ink-tertiary);
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.repguard-page .rg-stage-active {
+  background: var(--rg-accent-strong);
+  color: #fff8f7;
+  box-shadow: 0 8px 16px -10px rgba(166, 36, 32, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.repguard-page .rg-stage-complete:not(.rg-stage-active) {
+  background: var(--rg-accent-soft);
+  color: var(--rg-accent-deep);
+}
+
+.repguard-page .rg-mobile-stage {
+  border: 1px solid rgba(229, 72, 61, 0.2);
+  background: var(--rg-glass);
+  color: var(--rg-accent-deep);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-resting);
+}
+
+.repguard-page .rg-mobile-stage-count {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  letter-spacing: 0.02em;
+}
+
+.repguard-page .rg-eyebrow {
+  margin: 0;
+  color: var(--rg-accent-strong);
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.repguard-page .cg-evidence-surface,
+.repguard-page .cg-analyzer-panel,
+.repguard-page .cg-analysis-drawer {
+  border: 1px solid var(--rg-hairline);
+  border-radius: var(--rg-radius-panel);
+  background: var(--rg-glass-strong);
+  -webkit-backdrop-filter: var(--rg-blur);
+  backdrop-filter: var(--rg-blur);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-raised);
+}
+
+.repguard-page .cg-evidence-surface {
+  background:
+    radial-gradient(560px 280px at 48% 46%, rgba(229, 72, 61, 0.075), transparent 68%),
+    var(--rg-glass-strong);
+}
+
+.repguard-page .cg-evidence-surface-active {
+  border-color: rgba(229, 72, 61, 0.68);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-raised), 0 0 0 3px var(--rg-accent-soft);
+}
+
+.repguard-page .cg-workflow-has-evidence {
+  border-color: var(--rg-hairline-strong);
+}
+
+.repguard-page .cg-workflow-analyzing {
+  border-color: rgba(229, 72, 61, 0.34);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-raised), 0 0 0 3px rgba(229, 72, 61, 0.08);
+}
+
+.repguard-page .cg-workflow-complete {
+  border-color: rgba(36, 138, 76, 0.22);
+}
+
+.repguard-page .rg-upload-empty {
+  border-radius: 20px;
+}
+
+.repguard-page .rg-upload-icon {
+  border: 1px solid rgba(229, 72, 61, 0.2);
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-resting), 0 0 0 8px rgba(229, 72, 61, 0.055);
+}
+
+.repguard-page .cg-lab-chip,
+.repguard-page .rg-status-pill {
+  border: 1px solid var(--rg-hairline);
+  border-radius: 9999px;
+  background: var(--rg-glass);
+  color: var(--rg-ink-secondary);
+  box-shadow: var(--rg-bevel), 0 6px 14px -12px rgba(15, 23, 42, 0.28);
+}
+
+.repguard-page .cg-primary-button {
+  border: 1px solid rgba(166, 36, 32, 0.72);
+  background: var(--rg-accent-strong);
+  color: #fff8f7;
+  box-shadow: 0 12px 24px -12px rgba(166, 36, 32, 0.74), inset 0 1px 0 rgba(255, 255, 255, 0.26);
+}
+
+.repguard-page .cg-primary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--rg-accent-deep);
+  box-shadow: 0 16px 30px -12px rgba(166, 36, 32, 0.78), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.repguard-page .cg-primary-button:active:not(:disabled),
+.repguard-page .rg-secondary-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.repguard-page .cg-primary-button:disabled {
+  border-color: var(--rg-hairline);
+  background: rgba(15, 23, 42, 0.1);
+  color: var(--rg-ink-tertiary);
+  box-shadow: none;
+}
+
+.repguard-page .rg-secondary-button {
+  border: 1px solid var(--rg-hairline);
+  border-radius: 9999px;
+  background: var(--rg-glass);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-resting);
+}
+
+.repguard-page .rg-secondary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(229, 72, 61, 0.24);
+  background: var(--rg-glass-strong);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-raised);
+}
+
+.repguard-page :where(button, input):focus-visible {
+  outline: none;
+  box-shadow: var(--rg-bevel), var(--rg-shadow-raised), 0 0 0 3px var(--rg-accent-ring);
+}
+
+.repguard-page summary:focus-visible {
+  outline: none;
+  border-radius: calc(var(--rg-radius-card) - 1px);
+  box-shadow: inset 0 0 0 3px var(--rg-accent-ring);
+}
+
+.repguard-page .cg-preview-frame {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86), inset 0 0 0 1px rgba(15, 23, 42, 0.025);
+}
+
+.repguard-page .cg-preview-frame-complete {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86), 0 0 0 1px rgba(36, 138, 76, 0.12);
+}
+
+.repguard-page .rg-command-bar {
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  backdrop-filter: blur(16px) saturate(170%);
+  box-shadow: 0 12px 24px -20px rgba(15, 23, 42, 0.28);
+}
+
+.repguard-page .rg-status-pill {
+  border-color: rgba(36, 138, 76, 0.18);
+  background: rgba(36, 138, 76, 0.08);
+}
+
+.repguard-page .cg-analyzer-panel {
+  background:
+    radial-gradient(360px 220px at 92% 4%, rgba(229, 72, 61, 0.08), transparent 72%),
+    var(--rg-glass-strong);
+}
+
+.repguard-page .cg-analyzer-panel-active {
+  border-color: rgba(229, 72, 61, 0.3);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-floating), 0 0 0 3px rgba(229, 72, 61, 0.07);
+}
+
+.repguard-page .cg-analyzer-panel-complete {
+  border-color: rgba(36, 138, 76, 0.2);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-raised);
+}
+
+.repguard-page .rg-review-item,
+.repguard-page .rg-recommendation-card,
+.repguard-page .cg-metric-card,
+.repguard-page .rg-empty-signal,
+.repguard-page .rg-signal-item,
+.repguard-page .rg-note-callout,
+.repguard-page .rg-code-panel {
+  border: 1px solid var(--rg-hairline);
+  border-radius: var(--rg-radius-card);
+  background: var(--rg-glass-soft);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.56);
+}
+
+.repguard-page .rg-review-item {
+  color: var(--rg-ink-secondary);
+}
+
+.repguard-page .cg-metric-card-complete {
+  border-color: rgba(229, 72, 61, 0.16);
+  background: rgba(255, 255, 255, 0.54);
+  box-shadow: inset 3px 0 0 rgba(229, 72, 61, 0.62), inset 1px 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+.repguard-page .rg-analysis-progress,
+.repguard-page .rg-score-meaning,
+.repguard-page .rg-error-callout,
+.repguard-page .rg-warning-callout,
+.repguard-page .rg-customer-safe {
+  border-radius: var(--rg-radius-card);
+}
+
+.repguard-page .rg-analysis-progress,
+.repguard-page .rg-score-meaning {
+  border: 1px solid rgba(229, 72, 61, 0.18);
+  background: rgba(229, 72, 61, 0.075);
+}
+
+.repguard-page .rg-error-callout {
+  border: 1px solid rgba(180, 35, 24, 0.2);
+  background: rgba(180, 35, 24, 0.075);
+}
+
+.repguard-page .rg-warning-callout {
+  border: 1px solid rgba(181, 71, 8, 0.18);
+  background: rgba(181, 71, 8, 0.07);
+}
+
+.repguard-page .rg-customer-safe {
+  border: 1px solid rgba(36, 138, 76, 0.18);
+  background: rgba(36, 138, 76, 0.075);
+}
+
+.repguard-page .rg-signal-item-dark,
+.repguard-page .rg-signal-item-light {
+  color: var(--rg-ink);
+}
+
+.repguard-page .cg-risk-low {
+  border-color: rgba(36, 138, 76, 0.28);
+  background: rgba(36, 138, 76, 0.1);
+  color: #176a39;
+}
+
+.repguard-page .cg-risk-medium {
+  border-color: rgba(181, 71, 8, 0.28);
+  background: rgba(181, 71, 8, 0.1);
+  color: #8a3f08;
+}
+
+.repguard-page .cg-risk-high {
+  border-color: rgba(180, 35, 24, 0.28);
+  background: rgba(180, 35, 24, 0.1);
+  color: #8f1c13;
+}
+
+.repguard-page .cg-analysis-drawer {
+  overflow: hidden;
+}
+
+.repguard-page .rg-detail-section {
+  overflow: hidden;
+  border: 1px solid var(--rg-hairline);
+  border-radius: var(--rg-radius-card);
+  background: var(--rg-glass);
+  box-shadow: var(--rg-bevel), var(--rg-shadow-resting);
+}
+
+.repguard-page .rg-detail-section[open] {
+  background: var(--rg-glass-strong);
+}
+
+.repguard-page .rg-code-panel {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  white-space: pre-wrap;
+}
+
+.repguard-page .cg-result-reveal {
+  animation: rg-result-settle 240ms ease-out both;
+}
+
+.repguard-page .cg-analyzer-scroll {
+  scrollbar-color: rgba(229, 72, 61, 0.28) transparent;
+  scrollbar-width: thin;
+}
+
+@keyframes rg-result-settle {
+  from {
+    opacity: 0.72;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1023px) {
+  .repguard-page .cg-analyzer-panel {
+    min-height: 480px;
+  }
+
+  .repguard-page .cg-analyzer-scroll {
+    overflow: visible;
+  }
+}
+
+@media (max-width: 639px) {
+  .repguard-page .rg-topbar {
+    min-height: 68px;
+    border-radius: 20px;
+  }
+
+  .repguard-page .rg-brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .repguard-page .rg-wordmark {
+    font-size: 25px;
+  }
+
+  .repguard-page .rg-hero {
+    padding-top: 18px;
+  }
+
+  .repguard-page .cg-evidence-surface,
+  .repguard-page .cg-analyzer-panel,
+  .repguard-page .cg-analysis-drawer {
+    border-radius: 20px;
+  }
+
+  .repguard-page .rg-command-bar > div:last-child {
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .repguard-page *,
+  .repguard-page *::before,
+  .repguard-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
