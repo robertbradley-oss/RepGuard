@@ -529,8 +529,8 @@ export function ClaimReviewWorkflow() {
       <header className="rg-topbar flex min-h-[76px] items-center justify-between gap-4 px-1 py-3 md:px-2">
         <div className="rg-brand-lockup flex min-w-0 items-center gap-3">
           <Image
-            className="rg-brand-mark size-12 shrink-0 object-contain"
-            src="/brand/claimguard-mark.png"
+            className="rg-brand-mark size-[52px] -translate-y-0.5 shrink-0 object-contain"
+            src="/brand/claimguard-mark-clean.png"
             alt=""
             width={1024}
             height={1024}

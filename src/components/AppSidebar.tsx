@@ -49,7 +49,7 @@ export function AppSidebar() {
       <div className="flex h-12 items-center gap-2.5">
         <Image
           className="size-11 shrink-0 object-contain"
-          src="/brand/claimguard-mark.png"
+          src="/brand/claimguard-mark-clean.png"
           alt=""
           width={1024}
           height={1024}
