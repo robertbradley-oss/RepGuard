@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/repguard-logo.png" alt="RepGuard" width="760">
+</p>
+
 # RepGuard
 
 RepGuard is an evidence and claim review workspace for organizing support cases, uploaded evidence, and risk signals.
