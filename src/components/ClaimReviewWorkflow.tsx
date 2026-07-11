@@ -530,7 +530,7 @@ export function ClaimReviewWorkflow() {
         <div className="rg-brand-lockup flex min-w-0 items-center gap-3">
           <Image
             className="rg-brand-mark size-[52px] -translate-y-0.5 shrink-0 object-contain"
-            src="/brand/claimguard-mark-clean.png"
+            src="/brand/claimguard-mark-corrected.png"
             alt=""
             width={1024}
             height={1024}
