@@ -46,16 +46,19 @@ const navGroups = [
 export function AppSidebar() {
   return (
     <aside className="border-b border-white/10 bg-[#020713] px-4 py-5 text-white lg:min-h-screen lg:border-b-0 lg:border-r lg:border-white/10">
-      <div className="relative h-12 w-44 overflow-hidden lg:w-full">
+      <div className="flex h-12 items-center gap-2.5">
         <Image
-          className="object-contain object-left"
-          src="/brand/repguard-logo-full-red.png"
-          alt="RepGuard logo"
-          fill
+          className="size-11 shrink-0 object-contain"
+          src="/brand/claimguard-mark.png"
+          alt=""
+          width={1024}
+          height={1024}
           priority
-          unoptimized
-          sizes="200px"
         />
+        <p className="truncate text-[25px] font-semibold leading-none tracking-[-0.035em]">
+          <span className="text-white">Rep</span>
+          <span className="text-[#f52222]">Guard</span>
+        </p>
       </div>
       <p className="mt-3 text-xs leading-5 text-[var(--cg-text-muted)]">Evidence. Intelligence. Trust.</p>
 
