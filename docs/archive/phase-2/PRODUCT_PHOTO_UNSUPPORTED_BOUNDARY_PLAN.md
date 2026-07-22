@@ -2,7 +2,7 @@
 
 > Status: Phase 2.4.10 implemented the recommended no-live `pre-analysis-evidence-gate` contract/probe from this plan. `src/lib/analysis/pre-analysis-evidence-gate.ts` exports `PRE_ANALYSIS_EVIDENCE_GATE_STATUS` and `buildPreAnalysisEvidenceGateDecision`; `src/lib/analysis/pre-analysis-evidence-gate.probe.ts` exports `PRE_ANALYSIS_EVIDENCE_GATE_DEVELOPER_PROBE` and is registered with `check:product-photo-probes`. The gate is decision-only, fully self-contained, and unwired from upload/UI/live report adapter/runtime; it adds no OCR/metadata processing. The remaining sections describe the planning rationale and remain accurate for the future runtime-integration gates.
 
-> Phase 2.6.1 note: `PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md` keeps this unsupported-boundary rationale intact and recommends a future default-off thin wrapper, not an in-place `analyzeEvidenceFile` migration, as the safest first guard-only implementation path.
+> Phase 2.6.1 note: `docs/archive/phase-2/PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md` keeps this unsupported-boundary rationale intact and recommends a future default-off thin wrapper, not an in-place `analyzeEvidenceFile` migration, as the safest first guard-only implementation path.
 
 > Phase 2.6.2 note: the default-off runtime wrapper now derives privacy-safe gate hints from filename, MIME/type, and optional declared/source category only. Its File-to-hints adapter gives legacy damage/product cues precedence over receipt-ish mixed hints so enabled non-allow outcomes stop before the analyzer call.
 
@@ -216,7 +216,7 @@ Protected files for Phase 2.4.10 unless Robert explicitly opens a broader runtim
 - `src/components/TestEvidenceHarness.tsx`.
 - Routes, upload files, live report mapping, receipt fixtures, product-photo runtime analyzer/routing adapter, providers, storage, integrations, case queues, real photos, real metadata fixtures, deployment files, and package dependencies.
 
-`PRODUCT_PHOTO_DEV_HARNESS_PLAN.md` remains appropriate for later, but dev-only harness work should wait until the pre-analysis gate contract/probe exists and passes. `REPO_SOURCE_OF_TRUTH.md` cleanup can wait unless Robert requests a tiny docs-only alignment pass.
+`docs/archive/phase-2/PRODUCT_PHOTO_DEV_HARNESS_PLAN.md` remains appropriate for later, but dev-only harness work should wait until the pre-analysis gate contract/probe exists and passes. `REPO_SOURCE_OF_TRUTH.md` cleanup can wait unless Robert requests a tiny docs-only alignment pass.
 
 Suggested next prompt:
 

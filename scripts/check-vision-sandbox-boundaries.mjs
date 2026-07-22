@@ -217,15 +217,25 @@ const allowedChangedFiles = new Set([
   "AGENTS.md",
   "AGENT_LOG.md",
   ".env.example",
+  "LICENSE",
   "NEXT_STEPS.md",
+  "README.md",
   "REPO_SOURCE_OF_TRUTH.md",
   "ROADMAP.md",
+  "docs/README.md",
   "package.json",
   "scripts/check-report-semantics.mjs",
   "scripts/check-vision-sandbox-boundaries.mjs",
   "scripts/check-vision-sandbox-fixture-runner.cjs",
   "scripts/check-vision-sandbox-skeleton.cjs",
 ]);
+
+const documentationMigrationPrefixes = [
+  "docs/archive/",
+  "docs/operations/",
+  "docs/product/",
+  "docs/qa/",
+];
 
 for (const changedFile of changedFiles) {
   if (
@@ -238,6 +248,7 @@ for (const changedFile of changedFiles) {
 
   if (
     !allowedChangedFiles.has(changedFile) &&
+    !documentationMigrationPrefixes.some((prefix) => changedFile.startsWith(prefix)) &&
     !changedFile.startsWith(sandboxSkeletonSourcePrefix) &&
     !/^PHASE_4_(?:26|27|28|29|30|31|32|33|34|35|36|37|38|39|40)_/.test(changedFile) &&
     !changedFile.startsWith("sandbox-fixtures/") &&
@@ -483,7 +494,7 @@ for (const file of allTextFiles) {
   }
 }
 
-ensurePatterns("Phase 4.25 implementation plan package-safety signal", findFile("PHASE_4_25_VALIDATION_PROBE_IMPLEMENTATION_PLAN.md"), [
+ensurePatterns("Phase 4.25 implementation plan package-safety signal", findFile("docs/archive/phase-4/PHASE_4_25_VALIDATION_PROBE_IMPLEMENTATION_PLAN.md"), [
   /Package\/Distribution Safety Checks/,
   /Commit-Blocking Vs Package-Blocking Behavior/,
   /The next recommended task is Phase 4\.26 local static validation\/probe implementation only/,

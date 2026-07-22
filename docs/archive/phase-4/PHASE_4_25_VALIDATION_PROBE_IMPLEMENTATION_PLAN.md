@@ -44,12 +44,12 @@ The Phase 4.26 static check should inspect:
 - `scripts/check-report-semantics.mjs`
 - `scripts/run-product-photo-probes.cjs`
 - New static validation scripts under `scripts/`, if added.
-- `PHASE_4_19_OPENAI_VISION_SANDBOX_PLAN.md`
-- `PHASE_4_20_OPENAI_VISION_PROMPT_OUTPUT_CONTRACT_PLAN.md`
-- `PHASE_4_21_OPENAI_VISION_SANDBOX_SCHEMA_PLAN.md`
-- `PHASE_4_22_OPENAI_VISION_SANDBOX_FIXTURE_POLICY_PLAN.md`
-- `PHASE_4_23_OPENAI_VISION_SANDBOX_VALIDATION_PROBE_PLAN.md`
-- `PHASE_4_24_SYNTHETIC_FIXTURE_METADATA_SCHEMA_PLAN.md`
+- `docs/archive/phase-4/PHASE_4_19_OPENAI_VISION_SANDBOX_PLAN.md`
+- `docs/archive/phase-4/PHASE_4_20_OPENAI_VISION_PROMPT_OUTPUT_CONTRACT_PLAN.md`
+- `docs/archive/phase-4/PHASE_4_21_OPENAI_VISION_SANDBOX_SCHEMA_PLAN.md`
+- `docs/archive/phase-4/PHASE_4_22_OPENAI_VISION_SANDBOX_FIXTURE_POLICY_PLAN.md`
+- `docs/archive/phase-4/PHASE_4_23_OPENAI_VISION_SANDBOX_VALIDATION_PROBE_PLAN.md`
+- `docs/archive/phase-4/PHASE_4_24_SYNTHETIC_FIXTURE_METADATA_SCHEMA_PLAN.md`
 - This Phase 4.25 implementation plan.
 - Future Phase 4.27 metadata directories, only after that phase creates them.
 - Future Phase 4.29 fixture directories, only after that phase creates them.

@@ -1,6 +1,6 @@
 # Product-Photo Runtime Blockers Plan
 
-> Status: Phase 2.4.10 implemented the no-live `pre-analysis-evidence-gate` contract/probe, and Phase 2.5 added both dev-only review harnesses. The runtime blockers below remain accurate. Phase 2.6.0 (`PHASE_2_6_RUNTIME_SCOPE_PLAN.md`) is the canonical runtime-facing sequencing plan and identifies a guard-only gate wiring (block/quarantine before OCR/metadata, no product-photo analysis, additive unsupported result that avoids `LocalAnalysisResult` migration) as the safest eventual first runtime slice. Phase 2.6.1 (`PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md`) resolves the docs-only design recommendation: a thin default-off wrapper/probe implementation for a future Phase 2.6.2, still unwired from UI/upload/live report adapter routes. No runtime implementation is authorized.
+> Status: Phase 2.4.10 implemented the no-live `pre-analysis-evidence-gate` contract/probe, and Phase 2.5 added both dev-only review harnesses. The runtime blockers below remain accurate. Phase 2.6.0 (`docs/archive/phase-2/PHASE_2_6_RUNTIME_SCOPE_PLAN.md`) is the canonical runtime-facing sequencing plan and identifies a guard-only gate wiring (block/quarantine before OCR/metadata, no product-photo analysis, additive unsupported result that avoids `LocalAnalysisResult` migration) as the safest eventual first runtime slice. Phase 2.6.1 (`docs/archive/phase-2/PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md`) resolves the docs-only design recommendation: a thin default-off wrapper/probe implementation for a future Phase 2.6.2, still unwired from UI/upload/live report adapter routes. No runtime implementation is authorized.
 
 > Phase 2.6.2 note: `src/lib/analysis/pre-analysis-evidence-gate-runtime.ts` and `.probe.ts` now add the default-off wrapper/probe boundary. The wrapper remains unwired from live UI/upload/report paths and does not make product-photo runtime live.
 
@@ -10,7 +10,7 @@ Phase 2.4 adapter readiness planning is complete enough to close the adapter-rea
 
 Product-photo runtime remains non-live. `runtimeLive` remains false, `manualReviewOnly` remains true, `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior remains unchanged.
 
-Phase 2.4.5 note: the docs-only legacy `damage-photo` quarantine/migration plan now lives in `LEGACY_DAMAGE_PHOTO_QUARANTINE_PLAN.md`. It chooses filename/evidence-type classification before live analyzer execution as the safest first future hardening boundary and recommends Phase 2.4.6 as a no-live classifier quarantine hardening slice.
+Phase 2.4.5 note: the docs-only legacy `damage-photo` quarantine/migration plan now lives in `docs/archive/phase-2/LEGACY_DAMAGE_PHOTO_QUARANTINE_PLAN.md`. It chooses filename/evidence-type classification before live analyzer execution as the safest first future hardening boundary and recommends Phase 2.4.6 as a no-live classifier quarantine hardening slice.
 
 Phase 2.4.6 note: no-live legacy classifier quarantine hardening is complete. The live filename/evidence-type classifier now lives in `src/lib/analysis/analyzer-classifier.ts` and collapses legacy damage/product/photo/crack image filename cues to the existing receipt/default path instead of returning `damage-photo`.
 
@@ -222,7 +222,7 @@ Stop future work if:
 
 ## Phase 2.4.5 Decision, Phase 2.4.6 Hardening, Phase 2.4.8 Review, And Recommended Phase 2.4.9
 
-Phase 2.4.5 is complete as the docs-only legacy `damage-photo` quarantine/migration plan in `LEGACY_DAMAGE_PHOTO_QUARANTINE_PLAN.md`.
+Phase 2.4.5 is complete as the docs-only legacy `damage-photo` quarantine/migration plan in `docs/archive/phase-2/LEGACY_DAMAGE_PHOTO_QUARANTINE_PLAN.md`.
 
 Decision:
 
@@ -244,7 +244,7 @@ Phase 2.4.6 is complete as no-live legacy `damage-photo` classifier quarantine h
 
 Phase 2.4.8 review confirms the classifier quarantine is complete enough for its intended no-live scope. It is acceptable only short-term that product-photo-like filenames collapse into the existing receipt/default analyzer flow. The remaining risk is that those files still reach OCR and metadata processing before a true unsupported boundary exists.
 
-Phase 2.4.9 is complete as docs-only pre-OCR/pre-metadata unsupported boundary planning in `PRODUCT_PHOTO_UNSUPPORTED_BOUNDARY_PLAN.md`.
+Phase 2.4.9 is complete as docs-only pre-OCR/pre-metadata unsupported boundary planning in `docs/archive/phase-2/PRODUCT_PHOTO_UNSUPPORTED_BOUNDARY_PLAN.md`.
 
 Decision:
 
@@ -259,9 +259,9 @@ The safest next milestone is Phase 2.4.10: no-live `pre-analysis-evidence-gate` 
 Likely allowed files for Phase 2.4.9 docs-only status/planning updates must be named by the future prompt and should stay narrow:
 
 - `NEXT_STEPS.md`.
-- `PHASE_2_PHOTO_EVIDENCE_PLAN.md`.
-- `PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`.
-- `LEGACY_DAMAGE_PHOTO_QUARANTINE_PLAN.md`.
+- `docs/archive/phase-2/PHASE_2_PHOTO_EVIDENCE_PLAN.md`.
+- `docs/archive/phase-2/PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`.
+- `docs/archive/phase-2/LEGACY_DAMAGE_PHOTO_QUARANTINE_PLAN.md`.
 - `AGENT_LOG.md`.
 
 Protected files for Phase 2.4.9 unless separately authorized:

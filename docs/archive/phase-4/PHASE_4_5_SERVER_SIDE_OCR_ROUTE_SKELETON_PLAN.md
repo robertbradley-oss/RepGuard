@@ -6,7 +6,7 @@ It prepares an implementation-ready plan for a future synthetic-only/mock-provid
 
 ## Current State
 
-Phase 4.0 documented AI/OCR/photo intelligence readiness. Phase 4.1 documented the provider-neutral OCR/provider architecture. Phase 4.2 implemented the non-live synthetic OCR fixture harness in `src/lib/analysis/ocr-fixture-harness.ts` with probe coverage. Phase 4.3 implemented the non-live provider-neutral OCR extraction contract in `src/lib/analysis/ocr-extraction-contract.ts` with probe coverage. Phase 4.4 documented future server-side OCR route and data-flow requirements in `PHASE_4_4_SERVER_SIDE_OCR_ROUTE_DATA_FLOW_PLAN.md`.
+Phase 4.0 documented AI/OCR/photo intelligence readiness. Phase 4.1 documented the provider-neutral OCR/provider architecture. Phase 4.2 implemented the non-live synthetic OCR fixture harness in `src/lib/analysis/ocr-fixture-harness.ts` with probe coverage. Phase 4.3 implemented the non-live provider-neutral OCR extraction contract in `src/lib/analysis/ocr-extraction-contract.ts` with probe coverage. Phase 4.4 documented future server-side OCR route and data-flow requirements in `docs/archive/phase-4/PHASE_4_4_SERVER_SIDE_OCR_ROUTE_DATA_FLOW_PLAN.md`.
 
 The latest pushed checkpoint before this milestone is `7f8090b` (`docs: plan phase 4.4 server-side ocr route data flow`).
 

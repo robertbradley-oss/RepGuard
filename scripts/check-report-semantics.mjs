@@ -78,7 +78,7 @@ const filesToCheck = [
   "scripts/check-vision-sandbox-fixture-runner.cjs",
   "scripts/check-vision-sandbox-skeleton.cjs",
   "package.json",
-  "TEST_EVIDENCE.md",
+  "docs/qa/TEST_EVIDENCE.md",
 ];
 
 const readRequiredFile = (filePath) => {
@@ -122,80 +122,80 @@ const mockProviderAdapterCorpus = `${mockProviderAdapter}\n${mockProviderAdapter
 const mockProviderRoute = fileContents.get("src/app/api/analysis/mock-provider/route.ts") ?? "";
 const mockProviderRouteProbe = fileContents.get("src/app/api/analysis/mock-provider/route.probe.ts") ?? "";
 const mockProviderRouteCorpus = `${mockProviderRoute}\n${mockProviderRouteProbe}`;
-const phase49ProviderSelectionPlan = readRequiredFile("PHASE_4_9_OCR_PROVIDER_SELECTION_PLAN.md");
-const phase410ProviderAbstractionPlan = readRequiredFile("PHASE_4_10_PROVIDER_ABSTRACTION_PLAN.md");
-const phase411MockProviderAdapterPlan = readRequiredFile("PHASE_4_11_MOCK_PROVIDER_ADAPTER_PLAN.md");
+const phase49ProviderSelectionPlan = readRequiredFile("docs/archive/phase-4/PHASE_4_9_OCR_PROVIDER_SELECTION_PLAN.md");
+const phase410ProviderAbstractionPlan = readRequiredFile("docs/archive/phase-4/PHASE_4_10_PROVIDER_ABSTRACTION_PLAN.md");
+const phase411MockProviderAdapterPlan = readRequiredFile("docs/archive/phase-4/PHASE_4_11_MOCK_PROVIDER_ADAPTER_PLAN.md");
 const phase413MockProviderSafetyCheckpoint = readRequiredFile(
-  "PHASE_4_13_MOCK_PROVIDER_ADAPTER_SAFETY_READINESS_CHECKPOINT.md",
+  "docs/archive/phase-4/PHASE_4_13_MOCK_PROVIDER_ADAPTER_SAFETY_READINESS_CHECKPOINT.md",
 );
 const phase414MockProviderDeveloperUsage = readRequiredFile(
-  "PHASE_4_14_MOCK_PROVIDER_ADAPTER_DEVELOPER_USAGE.md",
+  "docs/archive/phase-4/PHASE_4_14_MOCK_PROVIDER_ADAPTER_DEVELOPER_USAGE.md",
 );
 const phase415MockAdapterRouteIntegrationPlan = readRequiredFile(
-  "PHASE_4_15_MOCK_ADAPTER_ROUTE_INTEGRATION_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_15_MOCK_ADAPTER_ROUTE_INTEGRATION_PLAN.md",
 );
 const phase417MockProviderRouteSafetyCheckpoint = readRequiredFile(
-  "PHASE_4_17_MOCK_PROVIDER_ROUTE_SAFETY_READINESS_CHECKPOINT.md",
+  "docs/archive/phase-4/PHASE_4_17_MOCK_PROVIDER_ROUTE_SAFETY_READINESS_CHECKPOINT.md",
 );
 const phase418MockProviderRouteDeveloperUsage = readRequiredFile(
-  "PHASE_4_18_MOCK_PROVIDER_ROUTE_DEVELOPER_USAGE.md",
+  "docs/archive/phase-4/PHASE_4_18_MOCK_PROVIDER_ROUTE_DEVELOPER_USAGE.md",
 );
-const phase419OpenAiVisionSandboxPlan = readRequiredFile("PHASE_4_19_OPENAI_VISION_SANDBOX_PLAN.md");
+const phase419OpenAiVisionSandboxPlan = readRequiredFile("docs/archive/phase-4/PHASE_4_19_OPENAI_VISION_SANDBOX_PLAN.md");
 const phase420OpenAiVisionPromptOutputContractPlan = readRequiredFile(
-  "PHASE_4_20_OPENAI_VISION_PROMPT_OUTPUT_CONTRACT_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_20_OPENAI_VISION_PROMPT_OUTPUT_CONTRACT_PLAN.md",
 );
 const phase421OpenAiVisionSandboxSchemaPlan = readRequiredFile(
-  "PHASE_4_21_OPENAI_VISION_SANDBOX_SCHEMA_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_21_OPENAI_VISION_SANDBOX_SCHEMA_PLAN.md",
 );
 const phase422OpenAiVisionSandboxFixturePolicyPlan = readRequiredFile(
-  "PHASE_4_22_OPENAI_VISION_SANDBOX_FIXTURE_POLICY_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_22_OPENAI_VISION_SANDBOX_FIXTURE_POLICY_PLAN.md",
 );
 const phase423OpenAiVisionSandboxValidationProbePlan = readRequiredFile(
-  "PHASE_4_23_OPENAI_VISION_SANDBOX_VALIDATION_PROBE_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_23_OPENAI_VISION_SANDBOX_VALIDATION_PROBE_PLAN.md",
 );
 const phase424SyntheticFixtureMetadataSchemaPlan = readRequiredFile(
-  "PHASE_4_24_SYNTHETIC_FIXTURE_METADATA_SCHEMA_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_24_SYNTHETIC_FIXTURE_METADATA_SCHEMA_PLAN.md",
 );
 const phase425ValidationProbeImplementationPlan = readRequiredFile(
-  "PHASE_4_25_VALIDATION_PROBE_IMPLEMENTATION_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_25_VALIDATION_PROBE_IMPLEMENTATION_PLAN.md",
 );
-const phase426SandboxValidationProbes = readRequiredFile("PHASE_4_26_SANDBOX_VALIDATION_PROBES.md");
+const phase426SandboxValidationProbes = readRequiredFile("docs/archive/phase-4/PHASE_4_26_SANDBOX_VALIDATION_PROBES.md");
 const visionSandboxBoundaryChecker = readRequiredFile("scripts/check-vision-sandbox-boundaries.mjs");
-const phase427SyntheticFixtureMetadata = readRequiredFile("PHASE_4_27_SYNTHETIC_FIXTURE_METADATA.md");
+const phase427SyntheticFixtureMetadata = readRequiredFile("docs/archive/phase-4/PHASE_4_27_SYNTHETIC_FIXTURE_METADATA.md");
 const phase427SyntheticFixtureRegistry = readRequiredFile(
   "fixtures/vision-sandbox/metadata/synthetic-fixture-registry.json",
 );
-const phase428SyntheticFixtureCreationPlan = readRequiredFile("PHASE_4_28_SYNTHETIC_FIXTURE_CREATION_PLAN.md");
-const phase429SyntheticVisionFixtures = readRequiredFile("PHASE_4_29_SYNTHETIC_VISION_FIXTURES.md");
+const phase428SyntheticFixtureCreationPlan = readRequiredFile("docs/archive/phase-4/PHASE_4_28_SYNTHETIC_FIXTURE_CREATION_PLAN.md");
+const phase429SyntheticVisionFixtures = readRequiredFile("docs/archive/phase-4/PHASE_4_29_SYNTHETIC_VISION_FIXTURES.md");
 const phase430OpenAiVisionSandboxSkeletonPlan = readRequiredFile(
-  "PHASE_4_30_OPENAI_VISION_SANDBOX_SKELETON_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_30_OPENAI_VISION_SANDBOX_SKELETON_PLAN.md",
 );
 const phase432VisionSandboxFixtureRunnerValidation = readRequiredFile(
-  "PHASE_4_32_VISION_SANDBOX_FIXTURE_RUNNER_VALIDATION.md",
+  "docs/archive/phase-4/PHASE_4_32_VISION_SANDBOX_FIXTURE_RUNNER_VALIDATION.md",
 );
 const phase433VisionSandboxDeveloperUsageReadiness = readRequiredFile(
-  "PHASE_4_33_VISION_SANDBOX_DEVELOPER_USAGE_READINESS.md",
+  "docs/archive/phase-4/PHASE_4_33_VISION_SANDBOX_DEVELOPER_USAGE_READINESS.md",
 );
 const phase434OpenAiVisionProviderConfigPlan = readRequiredFile(
-  "PHASE_4_34_OPENAI_VISION_PROVIDER_CONFIG_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_34_OPENAI_VISION_PROVIDER_CONFIG_PLAN.md",
 );
 const phase435OpenAiVisionSandboxImplementationPlan = readRequiredFile(
-  "PHASE_4_35_OPENAI_VISION_SANDBOX_IMPLEMENTATION_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_35_OPENAI_VISION_SANDBOX_IMPLEMENTATION_PLAN.md",
 );
 const phase436OpenAiVisionSandboxApprovalCheckpoint = readRequiredFile(
-  "PHASE_4_36_OPENAI_VISION_SANDBOX_APPROVAL_CHECKPOINT.md",
+  "docs/archive/phase-4/PHASE_4_36_OPENAI_VISION_SANDBOX_APPROVAL_CHECKPOINT.md",
 );
 const phase437OpenAiVisionProviderConfigSkeleton = readRequiredFile(
-  "PHASE_4_37_OPENAI_VISION_PROVIDER_CONFIG_SKELETON.md",
+  "docs/archive/phase-4/PHASE_4_37_OPENAI_VISION_PROVIDER_CONFIG_SKELETON.md",
 );
 const phase438OpenAiVisionProviderConfigHardening = readRequiredFile(
-  "PHASE_4_38_OPENAI_VISION_PROVIDER_CONFIG_HARDENING.md",
+  "docs/archive/phase-4/PHASE_4_38_OPENAI_VISION_PROVIDER_CONFIG_HARDENING.md",
 );
 const phase439ProviderConfigDeveloperUsageAndApiCreditReadiness = readRequiredFile(
-  "PHASE_4_39_PROVIDER_CONFIG_DEVELOPER_USAGE_AND_API_CREDIT_READINESS.md",
+  "docs/archive/phase-4/PHASE_4_39_PROVIDER_CONFIG_DEVELOPER_USAGE_AND_API_CREDIT_READINESS.md",
 );
 const phase440ApiCreditApprovalAndFirstLiveSandboxCallPlan = readRequiredFile(
-  "PHASE_4_40_API_CREDIT_APPROVAL_AND_FIRST_LIVE_SANDBOX_CALL_PLAN.md",
+  "docs/archive/phase-4/PHASE_4_40_API_CREDIT_APPROVAL_AND_FIRST_LIVE_SANDBOX_CALL_PLAN.md",
 );
 const envExample = readRequiredFile(".env.example");
 const visionSandboxSkeletonCorpus = [
@@ -2473,8 +2473,8 @@ const requiredPhase425ValidationProbeImplementationPlanSignals = [
     label: "files to inspect",
     patterns: [
       /`package\.json`/,
-      /`PHASE_4_19_OPENAI_VISION_SANDBOX_PLAN\.md`/,
-      /`PHASE_4_24_SYNTHETIC_FIXTURE_METADATA_SCHEMA_PLAN\.md`/,
+      /`docs\/archive\/phase-4\/PHASE_4_19_OPENAI_VISION_SANDBOX_PLAN\.md`/,
+      /`docs\/archive\/phase-4\/PHASE_4_24_SYNTHETIC_FIXTURE_METADATA_SCHEMA_PLAN\.md`/,
       /`src\/app\/api\/analysis\/ocr\/route\.ts`/,
       /`src\/app\/api\/analysis\/mock-provider\/route\.ts`/,
       /`src\/lib\/analysis\/providers\/mock-provider-adapter\.ts`/,

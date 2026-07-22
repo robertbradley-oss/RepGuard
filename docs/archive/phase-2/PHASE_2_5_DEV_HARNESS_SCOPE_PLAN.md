@@ -8,7 +8,7 @@ It does not implement a harness, route, component, render-case file, adapter/gat
 
 Phase 2.4 is closed as a non-live adapter/readiness/runtime-blocker phase. Product-photo runtime remains non-live. `runtimeLive` remains false, `manualReviewOnly` remains true, `analyzeEvidenceFile` remains the live receipt analyzer entrypoint, `LocalAnalysisResult` remains receipt-shaped, and receipt behavior remains unchanged. Latest pushed commit at planning time: `ecc45cd` (`docs: align agents phase 2.4 status`).
 
-This plan extends `PRODUCT_PHOTO_DEV_HARNESS_PLAN.md` (which scoped only the adapter-readiness harness) to also cover the Phase 2.4.10 `pre-analysis-evidence-gate` decision outputs. Where the two docs overlap, the stricter constraint wins.
+This plan extends `docs/archive/phase-2/PRODUCT_PHOTO_DEV_HARNESS_PLAN.md` (which scoped only the adapter-readiness harness) to also cover the Phase 2.4.10 `pre-analysis-evidence-gate` decision outputs. Where the two docs overlap, the stricter constraint wins.
 
 ## 1. What Phase 2.5 Is
 
@@ -95,7 +95,7 @@ If Robert explicitly opens a Phase 2.5 implementation slice, allowed files shoul
 - A clearly isolated dev-only display component only if necessary, e.g. `src/components/DevReadinessReviewPanel.tsx`. Reuse of `ProductPhotoReviewPanel` is allowed only if a future prompt explicitly resolves duplicate-id/browser-QA concerns first.
 - `scripts/check-report-semantics.mjs`, only to add harness semantic/import/privacy coverage.
 - `scripts/run-product-photo-probes.cjs` or a harness probe, only if the future prompt explicitly asks for executable harness probes.
-- Docs/status files: `PHASE_2_5_DEV_HARNESS_SCOPE_PLAN.md`, `PRODUCT_PHOTO_DEV_HARNESS_PLAN.md`, `PHASE_2_PHOTO_EVIDENCE_PLAN.md`, `NEXT_STEPS.md`, `AGENT_LOG.md`, `ROADMAP.md`.
+- Docs/status files: `docs/archive/phase-2/PHASE_2_5_DEV_HARNESS_SCOPE_PLAN.md`, `docs/archive/phase-2/PRODUCT_PHOTO_DEV_HARNESS_PLAN.md`, `docs/archive/phase-2/PHASE_2_PHOTO_EVIDENCE_PLAN.md`, `NEXT_STEPS.md`, `AGENT_LOG.md`, `ROADMAP.md`.
 
 Any future file name must include dev-only / adapter-readiness / gate-review intent. Avoid names that imply live product-photo support.
 
@@ -127,7 +127,7 @@ These must remain unchanged for any Phase 2.5 harness implementation unless Robe
 - No provider/storage/integration/case-queue scan.
 - Unsafe wording scan (report-semantics corpus): no proof/verification/approval/rejection/confirmed-wrongdoing/automatic-disposition wording.
 - Privacy/raw-marker scan: no raw EXIF, raw metadata, original filenames, raw label/serial values, exact dimensions, GPS, timestamps, customer/ticket/order/case/claim/evidence/provider/storage/integration IDs.
-- Browser QA only if a rendered route/component is added (see `PRODUCT_PHOTO_DEV_HARNESS_PLAN.md` Browser QA Criteria).
+- Browser QA only if a rendered route/component is added (see `docs/archive/phase-2/PRODUCT_PHOTO_DEV_HARNESS_PLAN.md` Browser QA Criteria).
 - Every new harness file must be covered by `scripts/check-report-semantics.mjs`. Missing semantic coverage for a new harness file is a stop condition.
 
 ## 8. Stop Conditions
@@ -169,7 +169,7 @@ Phase 2.5.1 allowed files:
 - `src/app/dev/pre-analysis-evidence-gate/page.tsx`.
 - `src/app/dev/pre-analysis-evidence-gate/render-cases.ts` (type-only import of `PreAnalysisEvidenceGateDecision`; literal synthetic decisions only).
 - `scripts/check-report-semantics.mjs`, only to add harness semantic/import/privacy coverage for the new files.
-- `NEXT_STEPS.md`, `AGENT_LOG.md`, `PHASE_2_5_DEV_HARNESS_SCOPE_PLAN.md`.
+- `NEXT_STEPS.md`, `AGENT_LOG.md`, `docs/archive/phase-2/PHASE_2_5_DEV_HARNESS_SCOPE_PLAN.md`.
 
 Phase 2.5.1 protected files: all files in Section 6, plus all existing `src/lib/analysis/*.ts` behavior.
 

@@ -18,8 +18,8 @@ The current sandbox foundation appears ready for an approval decision, not for u
 - The fixture runner exists at `src/lib/analysis/vision-sandbox/fixture-runner.ts`.
 - The synthetic fixture metadata registry exists at `fixtures/vision-sandbox/metadata/synthetic-fixture-registry.json`.
 - Synthetic SVG assets and markdown simulations exist under `fixtures/vision-sandbox/assets/` and `fixtures/vision-sandbox/simulations/`.
-- The provider configuration plan exists in `PHASE_4_34_OPENAI_VISION_PROVIDER_CONFIG_PLAN.md`.
-- The real OpenAI Vision sandbox implementation plan exists in `PHASE_4_35_OPENAI_VISION_SANDBOX_IMPLEMENTATION_PLAN.md`.
+- The provider configuration plan exists in `docs/archive/phase-4/PHASE_4_34_OPENAI_VISION_PROVIDER_CONFIG_PLAN.md`.
+- The real OpenAI Vision sandbox implementation plan exists in `docs/archive/phase-4/PHASE_4_35_OPENAI_VISION_SANDBOX_IMPLEMENTATION_PLAN.md`.
 - Boundary checks exist through `scripts/check-vision-sandbox-boundaries.mjs`.
 - Package-safety checks exist through metadata flags, sandbox output guards, fixture-runner validation, and boundary scans.
 - Semantic safety checks exist through `scripts/check-report-semantics.mjs`.

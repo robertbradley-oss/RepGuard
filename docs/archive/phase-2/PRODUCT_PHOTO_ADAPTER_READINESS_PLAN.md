@@ -6,7 +6,7 @@ Phase 2.3 analyzer hardening is closed. Product-photo analyzer, result, report v
 
 Phase 2.4.1 implementation note: the first guarded non-live adapter readiness boundary now exists inside `src/lib/analysis/product-photo-routing-adapter.ts` as `prepareProductPhotoAdapterReadinessForDevOnlyBoundary`, with active probe coverage in `src/lib/analysis/product-photo-adapter-readiness.probe.ts`. It remains dev/probe-only and does not open live product-photo routing.
 
-Phase 2.4.2 is complete, review-only, and clean. Phase 2.4.3 is a docs-only dev-only adapter review harness plan in `PRODUCT_PHOTO_DEV_HARNESS_PLAN.md`; it does not implement a harness, route, component, runtime adapter execution, upload path, live report mapping, provider, storage, integration, case queue, real photo, or real metadata fixture. Phase 2.4.4 closes adapter readiness planning as complete enough for the non-live checkpoint and records next runtime blockers in `PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`. Phase 2.4.5 documents the legacy `damage-photo` quarantine/migration decision in `LEGACY_DAMAGE_PHOTO_QUARANTINE_PLAN.md`.
+Phase 2.4.2 is complete, review-only, and clean. Phase 2.4.3 is a docs-only dev-only adapter review harness plan in `docs/archive/phase-2/PRODUCT_PHOTO_DEV_HARNESS_PLAN.md`; it does not implement a harness, route, component, runtime adapter execution, upload path, live report mapping, provider, storage, integration, case queue, real photo, or real metadata fixture. Phase 2.4.4 closes adapter readiness planning as complete enough for the non-live checkpoint and records next runtime blockers in `docs/archive/phase-2/PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`. Phase 2.4.5 documents the legacy `damage-photo` quarantine/migration decision in `docs/archive/phase-2/LEGACY_DAMAGE_PHOTO_QUARANTINE_PLAN.md`.
 
 ## 1. Phase 2.4 Objective
 
@@ -176,8 +176,8 @@ Likely allowed files for Phase 2.4.1, if the implementation prompt explicitly op
 - `scripts/run-product-photo-probes.cjs`, only to register the new probe.
 - `scripts/check-report-semantics.mjs`, only to guard the new adapter/probe files.
 - `NEXT_STEPS.md`.
-- `PHASE_2_PHOTO_EVIDENCE_PLAN.md`.
-- `PRODUCT_PHOTO_ADAPTER_READINESS_PLAN.md`.
+- `docs/archive/phase-2/PHASE_2_PHOTO_EVIDENCE_PLAN.md`.
+- `docs/archive/phase-2/PRODUCT_PHOTO_ADAPTER_READINESS_PLAN.md`.
 - `AGENT_LOG.md`.
 
 Any future file name should make the non-live intent obvious. Avoid names that imply live routing, upload handling, report mapping, workflow insertion, or provider execution.
@@ -247,7 +247,7 @@ The Phase 2.4.3 dev harness planning gate is intentionally separate from the ada
 
 A future dev-only adapter review harness may display only literal synthetic adapter-readiness cases. It must not call `prepareProductPhotoAdapterReadinessForDevOnlyBoundary` from a route or component, because route-level adapter execution could blur a developer review surface into runtime adapter behavior. At most, future render cases may use type-only imports for the adapter readiness output shape.
 
-The complete harness plan lives in `PRODUCT_PHOTO_DEV_HARNESS_PLAN.md` and defines:
+The complete harness plan lives in `docs/archive/phase-2/PRODUCT_PHOTO_DEV_HARNESS_PLAN.md` and defines:
 
 - Safe purpose and non-live scope.
 - Synthetic readiness cases.
@@ -272,6 +272,6 @@ Closeout means:
 - Passing adapter probes cannot be inferred as live product-photo readiness.
 - `readinessAccepted` means contract/shape accepted, not runtime-ready.
 
-Remaining blockers have moved to `PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`.
+Remaining blockers have moved to `docs/archive/phase-2/PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`.
 
 Phase 2.4.5 is complete as docs-only legacy `damage-photo` quarantine/migration planning. The documented first-boundary rule is filename/evidence-type classification before live analyzer execution. The safest next task is Phase 2.4.6 no-live classifier quarantine hardening; do not start dev-only adapter harness implementation or runtime-facing product-photo work until that classifier ambiguity is hardened or explicitly re-planned.

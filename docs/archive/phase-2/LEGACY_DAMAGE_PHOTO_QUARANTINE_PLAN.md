@@ -24,7 +24,7 @@ Future code hardening should prevent legacy `damage-photo` from entering the liv
 
 Allowed docs-only historical references:
 
-- `AGENTS.md`, `ROUTING.md`, `REPO_SOURCE_OF_TRUTH.md`, `ROADMAP.md`, `NEXT_STEPS.md`, `PHASE_2_PHOTO_EVIDENCE_PLAN.md`, `PRODUCT_PHOTO_ADAPTER_READINESS_PLAN.md`, `PRODUCT_PHOTO_DEV_HARNESS_PLAN.md`, and `PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md` may refer to `damage-photo` only as legacy receipt-era/mock terminology, compatibility alias, quarantine target, or historical phase context.
+- `AGENTS.md`, `ROUTING.md`, `REPO_SOURCE_OF_TRUTH.md`, `ROADMAP.md`, `NEXT_STEPS.md`, `docs/archive/phase-2/PHASE_2_PHOTO_EVIDENCE_PLAN.md`, `docs/archive/phase-2/PRODUCT_PHOTO_ADAPTER_READINESS_PLAN.md`, `docs/archive/phase-2/PRODUCT_PHOTO_DEV_HARNESS_PLAN.md`, and `docs/archive/phase-2/PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md` may refer to `damage-photo` only as legacy receipt-era/mock terminology, compatibility alias, quarantine target, or historical phase context.
 
 Allowed probe and quarantine references:
 
@@ -205,7 +205,7 @@ Phase 2.4.8 review status:
 
 Phase 2.4.9 planning status:
 
-- The docs-only unsupported-boundary plan now lives in `PRODUCT_PHOTO_UNSUPPORTED_BOUNDARY_PLAN.md`.
+- The docs-only unsupported-boundary plan now lives in `docs/archive/phase-2/PRODUCT_PHOTO_UNSUPPORTED_BOUNDARY_PLAN.md`.
 - The recommended future boundary name is `pre-analysis-evidence-gate`.
 - Future no-live implementation should stop product-photo-like synthetic filename/type hints before OCR/metadata processing while preserving receipt/PDF/screenshot behavior.
 - Legacy `damage-photo` remains quarantine-only and non-canonical.

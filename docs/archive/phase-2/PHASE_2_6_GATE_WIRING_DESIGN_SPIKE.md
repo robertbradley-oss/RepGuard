@@ -231,7 +231,7 @@ Allowed files, if Robert explicitly opens follow-up maintenance on Phase 2.6.2:
 - `src/lib/analysis/pre-analysis-evidence-gate-runtime.probe.ts` for receipt-preservation and gate-wiring probes.
 - `scripts/run-product-photo-probes.cjs` only to register the new probe.
 - `scripts/check-report-semantics.mjs` only to add semantic/import/privacy guards for the wrapper/probe.
-- `PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md`, `PHASE_2_6_RUNTIME_SCOPE_PLAN.md`, `NEXT_STEPS.md`, `ROADMAP.md`, `PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`, and `AGENT_LOG.md` for status updates.
+- `docs/archive/phase-2/PHASE_2_6_GATE_WIRING_DESIGN_SPIKE.md`, `docs/archive/phase-2/PHASE_2_6_RUNTIME_SCOPE_PLAN.md`, `NEXT_STEPS.md`, `ROADMAP.md`, `docs/archive/phase-2/PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`, and `AGENT_LOG.md` for status updates.
 
 Allowed only if the implementation reveals a tiny type-only placement need and Robert explicitly approves it:
 

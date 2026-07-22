@@ -458,6 +458,6 @@ Phase 3.1 is ready to close when:
 
 - This design concept exists.
 - Source-of-truth docs point to Phase 3.2 as the next implementation candidate only with explicit approval.
-- `DESIGN.md` includes the Case Review Command Center direction.
+- `docs/product/DESIGN.md` includes the Case Review Command Center direction.
 - No runtime/UI/code/route/component files changed.
 - Docs-safe checks pass.

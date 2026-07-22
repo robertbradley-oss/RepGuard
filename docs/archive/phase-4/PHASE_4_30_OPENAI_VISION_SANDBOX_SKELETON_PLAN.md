@@ -262,7 +262,7 @@ Before Phase 4.31 implementation:
 
 - Confirm `main` is clean and synced.
 - Re-read this Phase 4.30 plan.
-- Re-read `PHASE_4_26_SANDBOX_VALIDATION_PROBES.md`.
+- Re-read `docs/archive/phase-4/PHASE_4_26_SANDBOX_VALIDATION_PROBES.md`.
 - Re-read existing OCR and mock-provider route probes.
 - Confirm no route option is approved unless Robert explicitly says so.
 
