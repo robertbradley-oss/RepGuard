@@ -101,7 +101,7 @@ ClaimGuard should look like a fraud-risk evidence review command center for supp
 
 ## Phase 3 Case Review Command Center Direction
 
-Phase 3.1 is documented in `PHASE_3_1_CASE_WORKFLOW_DESIGN_CONCEPT.md`. This is product/design planning only and does not authorize implementation.
+Phase 3.1 is documented in `docs/archive/phase-3/PHASE_3_1_CASE_WORKFLOW_DESIGN_CONCEPT.md`. This is product/design planning only and does not authorize implementation.
 
 The future Case Review Command Center should extend the current evidence workspace into a multi-evidence case file:
 

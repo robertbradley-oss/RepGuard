@@ -1,6 +1,6 @@
 # Product-Photo Dev-Only Adapter Review Harness Plan
 
-> Status: Phase 2.5.0 supersedes the phase framing here. `PHASE_2_5_DEV_HARNESS_SCOPE_PLAN.md` is the canonical Phase 2.5 dev-only adapter/gate review harness scope plan and extends this doc to also cover `pre-analysis-evidence-gate` decision outputs. The adapter-readiness harness scope below remains accurate; where the two docs overlap, the stricter constraint wins.
+> Status: Phase 2.5.0 supersedes the phase framing here. `docs/archive/phase-2/PHASE_2_5_DEV_HARNESS_SCOPE_PLAN.md` is the canonical Phase 2.5 dev-only adapter/gate review harness scope plan and extends this doc to also cover `pre-analysis-evidence-gate` decision outputs. The adapter-readiness harness scope below remains accurate; where the two docs overlap, the stricter constraint wins.
 
 This is the Phase 2.4.3 docs-only plan for a possible future adapter review harness.
 
@@ -143,7 +143,7 @@ The following gates must stay closed:
 
 The legacy live receipt-era `damage-photo` filename classification path remains a pre-runtime blocker. It must be quarantined or migrated in a separate authorized slice before any live product-photo runtime support can be considered. The adapter readiness quarantine does not by itself clean up that legacy live receipt-shaped path.
 
-Phase 2.4.9 update: the classifier-label blocker is quarantined, but a broader residual risk remains because product-photo-like filenames can still collapse into the receipt/default OCR and metadata path. `PRODUCT_PHOTO_UNSUPPORTED_BOUNDARY_PLAN.md` defines the future no-live `pre-analysis-evidence-gate` plan. Dev-only adapter harness work remains appropriate later, but it should wait until the pre-analysis gate contract/probe exists and passes.
+Phase 2.4.9 update: the classifier-label blocker is quarantined, but a broader residual risk remains because product-photo-like filenames can still collapse into the receipt/default OCR and metadata path. `docs/archive/phase-2/PRODUCT_PHOTO_UNSUPPORTED_BOUNDARY_PLAN.md` defines the future no-live `pre-analysis-evidence-gate` plan. Dev-only adapter harness work remains appropriate later, but it should wait until the pre-analysis gate contract/probe exists and passes.
 
 ## Semantic And Probe Requirements
 
@@ -204,9 +204,9 @@ If Robert explicitly opens a future implementation slice, the exact allowed impl
 - `scripts/check-report-semantics.mjs`, only to add harness semantic/privacy/import coverage.
 - `src/app/dev/product-photo-adapter-readiness/product-photo-adapter-readiness-harness.probe.ts`, only if the future prompt explicitly asks for executable harness probes.
 - `NEXT_STEPS.md`.
-- `PRODUCT_PHOTO_DEV_HARNESS_PLAN.md`.
-- `PRODUCT_PHOTO_ADAPTER_READINESS_PLAN.md`.
-- `PHASE_2_PHOTO_EVIDENCE_PLAN.md`.
+- `docs/archive/phase-2/PRODUCT_PHOTO_DEV_HARNESS_PLAN.md`.
+- `docs/archive/phase-2/PRODUCT_PHOTO_ADAPTER_READINESS_PLAN.md`.
+- `docs/archive/phase-2/PHASE_2_PHOTO_EVIDENCE_PLAN.md`.
 - `AGENT_LOG.md`.
 
 Any future file name must include dev-only or adapter-readiness intent. Avoid names that imply live product-photo support.
@@ -239,7 +239,7 @@ The following files must remain protected for any future harness implementation 
 
 ## Phase 2.4.4 Recommendation
 
-Phase 2.4.4 is docs-only: adapter readiness closeout and next-runtime-blockers planning. The closeout and blocker inventory live in `PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`.
+Phase 2.4.4 is docs-only: adapter readiness closeout and next-runtime-blockers planning. The closeout and blocker inventory live in `docs/archive/phase-2/PRODUCT_PHOTO_RUNTIME_BLOCKERS_PLAN.md`.
 
 The Phase 2.4.4 task should:
 

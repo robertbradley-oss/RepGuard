@@ -57,6 +57,10 @@ npm run lint
 npm run build
 ```
 
+## Documentation
+
+The repository root stays focused on the project and its active operating guidance. Product, QA, operations, and completed phase documentation are organized in the [documentation index](docs/README.md).
+
 ## Current Status
 
 RepGuard is an active prototype for exploring claim review, evidence organization, and support-case risk workflows.
@@ -68,3 +72,7 @@ It is focused on internal review support, local analysis behavior, and safer rep
 - RepStack: review collection and pay-period tracking app
 - RepReport: review parser and export helper
 - RepOS: customer support workflow system prototype
+
+## License
+
+MIT. See [LICENSE](LICENSE).
