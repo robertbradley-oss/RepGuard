@@ -7,6 +7,8 @@ The repository root contains the public project overview and the small set of op
 - [Product design](product/DESIGN.md)
 - [Test evidence and QA](qa/TEST_EVIDENCE.md)
 - [ClaimGuard agent command](operations/CLAIMGUARD_AGENT_COMMAND.md)
+- [Agent inbox](operations/AGENT_INBOX.md)
+- [Agent work log](operations/AGENT_LOG.md)
 
 ## Historical Planning
 

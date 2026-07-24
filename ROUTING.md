@@ -120,6 +120,6 @@ The Main ClaimGuard Agent should request another pass when a handoff is vague, m
 
 ## Command Guidance
 
-Direct `/claimguardagent` tasks are executed immediately in the current thread and are not added to `AGENT_INBOX.md`.
+Direct `/claimguardagent` tasks are executed immediately in the current thread and are not added to `docs/operations/AGENT_INBOX.md`.
 
-Queued future requests can go in `AGENT_INBOX.md`, but each request should be small enough for one focused agent pass.
+Queued future requests can go in `docs/operations/AGENT_INBOX.md`, but each request should be small enough for one focused agent pass.

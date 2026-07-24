@@ -215,19 +215,22 @@ const protectedRuntimeFiles = [
 
 const allowedChangedFiles = new Set([
   "AGENTS.md",
-  "AGENT_LOG.md",
+  "docs/operations/AGENT_LOG.md",
   ".env.example",
   "LICENSE",
   "NEXT_STEPS.md",
   "README.md",
   "REPO_SOURCE_OF_TRUTH.md",
   "ROADMAP.md",
+  "ROUTING.md",
   "docs/README.md",
   "package.json",
+  ".github/workflows/ci.yml",
   "scripts/check-report-semantics.mjs",
   "scripts/check-vision-sandbox-boundaries.mjs",
   "scripts/check-vision-sandbox-fixture-runner.cjs",
   "scripts/check-vision-sandbox-skeleton.cjs",
+  "scripts/claimguardagent.ps1",
 ]);
 
 const documentationMigrationPrefixes = [

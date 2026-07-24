@@ -2,7 +2,7 @@
 
 This file is the source of truth for ClaimGuard agent roles, safety rules, handoff expectations, and phase-aware operating discipline.
 
-For quick routing, read `ROUTING.md`. For durable product direction, read `ROADMAP.md`. For the immediate working queue, read `NEXT_STEPS.md`. For repo path and release discipline, read `REPO_SOURCE_OF_TRUTH.md`. For prior agent work, read `AGENT_LOG.md`.
+For quick routing, read `ROUTING.md`. For durable product direction, read `ROADMAP.md`. For the immediate working queue, read `NEXT_STEPS.md`. For repo path and release discipline, read `REPO_SOURCE_OF_TRUTH.md`. For prior agent work, read `docs/operations/AGENT_LOG.md`.
 
 ## Current Product State
 
@@ -38,8 +38,8 @@ Important local files:
 - `NEXT_STEPS.md`: immediate operational queue.
 - `ROUTING.md`: compact agent-routing reference.
 - `REPO_SOURCE_OF_TRUTH.md`: repo path, checks, branch, and release discipline.
-- `AGENT_LOG.md`: project-agent work log.
-- `AGENT_INBOX.md`: queued user requests only; do not add direct `/claimguardagent` tasks here.
+- `docs/operations/AGENT_LOG.md`: project-agent work log.
+- `docs/operations/AGENT_INBOX.md`: queued user requests only; do not add direct `/claimguardagent` tasks here.
 
 ## Primary Operating Rule
 
@@ -299,7 +299,7 @@ Files to inspect first:
 - `NEXT_STEPS.md`
 - `AGENTS.md`
 - `ROUTING.md`
-- `AGENT_LOG.md`
+- `docs/operations/AGENT_LOG.md`
 
 Hard constraints:
 
@@ -768,7 +768,7 @@ When not to use:
 Files to inspect first:
 
 - `REPO_SOURCE_OF_TRUTH.md`
-- `AGENT_LOG.md`
+- `docs/operations/AGENT_LOG.md`
 - `package.json`
 - Deployment notes if added later
 - Git status and recent commit history
@@ -869,7 +869,7 @@ Files to inspect first:
 - `ROADMAP.md`
 - `NEXT_STEPS.md`
 - `AGENTS.md`
-- `AGENT_LOG.md`
+- `docs/operations/AGENT_LOG.md`
 
 Hard constraints:
 
@@ -940,7 +940,7 @@ When Robert sends a message that starts with:
 /claimguardagent
 ```
 
-Treat the rest of the message as a direct ClaimGuard project-agent task and perform it immediately in the current thread. Do not add the same task to `AGENT_INBOX.md`.
+Treat the rest of the message as a direct ClaimGuard project-agent task and perform it immediately in the current thread. Do not add the same task to `docs/operations/AGENT_INBOX.md`.
 
 Direct command tasks must follow this file, `ROUTING.md`, `NEXT_STEPS.md`, and `REPO_SOURCE_OF_TRUTH.md`; use mock or synthetic data only unless explicitly approved; preserve customer-safe language; and end with the expanded CLAIMGUARD HANDOFF.
 

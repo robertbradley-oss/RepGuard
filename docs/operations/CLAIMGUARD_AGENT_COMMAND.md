@@ -14,7 +14,7 @@ Example:
 
 When Codex receives a message that starts with `/claimguardagent`, it should act as the Main ClaimGuard Agent described in `AGENTS.md`. The Main ClaimGuard Agent is the orchestrator/supervisor: it classifies the task and phase, selects and delegates to the best specialized agent, defines in-scope and out-of-scope work, critiques the specialist output, requires another pass when the work is not strong enough, respects `ROUTING.md`, and preserves the phase boundaries in `ROADMAP.md`.
 
-Direct `/claimguardagent` tasks are not added to `AGENT_INBOX.md`.
+Direct `/claimguardagent` tasks are not added to `docs/operations/AGENT_INBOX.md`.
 
 ## Source-Of-Truth Docs
 
@@ -39,10 +39,10 @@ It should apply the secondary-review triggers in `AGENTS.md` and `ROUTING.md`, s
 
 ## Future Task Inbox
 
-Use `AGENT_INBOX.md` only for future queued work. You can add a durable future task from PowerShell:
+Use `docs/operations/AGENT_INBOX.md` only for future queued work. You can add a durable future task from PowerShell:
 
 ```powershell
 .\scripts\claimguardagent.ps1 "plan the next approved ClaimGuard documentation task"
 ```
 
-The autonomous ClaimGuard heartbeat agent reads `AGENT_INBOX.md` during scheduled runs. This is separate from `/claimguardagent`, which runs now.
+The autonomous ClaimGuard heartbeat agent reads `docs/operations/AGENT_INBOX.md` during scheduled runs. This is separate from `/claimguardagent`, which runs now.
