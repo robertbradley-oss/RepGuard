@@ -8,10 +8,10 @@ param(
 $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$inboxPath = Join-Path $projectRoot "AGENT_INBOX.md"
+$inboxPath = Join-Path $projectRoot "docs\operations\AGENT_INBOX.md"
 
 if (-not (Test-Path -LiteralPath $inboxPath)) {
-  throw "AGENT_INBOX.md was not found at $inboxPath"
+  throw "docs/operations/AGENT_INBOX.md was not found at $inboxPath"
 }
 
 $taskText = ($Task -join " ").Trim()
