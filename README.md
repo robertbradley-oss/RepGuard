@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/repguard-logo.png" alt="RepGuard" width="760">
+  <img src="docs/assets/repguard-logo-transparent.png" alt="RepGuard" width="480">
 </p>
 
 # RepGuard
