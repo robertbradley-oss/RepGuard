@@ -1,5 +1,7 @@
 # ClaimGuard Repo Source Of Truth
 
+Operating instructions are in `AGENTS.md`. The Phase-Aware Workflow below preserves historical checkpoints; earlier planning restrictions describe those slices, not the current implementation state or a requirement to repeat completed work. For the current queue, use `NEXT_STEPS.md` **Current Recommended Next Prompt** and current user authorization.
+
 Use `C:\Users\robby\Projects\ClaimGuard` as the active ClaimGuard source-of-truth repo.
 
 Do not make ClaimGuard code, fixture, package, or documentation edits in `C:\Users\robby\OneDrive\Documents\GitHub\claimguard`. That OneDrive checkout is an outdated duplicate and should be treated as read-only reference material unless Robert explicitly says otherwise.
@@ -121,13 +123,13 @@ The OneDrive Documents path may exist as a shell starting point, but it is not t
 Before editing:
 
 - Confirm you are in `C:\Users\robby\Projects\ClaimGuard`.
-- Confirm the selected agent and phase boundary.
+- Confirm the requested scope and relevant implementation boundary.
 - Identify whether the task touches docs/config, UI, analyzer/parser/scoring/report/privacy logic, fixtures, dependencies, or release/deploy workflow.
 - Confirm private evidence is not being introduced.
 
 ## Stop And Report Conditions
 
-Stop and report before continuing when:
+Resolve issues within the authorized scope; pause only the affected action when the issue cannot safely be resolved:
 
 - The active path is not `C:\Users\robby\Projects\ClaimGuard`.
 - Work appears to be in a OneDrive duplicate or outdated checkout.
@@ -136,7 +138,7 @@ Stop and report before continuing when:
 - Real customer evidence, private customer data, raw OCR, copied private JSON, or credentials appear in files or logs.
 - Unsafe wrongdoing-confirming language, customer-accusation language, or automatic-denial language appears.
 - Product-photo runtime behavior, UI/upload wiring, analyzer routing, live report mapping, scoring/report/parser/fixture changes, or provider/storage/integration/case-queue work appears before Robert explicitly opens that runtime slice.
-- A required check fails or cannot run.
+- A required check still fails after investigation or cannot run; report the limitation without claiming success.
 
 ## Check Guidance
 

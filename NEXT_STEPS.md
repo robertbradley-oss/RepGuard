@@ -1,6 +1,6 @@
 # ClaimGuard Next Steps
 
-This file is the near-term operational queue. Keep it short, current, and actionable.
+The **Current Recommended Next Prompt** section is the current operational queue. Earlier checkpoint lists and phase plans are retained as historical context, not instructions to repeat completed work. Read those details only for the relevant task. Current user authorization and AGENTS.md govern execution.
 
 Use `ROADMAP.md` for durable product roadmap, future modules, and phase definitions.
 
@@ -154,7 +154,7 @@ Use `ROADMAP.md` for durable product roadmap, future modules, and phase definiti
 - `product-photo` is canonical.
 - `damage-photo` remains only a compatibility alias to `product-photo` / `damage-close-up`.
 
-## Next Safe Tasks
+## Historical Phase 2 Next Tasks
 
 1. Run Phase 3.0 planning-only case workflow readiness. Define case states, audit/history needs, reviewer actions, privacy/retention boundaries, and handoff requirements without implementing UI, persistence, integrations, auth, or live unsupported/product-photo runtime.
 2. Keep Phase 3 implementation blocked until Robert explicitly opens a named implementation slice.
