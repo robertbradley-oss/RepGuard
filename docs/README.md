@@ -1,6 +1,6 @@
 # RepGuard Documentation
 
-The repository root contains the public project overview and the small set of operational files used by the ClaimGuard agent workflow. Supporting material is organized here so the project remains easy to scan without losing its development history.
+Product notes, QA instructions, and ClaimGuard agent records are collected here. The project overview and current operating guidance live in the repository root.
 
 ## Current References
 
@@ -17,4 +17,4 @@ The repository root contains the public project overview and the small set of op
 - [Phase 3: case workflow planning](archive/phase-3/)
 - [Phase 4: OCR and vision sandbox planning](archive/phase-4/)
 
-The archive preserves completed planning and readiness artifacts. Current operating state remains defined by the root `ROADMAP.md`, `NEXT_STEPS.md`, `REPO_SOURCE_OF_TRUTH.md`, and `AGENTS.md`.
+The archive records earlier planning and readiness reviews. For current scope and constraints, read the root `ROADMAP.md`, `NEXT_STEPS.md`, `REPO_SOURCE_OF_TRUTH.md`, and `AGENTS.md`.

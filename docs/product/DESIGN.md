@@ -1,15 +1,15 @@
 # ClaimGuard Design System
 
-ClaimGuard should look like a fraud-risk evidence review command center for support and warranty teams. It should not look like a generic white-card SaaS template, a default shadcn demo, or a centered landing page.
+ClaimGuard is an evidence review workspace for support and warranty teams. Give the evidence viewer the most space, with case details and review signals beside it. Avoid generic white-card layouts, default component demos, and centered landing-page layouts.
 
 ## Design Principles
 
-- Evidence first: every screen should communicate claim evidence, document review, and support decisioning.
-- Evidence viewer first: uploaded receipts, screenshots, PDFs, and product photos should feel like inspected artifacts, not generic attachments.
+- Show claim evidence and document details where support reps can use them during review.
+- Make uploaded receipts, screenshots, PDFs, and product photos easy to inspect in the evidence viewer.
 - Keep the primary screen minimal: left navigation, calm case header, dominant central evidence viewer, compact right risk/signals stack, lower case context, and a small recent-case queue.
 - Dark operational shell: use deep navy and charcoal as the base, with bright but controlled blue and verification green accents.
 - Dense but readable: support reps should scan scores, tickets, evidence, review signals, and safe wording quickly.
-- Professional, not cyberpunk: forensic textures, grid lines, receipt-paper surfaces, and scanline accents are acceptable when subtle.
+- Keep forensic textures, grid lines, receipt-paper surfaces, and scanline accents subtle.
 - Support-safe: visual urgency can indicate review priority, but copy must never accuse a customer or confirm fraud.
 
 ## Tokens
@@ -50,7 +50,7 @@ ClaimGuard should look like a fraud-risk evidence review command center for supp
 - `--cg-shadow-panel`: `0 24px 80px rgba(0, 0, 0, 0.34)`.
 - `--cg-shadow-blue`: `0 0 0 1px rgba(53, 217, 255, 0.2), 0 18px 48px rgba(24, 183, 255, 0.12)`.
 - `--cg-shadow-green`: `0 0 0 1px rgba(74, 222, 128, 0.24), 0 18px 48px rgba(74, 222, 128, 0.1)`.
-- Glows should be restrained and tied to active review states, not random decoration.
+- Use restrained glows to mark active review states.
 
 ### Risk States
 
@@ -71,7 +71,7 @@ ClaimGuard should look like a fraud-risk evidence review command center for supp
 
 - Badges are compact, security-style labels with uppercase or short title-case text.
 - Use colored left dots, fine borders, and subtle glow for state.
-- Avoid pill overload; badges should convey risk, status, evidence type, or queue priority.
+- Reserve badges for risk, status, evidence type, or queue priority.
 
 ### Typography Scale
 

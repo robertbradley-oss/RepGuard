@@ -4,26 +4,18 @@
 
 # RepGuard
 
-RepGuard is an evidence and claim review workspace for organizing support cases, uploaded evidence, and risk signals.
+RepGuard is a prototype for reviewing receipts in support and warranty cases. It reads uploaded images and PDFs locally, flags details that need checking, and helps a support rep decide what to review next.
 
-It is built as a practical prototype for reviewing receipts, documents, photos, and case context without turning review signals into automatic claim decisions.
+Scores describe evidence quality and internal consistency. They do not verify a claim or make an automatic claim decision.
 
-## Why It Exists
+## What works
 
-Support claim reviews can involve scattered evidence, unclear receipt details, customer-safe wording concerns, and manual risk checks. RepGuard brings those pieces into a focused workspace so evidence can be reviewed more consistently.
+- Receipt image and PDF upload
+- Local OCR and receipt parsing
+- Review signals, reports, and support guidance
+- Synthetic evidence fixtures for testing
 
-The goal is to help support teams organize case context, identify review signals, and prepare clearer next steps while keeping final decisions in a manual review workflow.
-
-## Core Features
-
-- Evidence upload and review workflow for images and PDFs
-- Claim and case review workspace with a case command center
-- Risk signals and review indicators for manual support review
-- Receipt, document, and product-photo analysis paths
-- OCR and receipt parsing for local evidence review
-- Customer-safe report language and support guidance
-- Local and sandbox analysis flows for prototype validation
-- Dashboard-style case review surfaces for evidence, status, and review context
+The case command center is a static demo with synthetic cases and no saved state. Product-photo analysis is not live; OCR and vision provider work remains in isolated mock and synthetic-fixture sandboxes.
 
 ## Tech Stack
 
@@ -59,13 +51,7 @@ npm run build
 
 ## Documentation
 
-The repository root stays focused on the project and its active operating guidance. Product, QA, operations, and completed phase documentation are organized in the [documentation index](docs/README.md).
-
-## Current Status
-
-RepGuard is an active prototype for exploring claim review, evidence organization, and support-case risk workflows.
-
-It is focused on internal review support, local analysis behavior, and safer report language. It is not a production claim decision system.
+See the [documentation index](docs/README.md) for product notes, QA instructions, operating guidance, and phase history. RepGuard is not a production claim decision system.
 
 ## Related Projects
 
