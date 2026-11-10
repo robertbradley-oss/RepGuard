@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "check:report-semantics": "node scripts/check-report-semantics.mjs",
+    "check:receipt-regressions": "node scripts/check-receipt-regressions.cjs",
     "check:vision-sandbox-skeleton": "node scripts/check-vision-sandbox-skeleton.cjs",
     "check:vision-sandbox-fixture-runner": "node scripts/check-vision-sandbox-fixture-runner.cjs",
     "check:vision-sandbox-boundaries": "node scripts/check-vision-sandbox-boundaries.mjs",

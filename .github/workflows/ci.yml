@@ -26,6 +26,7 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm run check:report-semantics
+      - run: npm run check:receipt-regressions
       - run: npm run check:product-photo-probes
       - run: npm run check:vision-sandbox-skeleton
       - run: npm run check:vision-sandbox-fixture-runner

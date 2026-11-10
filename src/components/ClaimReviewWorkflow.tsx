@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Local object URL evidence previews cannot be optimized through next/image. */
 
-import { Fragment, useEffect, useMemo, useRef, useState, type DragEvent, type ReactNode } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type DragEvent, type ReactNode } from "react";
 import Image from "next/image";
 import {
   AlertTriangle,
@@ -332,6 +332,17 @@ export function ClaimReviewWorkflow() {
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [pdfPreviewError, setPdfPreviewError] = useState<string | null>(null);
   const [isPdfPreviewLoading, setIsPdfPreviewLoading] = useState(false);
+  const analysisRunId = useRef(0);
+  const analysisStepTimer = useRef<number | null>(null);
+  const invalidateAnalysis = useCallback(() => {
+    analysisRunId.current += 1;
+    if (analysisStepTimer.current !== null) {
+      window.clearInterval(analysisStepTimer.current);
+      analysisStepTimer.current = null;
+    }
+  }, []);
+
+  useEffect(() => invalidateAnalysis, [invalidateAnalysis]);
 
   const evidenceType = useMemo(() => getEvidenceTypeFromFile(selectedFile), [selectedFile]);
   const report = localReport ?? mockAnalysisReports[evidenceType];
@@ -419,6 +430,7 @@ export function ClaimReviewWorkflow() {
     }
 
     const isPdf = isPdfEvidenceFile(file);
+    invalidateAnalysis();
     setSelectedFile(file);
     setLocalAnalysisResult(null);
     setLocalReport(null);
@@ -471,6 +483,7 @@ export function ClaimReviewWorkflow() {
   }
 
   function handleReset() {
+    invalidateAnalysis();
     setSelectedFile(null);
     setLocalAnalysisResult(null);
     setLocalReport(null);
@@ -489,29 +502,39 @@ export function ClaimReviewWorkflow() {
       return;
     }
 
+    invalidateAnalysis();
+    const runId = analysisRunId.current;
+    const isCurrentRun = () => analysisRunId.current === runId;
     setLocalAnalysisResult(null);
     setLocalReport(null);
     setAnalysisError(null);
     setActiveAnalysisStep(0);
     setStatus("analyzing");
 
-    const stepTimer = window.setInterval(() => {
-      setActiveAnalysisStep((current) => Math.min(current + 1, mockAnalysisSteps.length - 1));
+    analysisStepTimer.current = window.setInterval(() => {
+      if (isCurrentRun()) {
+        setActiveAnalysisStep((current) => Math.min(current + 1, mockAnalysisSteps.length - 1));
+      }
     }, 900);
 
     try {
       const result = await analyzeEvidenceFile(selectedFile);
+      if (!isCurrentRun()) return;
       setLocalAnalysisResult(result);
       setLocalReport(mapLocalAnalysisToReport(result));
       setActiveAnalysisStep(mockAnalysisSteps.length - 1);
       setStatus("complete");
     } catch (error) {
+      if (!isCurrentRun()) return;
       console.error(error);
       setAnalysisError("Local analysis could not complete. Try a clearer image, a smaller PDF, or another evidence file.");
       setStatus("uploaded");
       setActiveAnalysisStep(0);
     } finally {
-      window.clearInterval(stepTimer);
+      if (isCurrentRun() && analysisStepTimer.current !== null) {
+        window.clearInterval(analysisStepTimer.current);
+        analysisStepTimer.current = null;
+      }
     }
   }
 
