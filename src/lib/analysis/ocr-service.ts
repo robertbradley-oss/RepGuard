@@ -138,13 +138,21 @@ async function runTesseract(image: File | HTMLCanvasElement, engine: OcrExtracti
   // Receipt bytes stay in the browser for Phase 1. Tesseract.js may still
   // download worker/core/language runtime assets unless self-hosted paths are
   // configured in a later bucket.
-  const { recognize } = await import("tesseract.js");
-  const result = await recognize(image, "eng", {
+  const { createWorker } = await import("tesseract.js");
+  const worker = await createWorker("eng", 1, {
     logger: () => undefined,
   });
-  const words = ((result.data as { words?: TesseractWord[] }).words ?? []).filter(
-    (word) => word.text?.trim(),
-  );
+  let result;
+  try {
+    result = await worker.recognize(image, {}, { text: true, blocks: true });
+  } finally {
+    await worker.terminate();
+  }
+  const words: TesseractWord[] = (result.data.blocks ?? [])
+    .flatMap((block) => block.paragraphs)
+    .flatMap((paragraph) => paragraph.lines)
+    .flatMap((line) => line.words)
+    .filter((word) => word.text?.trim());
   const lowConfidenceWords = words.filter((word) => typeof word.confidence === "number" && word.confidence < 55);
   const normalizedText = normalizeOcrText(result.data.text ?? "");
   const textTokens = normalizedText.split(/\s+/).filter(Boolean);
